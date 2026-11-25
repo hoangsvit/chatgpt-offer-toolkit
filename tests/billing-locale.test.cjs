@@ -18,3 +18,10 @@ test('unmapped region leaves currency empty rather than inventing USD',()=>{
 test('country edit suggests known currency case-insensitively',()=>{
  assert.equal(currencyForCountry(' jp '),'JPY');assert.equal(currencyForCountry('V'),null);
 });
+
+test('saved billing preference must contain explicit valid uppercase codes',()=>{
+ const parse=ctx.exports.parseBillingPreference;
+ assert.equal(parse({country:'VN',currency:'VND'}).country,'VN');
+ assert.equal(parse({country:'US',currency:'USD'}).currency,'USD');
+ for(const v of [null,{}, {country:'en-US',currency:'USD'},{country:'vn',currency:'VND'},{country:'VN',currency:'bad!'}])assert.equal(parse(v),null);
+});
