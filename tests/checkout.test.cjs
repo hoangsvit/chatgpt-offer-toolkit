@@ -2,11 +2,14 @@ const test = require("node:test");
 const assert = require("node:assert/strict");
 const vm = require("node:vm");
 const fs = require("node:fs");
-const source = fs.readFileSync("extension/checkout.js","utf8");
+const ts = require("typescript");
+const source = ts.transpileModule(fs.readFileSync("utils/checkout.ts","utf8"), {
+  compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 }
+}).outputText;
 function load({origin="https://chatgpt.com",fetch=async()=>{throw Error("unexpected request")}}={}){
-  const ctx=vm.createContext({URL,location:{origin},fetch});
+  const ctx=vm.createContext({URL,location:{origin},fetch,exports:{}});
   vm.runInContext(source,ctx);
-  return ctx;
+  return ctx.exports;
 }
 const config={workspace:"MyTeam",seats:5,country:"VN",currency:"USD"};
 test("config validation",()=>{

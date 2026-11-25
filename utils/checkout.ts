@@ -1,4 +1,14 @@
-function validateConfig(input) {
+export interface CheckoutConfig {
+  workspace: string;
+  seats: number;
+  country: string;
+  currency: string;
+}
+export type CheckoutInput = Omit<CheckoutConfig, "seats"> & { seats: number | string };
+export type CheckoutResult = { url: string; error?: never } | { error: string; url?: never };
+
+// This function is serialized and injected into the active tab. Keep it self-contained.
+export function validateConfig(input: CheckoutInput): CheckoutConfig {
   const workspace = input.workspace.trim();
   const seats = Number(input.seats);
   const country = input.country.trim().toUpperCase();
@@ -8,13 +18,13 @@ function validateConfig(input) {
   }
   return {workspace, seats, country, currency};
 }
-function validCheckoutUrl(value) {
+export function validCheckoutUrl(value: string): string | null {
   try {
     const url = new URL(value);
     return url.protocol === "https:" && !url.username && !url.password && !url.port && ["checkout.stripe.com", "chatgpt.com", "openai.com"].includes(url.hostname) ? url.href : null;
   } catch { return null; }
 }
-async function requestCheckout(config) {
+export async function requestCheckout(config: CheckoutConfig): Promise<CheckoutResult> {
   if (location.origin !== "https://chatgpt.com") return {error:"Open chatgpt.com and sign in first."};
   try {
     const s = await fetch("/api/auth/session", {credentials:"same-origin", redirect:"error", cache:"no-store"});

@@ -1,13 +1,29 @@
 # ChatGPT Offer Toolkit
 
-An unofficial Chrome / Microsoft Edge extension for reviewing a ChatGPT Business promotional checkout without pasting JavaScript into DevTools.
+An unofficial Chrome / Microsoft Edge / Firefox extension for reviewing a ChatGPT Business promotional checkout without pasting JavaScript into DevTools.
 
 ## Install
 
-1. Download this repository as a ZIP and extract it, or clone it.
-2. Open `chrome://extensions` (Chrome) or `edge://extensions` (Edge).
-3. Enable **Developer mode** and click **Load unpacked**.
-4. Select the **extension** directory.
+Download the browser-specific ZIP artifact from a successful [GitHub Actions run](https://github.com/hoangsvit/chatgpt-offer-toolkit/actions), then extract it.
+
+- **Chrome / Edge:** open `chrome://extensions` or `edge://extensions`, enable Developer mode, select Load unpacked and choose the extracted directory containing manifest.json.
+- **Firefox:** open `about:debugging#/runtime/this-firefox`, click Load Temporary Add-on and select the extracted manifest.json. Temporary add-ons are removed when Firefox restarts. Permanent installation requires Mozilla signing.
+
+## Develop and build
+
+Requires Node.js 22.12+ (CI uses Node 24). WXT 0.21.5 generates separate Manifest V3 builds.
+
+```sh
+npm install
+npm run dev                 # Chrome
+npm run dev:firefox         # Firefox
+npm run typecheck
+npm test
+npm run build:all
+npm run zip:all
+```
+
+Output directories: `.output/chrome-mv3`, `.output/firefox-mv3`. ZIP packages are in `.output/`. The CI workflow builds and uploads both targets. No store submission or signing is performed.
 
 ## Use
 
@@ -25,7 +41,7 @@ Only `activeTab` and `scripting` are requested. A user-initiated script runs on 
 
 ## Tests
 
-Run `node --test tests/*.test.cjs` from the repository root with Node.js 22 or newer. Tests mock session and checkout responses; they never contact ChatGPT or create a live checkout.
+Run `npm test` after installing dependencies. Tests mock session and checkout responses; they never contact ChatGPT or create a live checkout.
 
 ## Limitations
 
