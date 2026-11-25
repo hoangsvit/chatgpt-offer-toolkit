@@ -28,8 +28,15 @@
 <section id="result" hidden><label for="link">Checkout link</label><input id="link" readonly><div class="grid result-actions"><button id="copy" type="button" class="secondary">Copy link</button><button id="open" type="button" class="primary">Open checkout</button></div></section>
 </details>
 <p id="claim-status" role="status" aria-live="polite" hidden></p>
+<details class="advanced banner-settings"><summary>Banner settings</summary>
+<label class="toggle-row"><span>Show promotion banner</span><input id="banner-enabled" type="checkbox" checked></label>
+<label for="banner-position">Banner position</label><select id="banner-position"><option value="top">Top banner</option><option value="floating">Floating bottom right</option></select>
+<label for="banner-dismiss">Hide after dismissal</label><select id="banner-dismiss"><option value="day">24 hours</option><option value="week">7 days</option><option value="forever">Until manually enabled</option></select>
+<button type="button" class="secondary" id="banner-reset">Show banner again</button>
+<p id="banner-status" role="status" class="hint" hidden></p>
+</details>
 <div class="privacy"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-11V5l-8-3-8 3v6c0 7 8 11 8 11Z"/><path d="m9 12 2 2 4-4"/></svg><span>No stored tokens · Privacy first</span></div>
 </main>
-<footer><button id="github" type="button" class="text-button">GitHub ↗</button><span>Unofficial extension</span></footer>
+<footer><button id="github" type="button" class="text-button">GitHub ↗</button><button id="telegram" type="button" class="text-button">Telegram Support ↗</button><button id="eplus" type="button" class="text-button">ePlus.DEV ↗</button></footer>
 <script type="module" src="./main.ts"></script>
 </body></html>
