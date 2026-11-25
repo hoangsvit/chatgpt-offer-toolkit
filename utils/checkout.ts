@@ -5,7 +5,7 @@ export interface CheckoutConfig {
   currency: string;
 }
 export type CheckoutInput = Omit<CheckoutConfig, "seats"> & { seats: number | string };
-export type CheckoutResult = { url: string; error?: never } | { error: string; url?: never };
+export type CheckoutResult = { url: string; error?: never } | { error: string; url?: never; code?: "billing_country_mismatch" };
 
 // This function is serialized and injected into the active tab. Keep it self-contained.
 export function validateConfig(input: CheckoutInput): CheckoutConfig {
@@ -44,7 +44,16 @@ export async function requestCheckout(config: CheckoutConfig): Promise<CheckoutR
         promo_campaign:{promo_campaign_id:"team-1-month-free",is_coupon_from_query_param:false}
       })
     });
-    if (!resp.ok) return {error:"Checkout request declined (HTTP "+resp.status+"). Check eligibility on the official offer page."};
+    if (!resp.ok) {
+      // Recognize only the known billing error; do not expose arbitrary server response bodies.
+      if (resp.status === 400) {
+        const failure = await resp.json().catch(() => null);
+        if (failure?.detail === "Billing country must match request country.") {
+          return {code:"billing_country_mismatch",error:"Billing country does not match the country recognized by ChatGPT (HTTP 400). Confirm your actual billing country and currency on the official page. No retry was made."};
+        }
+      }
+      return {error:"Checkout request declined (HTTP "+resp.status+"). Review your billing details on the official offer page."};
+    }
     const data = await resp.json();
     const url = [data?.url, data?.stripe_hosted_url, data?.checkout_url].find(
       (value): value is string => typeof value === "string" && value.trim().length > 0
