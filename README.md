@@ -45,7 +45,7 @@ Output directories: `.output/chrome-mv3`, `.output/firefox-mv3`. ZIP packages ar
 
 ## Popup design
 
-Modern Minimal: a compact 400px popup with an explicit root width to prevent browser popup shrinkage, system-aware light/dark theme with a manual toggle, active ChatGPT tab status, seat stepper (2–100), editable country/currency suggestions and checkout actions. The tab indicator does not verify login or offer eligibility; those are checked when requesting checkout.
+Two-view popup (Offer / Settings): eligibility details collapse by default, checkout fields share compact rows, price review appears only on a supported checkout page, and banner/update preferences live under Settings with an update indicator. Modern Minimal: a compact 400px popup with an explicit root width to prevent browser popup shrinkage, system-aware light/dark theme with a manual toggle, active ChatGPT tab status, seat stepper (2–100), editable country/currency suggestions and checkout actions. The tab indicator does not verify login or offer eligibility; those are checked when requesting checkout.
 
 ## Promotion banner
 

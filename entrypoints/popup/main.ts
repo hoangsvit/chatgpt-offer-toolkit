@@ -18,6 +18,15 @@ function element<T extends HTMLElement = HTMLElement>(id: string): T {
 const field = (id: string) => element<HTMLInputElement>(id);
 const button = (id: string) => element<HTMLButtonElement>(id);
 const generate = button('generate');
+function showView(view:'offer'|'settings') {
+  const isOffer=view==='offer';
+  element('offer-view').hidden=!isOffer;
+  element('settings-view').hidden=isOffer;
+  button('view-offer').setAttribute('aria-pressed',String(isOffer));
+  button('view-settings').setAttribute('aria-pressed',String(!isOffer));
+}
+button('view-offer').addEventListener('click',()=>showView('offer'));
+button('view-settings').addEventListener('click',()=>showView('settings'));
 const seats = field('seats');
 const countryField = field('country');
 const currencyField = field('currency');
@@ -188,10 +197,14 @@ async function runPriceReview() {
     const [tab] = await browser.tabs.query({active:true,currentWindow:true});
     const url = tab?.url ? new URL(tab.url) : null;
     if (tab?.id == null || !url || !(url.origin === 'https://chatgpt.com' && /^\/(checkout|payments\/checkout)(\/|$)/.test(url.pathname))) {
+      element('price-panel').hidden = true;
       state.textContent = 'Price unknown';
       reason.textContent = 'Open a checkout on chatgpt.com. External payment pages are not read by this extension.';
       return;
     }
+    const panel=element<HTMLDetailsElement>('price-panel');
+    panel.hidden=false;
+    panel.open=true;
     const [response] = await browser.scripting.executeScript({target:{tabId:tab.id},func:reviewCheckoutPrice});
     const result = response?.result as PriceReview | undefined;
     state.textContent = result?.state === 'zero' ? 'Zero due today' : result?.state === 'paid' ? 'Paid checkout' : 'Price unknown';
@@ -357,6 +370,7 @@ function renderUpdate() {
   const newer = isNewer(updateState.latest,currentVersion);
   element('update-latest').textContent = updateState.latest ? 'v'+updateState.latest : '—';
   element('update-dot').hidden = !newer;
+  element('nav-update-dot').hidden = !newer;
   button('update-download').hidden = !newer;
   button('update-check').disabled = checkingUpdate;
   field('update-auto').checked = updateAuto;
