@@ -42,11 +42,13 @@ jobs:
            lines.push('','⏳ **Building and testing…**','','Downloads will appear here only after all checks pass.');
           }else if(test==='success'&&build==='success'){
            const artifacts=api(endpoint+'/actions/runs/'+run+'/artifacts?per_page=100','--paginate','--slurp').flatMap(p=>p.artifacts).filter(a=>!a.expired);
-           const names=['extension-chrome','extension-firefox','popup-screenshots'];
+           const names=['extension-chrome','extension-firefox'];
            const selected=names.map(name=>artifacts.find(a=>a.name===name));
            if(selected.every(Boolean)){
             lines.push('','✅ **Build and tests passed**','','| Package | Download |','| --- | --- |');
-            for(const [i,label] of ['Chrome / Edge','Firefox (unsigned)','Popup screenshots'].entries())lines.push('| '+label+' | [Download ZIP]('+runUrl+'/artifacts/'+selected[i].id+') |');
+            for(const [i,label] of ['Chrome / Edge','Firefox (unsigned)'].entries())lines.push('| '+label+' | [Download ZIP]('+runUrl+'/artifacts/'+selected[i].id+') |');
+            const screenshots=artifacts.find(a=>a.name==='popup-screenshots');
+            if(screenshots)lines.push('| Popup screenshots | [Download ZIP]('+runUrl+'/artifacts/'+screenshots.id+') |');
             lines.push('','GitHub login may be required. Extract the extension package before loading it. Artifacts expire according to repository retention settings.');
            }else lines.push('','⚠️ **Build finished, but required artifacts are missing.**','','Downloads withheld.');
           }else{
@@ -74,6 +76,7 @@ jobs:
       - run: npm test
   build:
     needs: test
+    if: ${{ !cancelled() && needs.test.result == 'success' }}
     runs-on: ubuntu-24.04
     strategy:
       fail-fast: false
@@ -89,11 +92,11 @@ jobs:
       - run: npm install --no-audit --no-fund
       - run: npx wxt build -b ${{ matrix.browser }} --mv3
       - run: node scripts/check-manifest.mjs ${{ matrix.browser }}
-      - if: matrix.browser == 'chrome'
+      - if: matrix.browser == 'chrome' && vars.RUN_POPUP_PLAYWRIGHT == 'true'
         run: npx playwright install --with-deps chromium
-      - if: matrix.browser == 'chrome'
+      - if: matrix.browser == 'chrome' && vars.RUN_POPUP_PLAYWRIGHT == 'true'
         run: npm run test:popup
-      - if: matrix.browser == 'chrome' && always()
+      - if: matrix.browser == 'chrome' && vars.RUN_POPUP_PLAYWRIGHT == 'true' && always()
         uses: actions/upload-artifact@v7.0.2
         with:
           name: popup-screenshots
@@ -146,11 +149,13 @@ jobs:
            lines.push('','⏳ **Building and testing…**','','Downloads will appear here only after all checks pass.');
           }else if(test==='success'&&build==='success'){
            const artifacts=api(endpoint+'/actions/runs/'+run+'/artifacts?per_page=100','--paginate','--slurp').flatMap(p=>p.artifacts).filter(a=>!a.expired);
-           const names=['extension-chrome','extension-firefox','popup-screenshots'];
+           const names=['extension-chrome','extension-firefox'];
            const selected=names.map(name=>artifacts.find(a=>a.name===name));
            if(selected.every(Boolean)){
             lines.push('','✅ **Build and tests passed**','','| Package | Download |','| --- | --- |');
-            for(const [i,label] of ['Chrome / Edge','Firefox (unsigned)','Popup screenshots'].entries())lines.push('| '+label+' | [Download ZIP]('+runUrl+'/artifacts/'+selected[i].id+') |');
+            for(const [i,label] of ['Chrome / Edge','Firefox (unsigned)'].entries())lines.push('| '+label+' | [Download ZIP]('+runUrl+'/artifacts/'+selected[i].id+') |');
+            const screenshots=artifacts.find(a=>a.name==='popup-screenshots');
+            if(screenshots)lines.push('| Popup screenshots | [Download ZIP]('+runUrl+'/artifacts/'+screenshots.id+') |');
             lines.push('','GitHub login may be required. Extract the extension package before loading it. Artifacts expire according to repository retention settings.');
            }else lines.push('','⚠️ **Build finished, but required artifacts are missing.**','','Downloads withheld.');
           }else{

@@ -103,8 +103,8 @@ The checkout endpoint and campaign identifier are undocumented and may change or
 
 ## Popup visual regression
 
-Chrome validation runs the built extension in Chromium with a non-ChatGPT tab, checks the theme toggle and settings controls, and uploads actual light/dark/settings screenshots as a separate artifact. It does not create a checkout or access account data.
+Playwright popup validation is temporarily disabled by default to speed up CI. Set the GitHub Actions repository variable `RUN_POPUP_PLAYWRIGHT` to `true` to enable Chromium tests and screenshot uploads again. The existing `npm run test:popup` script remains available for local testing after building the Chrome extension and installing Chromium. The test does not create a checkout or access account data.
 
 ### PR build downloads
 
-For same-repository pull requests, the validation workflow maintains one bot comment. At the start of a new build it removes old download links; after tests and both builds succeed it links the current run's Chrome/Edge, Firefox and popup screenshot artifacts. Failed builds do not publish download links. Fork and Dependabot PRs retain read-only validation and use the Actions artifacts page instead. Artifact downloads may require GitHub login and expire under the repository's retention policy.
+For same-repository pull requests, the validation workflow maintains one bot comment. At the start of a new build it removes old download links; after tests and both builds succeed it links the current run's Chrome/Edge and Firefox artifacts, plus optional popup screenshots when available. Failed builds do not publish download links. Fork and Dependabot PRs retain read-only validation and use the Actions artifacts page instead. Artifact downloads may require GitHub login and expire under the repository's retention policy.
