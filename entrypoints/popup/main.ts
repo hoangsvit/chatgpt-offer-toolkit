@@ -2,6 +2,8 @@ import { browser } from 'wxt/browser';
 import { validateConfig, validCheckoutUrl, requestCheckout } from '../../utils/checkout';
 import type { CheckoutConfig, CheckoutResult } from '../../utils/checkout';
 import './style.css';
+import { reviewCheckoutPrice } from '../../utils/checkout-price';
+import type { PriceReview } from '../../utils/checkout-price';
 import { CHECK_TAB_MESSAGE } from '../../utils/eligibility-badge';
 import type { EligibilityResult } from '../../utils/eligibility';
 import { currencyForCountry, BILLING_PREFERENCE_KEY, parseBillingPreference } from '../../utils/billing-locale';
@@ -172,6 +174,40 @@ async function runEligibilityCheck(force = false) {
 eligibilityButton.addEventListener('click', () => void runEligibilityCheck(true));
 // Reuse the current tab's automatic eligibility check; no checkout.
 void runEligibilityCheck();
+
+let priceBusy = false;
+async function runPriceReview() {
+  if (priceBusy) return;
+  priceBusy = true;
+  button('price-check').disabled = true;
+  const state = element('price-state');
+  const amount = element('price-amount');
+  const reason = element('price-reason');
+  state.textContent = 'Checking…'; state.dataset.state = 'unknown'; amount.textContent = '—';
+  try {
+    const [tab] = await browser.tabs.query({active:true,currentWindow:true});
+    const url = tab?.url ? new URL(tab.url) : null;
+    if (tab?.id == null || !url || !(url.origin === 'https://pay.openai.com' || url.origin === 'https://checkout.stripe.com' || (url.origin === 'https://chatgpt.com' && /^\/(checkout|payments\/checkout)(\/|$)/.test(url.pathname)))) {
+      state.textContent = 'Price unknown';
+      reason.textContent = 'Open the official checkout, then open this popup to review its displayed due-today amount.';
+      return;
+    }
+    const [response] = await browser.scripting.executeScript({target:{tabId:tab.id},func:reviewCheckoutPrice});
+    const result = response?.result as PriceReview | undefined;
+    state.textContent = result?.state === 'zero' ? 'Zero due today' : result?.state === 'paid' ? 'Paid checkout' : 'Price unknown';
+    state.dataset.state = result?.state === 'zero' ? 'eligible' : result?.state === 'paid' ? 'not_eligible' : 'unknown';
+    amount.textContent = result?.amount ?? '—';
+    reason.textContent = result?.reason ?? 'No readable price. Review the official checkout manually.';
+  } catch {
+    state.textContent = 'Price unknown';
+    reason.textContent = 'Unable to read this checkout. Review the official total manually.';
+  } finally {
+    priceBusy = false;
+    button('price-check').disabled = false;
+  }
+}
+button('price-check').addEventListener('click', () => void runPriceReview());
+void runPriceReview();
 
 element<HTMLFormElement>('settings').addEventListener('submit', async event => {
   event.preventDefault();
