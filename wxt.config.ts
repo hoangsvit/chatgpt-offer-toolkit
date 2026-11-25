@@ -8,7 +8,7 @@ export default defineConfig({
     icons: {16: 'icon/16.png', 32: 'icon/32.png', 48: 'icon/48.png', 96: 'icon/96.png', 128: 'icon/128.png'},
     action: {default_title: 'ChatGPT Offer Toolkit', default_icon: {16: 'icon/16.png', 32: 'icon/32.png', 48: 'icon/48.png'}},
     permissions: ['activeTab', 'scripting', 'storage', 'alarms'],
-    host_permissions: ['https://api.github.com/*'],
+    host_permissions: ['https://api.github.com/*', 'https://chatgpt.com/*'],
     ...(browser === 'firefox' ? {
       browser_specific_settings: {
         gecko: { id: 'chatgpt-offer-toolkit@eplus.dev', strict_min_version: '128.0', update_url: 'https://github.com/hoangsvit/chatgpt-offer-toolkit/releases/download/firefox-updates/updates.json' },
