@@ -4,10 +4,8 @@ export type PriceReview = {state:'zero'|'paid'|'unknown'; amount:string|null; re
 // no page writes, no reading form fields, payment credentials or checkout IDs.
 export function reviewCheckoutPrice(): PriceReview {
   const unknown = (reason:string): PriceReview => ({state:'unknown',amount:null,reason});
-  if (location.origin !== 'https://pay.openai.com' &&
-      location.origin !== 'https://checkout.stripe.com' &&
-      !(location.origin === 'https://chatgpt.com' && /^\/(checkout|payments\/checkout)(\/|$)/.test(location.pathname))) {
-    return unknown('Open the official ChatGPT checkout first.');
+  if (location.origin !== 'https://chatgpt.com' || !/^\/(checkout|payments\/checkout)(\/|$)/.test(location.pathname)) {
+    return unknown('Price review is available only on chatgpt.com checkout pages.');
   }
   const clean = (text:string) => text.replace(/[\u00a0\u202f]/g,' ').replace(/\s+/g,' ').trim();
   function visible(el: Element): boolean {
@@ -27,13 +25,8 @@ export function reviewCheckoutPrice(): PriceReview {
     if (!digits || digits.length > 18) return null;
     return {amount:text,zero:/^0+$/.test(digits)};
   }
-  // Stripe is a multi-merchant site. Require a visible product label for ChatGPT Business
-  // before reporting a result; other merchant pages always remain unknown.
   const elements=Array.from(document.querySelectorAll('span,div,p,dt,dd,strong,b,label,h1,h2,h3'));
   const leaves=elements.filter(el=>el.childElementCount===0 && visible(el));
-  if (location.origin === 'https://checkout.stripe.com' && !leaves.some(el=>/^(ChatGPT Business|ChatGPT Team)(\s*[-–:]\s*(Standard|Monthly|Subscription))?$/i.test(clean(el.textContent ?? '')))) {
-    return unknown('The current Stripe checkout could not be identified as ChatGPT Business.');
-  }
   const amounts: {amount:string;zero:boolean}[] = [];
   let foundLabel=false;
   for (const label of leaves) {
