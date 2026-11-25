@@ -44,9 +44,9 @@ Output directories: `.output/chrome-mv3`, `.output/firefox-mv3`. ZIP packages ar
 
 ## Popup design
 
-BeUI popup (Offer / Settings): uses locally vendored MIT-licensed BeUI Button, AnimatedBadge and ThemeToggle components with React, Motion and Tailwind CSS. The Offer screen shows the primary Generate action only; editable checkout defaults are in Settings and open automatically if required fields are missing. The toolbar badge and payment logic are unchanged. See public/beui-LICENSE.txt for upstream attribution.
+BeUI popup (Offer / Settings): uses locally vendored MIT-licensed BeUI Button, Input, Switch, AnimatedBadge, ActionSwap and ThemeToggle components with React, Motion and Tailwind CSS. The Offer screen shows the primary Generate action only; editable checkout defaults are in Settings and open automatically if required fields are missing. The toolbar badge and payment logic are unchanged. See public/beui-LICENSE.txt for upstream attribution.
 
-Two-view popup (Offer / Settings): eligibility details collapse by default, checkout fields share compact rows, price review appears only on a supported checkout page, and checkout/update preferences live under Settings with an update indicator. Modern Minimal: a compact 384px popup with an explicit root width to prevent browser popup shrinkage, official beUI light/dark tokens and animated ThemeToggle, with system preference and persisted manual override, active ChatGPT tab status, seat stepper (2–100), editable country/currency suggestions and checkout actions. The tab indicator does not verify login or offer eligibility; those are checked when requesting checkout.
+Two-view popup (Offer / Settings): eligibility details collapse by default, checkout fields share compact rows, price review appears only on a supported checkout page, and checkout/update preferences live under Settings with an update indicator. Modern Minimal: a compact 384px popup with an explicit root width to prevent browser popup shrinkage, official beUI light/dark tokens and animated ThemeToggle (transition stylesheet bundled locally), with system preference and persisted manual override, active ChatGPT tab status, seat stepper (2–100), editable country/currency suggestions and checkout actions. The tab indicator does not verify login or offer eligibility; those are checked when requesting checkout.
 
 ## Updates without a public store
 
@@ -100,3 +100,7 @@ The checkout endpoint and campaign identifier are undocumented and may change or
 ## Support
 
 [ePlus.DEV](https://eplus.dev) · [Telegram channel](https://t.me/eplus_news) · [GitHub issues](https://github.com/hoangsvit/chatgpt-offer-toolkit/issues)
+
+## Popup visual regression
+
+Chrome validation runs the built extension in Chromium with a non-ChatGPT tab, checks the theme toggle and settings controls, and uploads actual light/dark/settings screenshots as a separate artifact. It does not create a checkout or access account data.

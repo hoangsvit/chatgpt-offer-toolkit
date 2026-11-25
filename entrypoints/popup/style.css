@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import "./beui/theme.css";
+@import "./beui/theme-transition.css";
 
 /* Local layout aliases: all surfaces and accent colors follow upstream beUI tokens. */
 :root{
@@ -132,3 +133,19 @@ footer{margin-top:10px}.privacy{margin-top:15px}
 .offer-link{display:inline-flex;align-items:center;gap:4px;flex:none;padding:4px 0;border:0;background:transparent;color:var(--primary);font-size:11px;font-weight:600;letter-spacing:0;line-height:1.4;white-space:nowrap}
 .offer-link:hover{text-decoration:underline;text-underline-offset:3px}
 .offer #claim-status{font-size:11px;color:var(--status-danger);margin:6px 0 0}
+
+/* The form controller owns the hidden native actions; beUI owns the visible controls. */
+.beui-native{display:none!important}
+.beui-action{display:inline-flex;min-width:0;align-items:center}
+.result-actions .beui-action,.update-settings>.beui-action{display:flex;width:100%;margin-bottom:6px}
+.stepper .beui-field{flex:1;min-width:0}
+.beui-field{min-width:0;width:100%;margin:0 0 9px}
+.beui-field input{height:100%;border:0;background:transparent;margin:0;padding:0 10px;outline:none}
+.beui-field input:focus-visible{outline:none}
+.stepper .beui-field{margin:0}
+.stepper .beui-field input{text-align:center;padding:0 3px;font-size:14px}
+.beui-field input:read-only{background:transparent}
+#beui-theme button{width:34px;height:34px}
+.offer-top .beui-action{margin-left:auto}
+footer .beui-action{flex:none}
+body{font-size:13px;-webkit-font-smoothing:antialiased}

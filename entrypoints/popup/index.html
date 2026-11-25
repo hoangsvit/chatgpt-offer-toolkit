@@ -51,7 +51,7 @@
     <div><label for="currency">Currency</label><input id="currency" list="currencies" required maxlength="3" pattern="[A-Za-z]{3}" placeholder="e.g. VND" autocomplete="off"><datalist id="currencies"><option value="USD"></option><option value="VND"></option><option value="SGD"></option><option value="JPY"></option><option value="GBP"></option><option value="EUR"></option><option value="AUD"></option><option value="CAD"></option><option value="INR"></option></datalist></div>
   </div>
   <p id="billing-suggestion" class="hint" role="status" aria-live="polite"></p>
-  <label class="toggle-row"><span>Remember billing after link succeeds</span><input id="remember-billing" type="checkbox"></label>
+  <div class="toggle-row"><span>Remember billing after link succeeds</span><input id="remember-billing" type="checkbox"></div>
   <p class="hint">Confirm actual billing details before continuing.</p>
   <button id="generate" type="submit" disabled hidden><span id="generate-label">Generate checkout link</span></button>
 </form></details>
@@ -60,7 +60,7 @@
 <div class="update-row"><span>Latest version</span><strong id="update-latest">—</strong></div>
 <p class="hint" id="update-state" role="status" aria-live="polite">Loading…</p>
 <button id="update-download" type="button" class="primary" hidden>View release / download ↗</button>
-<label class="toggle-row"><span>Automatically check on ChatGPT (15 min cache)</span><input id="update-auto" type="checkbox" checked disabled></label>
+<div class="toggle-row"><span>Automatically check on ChatGPT (15 min cache)</span><input id="update-auto" type="checkbox" checked disabled></div>
 <button id="update-check" type="button" class="secondary">Check for updates</button>
 <p class="hint update-note" id="update-note"></p>
 </details>

@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import { flushSync } from 'react-dom';
-import { ArrowRight, Link2, RefreshCw } from 'lucide-react';
+import { ArrowRight, ArrowLeft, ArrowUpRight, Settings2, Link2, RefreshCw, Minus, Plus, Copy, ExternalLink, Download } from 'lucide-react';
+import { Input } from './input';
+import { Switch } from './switch';
 import { Button } from './button';
 import { ThemeToggle } from './theme-toggle';
 import { initTheme } from './extension-theme';
@@ -57,5 +59,72 @@ export function mountBeui(submit:()=>void) {
   const cta=document.getElementById('beui-generate')!;
   const eligibility=document.getElementById('beui-eligibility')!;
   const refresh=document.getElementById('beui-refresh')!;
-  flushSync(()=>{createRoot(theme).render(<ThemeToggle variant="circle" start="top-right" className="icon-button" iconClassName="size-4"/>);createRoot(cta).render(<Generate submit={submit}/>);createRoot(eligibility).render(<EligibilityBadge/>);createRoot(refresh).render(<RefreshEligibility/>);});
+  flushSync(()=>{createRoot(theme).render(<ThemeToggle variant="circle" start="top-right" className="rounded-xl border border-border bg-background p-2" iconClassName="size-4"/>);createRoot(cta).render(<Generate submit={submit}/>);createRoot(eligibility).render(<EligibilityBadge/>);createRoot(refresh).render(<RefreshEligibility/>);});
+}
+
+const buttonSpecs = {
+  'view-offer': {icon:ArrowLeft, variant:'ghost', size:'icon'},
+  'view-settings': {icon:Settings2, variant:'outline', size:'icon'},
+  'official': {icon:ArrowUpRight, variant:'ghost', size:'sm'},
+  'minus': {icon:Minus, variant:'outline', size:'icon'},
+  'plus': {icon:Plus, variant:'outline', size:'icon'},
+  'copy': {icon:Copy, variant:'outline', size:'md'},
+  'open': {icon:ExternalLink, variant:'primary', size:'md'},
+  'price-check': {icon:RefreshCw, variant:'outline', size:'md'},
+  'update-check': {icon:RefreshCw, variant:'outline', size:'md'},
+  'update-download': {icon:Download, variant:'primary', size:'md'},
+  'github': {icon:ArrowUpRight, variant:'ghost', size:'sm'},
+  'telegram': {icon:ArrowUpRight, variant:'ghost', size:'sm'},
+  'eplus': {icon:ArrowUpRight, variant:'ghost', size:'sm'},
+} as const;
+function NativeAction({native,id,host}:{native:HTMLButtonElement;id:keyof typeof buttonSpecs;host:HTMLElement}){
+  const spec=buttonSpecs[id];
+  const Icon=spec.icon;
+  const read=()=>({disabled:native.disabled,hidden:native.hidden,label:(native.textContent||'').replace(/↗/g,'').trim(),pressed:native.getAttribute('aria-pressed'),dot:id==='view-settings'&&!document.getElementById('nav-update-dot')?.hidden});
+  const [state,setState]=useState(read);
+  useEffect(()=>{
+    const sync=()=>{host.hidden=native.hidden;setState(read());};
+    const obs=new MutationObserver(sync);
+    obs.observe(native,{attributes:true,childList:true,characterData:true,subtree:true});
+    sync();return ()=>obs.disconnect();
+  },[]);
+  const onlyIcon=spec.size==='icon';
+  return <Button variant={spec.variant} size={spec.size} className={onlyIcon?'relative size-8 rounded-lg':id==='official'?'h-7 gap-1 px-1 text-primary':id==='github'||id==='telegram'||id==='eplus'?'h-7 gap-1 px-1 text-[10px]':'w-full rounded-lg'} disabled={state.disabled}
+    aria-label={native.getAttribute('aria-label')||state.label} aria-controls={native.getAttribute('aria-controls')||undefined} aria-pressed={state.pressed===null?undefined:state.pressed==='true'} title={native.title||undefined}
+    onClick={()=>{if(!native.disabled&&!native.hidden)native.click()}}>
+    {!onlyIcon&&<span>{state.label}</span>}<Icon size={onlyIcon?17:13} aria-hidden="true"/>
+    {state.dot&&<span className="absolute right-0 top-0 size-2 rounded-full bg-primary" aria-label="Update available"/>}
+  </Button>;
+}
+const SWITCH_EVENT='offer-toolkit-switch-sync';
+export function syncBeuiSwitches(){document.dispatchEvent(new Event(SWITCH_EVENT));}
+function NativeSwitch({native,label}:{native:HTMLInputElement;label:string}){
+  const read=()=>({checked:native.checked,disabled:native.disabled});
+  const [state,setState]=useState(read);
+  useEffect(()=>{
+    const sync=()=>setState(read());
+    const obs=new MutationObserver(sync);obs.observe(native,{attributes:true,attributeFilter:['disabled','checked']});
+    native.addEventListener('change',sync);document.addEventListener(SWITCH_EVENT,sync);sync();
+    return ()=>{obs.disconnect();native.removeEventListener('change',sync);document.removeEventListener(SWITCH_EVENT,sync);};
+  },[]);
+  return <Switch checked={state.checked} disabled={state.disabled} ariaLabel={label} onCheckedChange={next=>{if(!native.disabled&&next!==native.checked)native.click()}}/>;
+}
+export function enhanceFormControls(){
+  // Actual beUI inputs retain native form validation, IDs and DOM value ownership.
+  for(const id of ['workspace','seats','country','currency','link']){
+    const native=document.getElementById(id) as HTMLInputElement;
+    const props={id,type:native.type,defaultValue:native.value,required:native.required,readOnly:native.readOnly,disabled:native.disabled,maxLength:native.maxLength>=0?native.maxLength:undefined,min:native.min||undefined,max:native.max||undefined,step:native.step||undefined,pattern:native.pattern||undefined,list:native.getAttribute('list')||undefined,placeholder:native.placeholder,autoComplete:native.autocomplete||undefined,inputMode:(native.inputMode||undefined) as React.InputHTMLAttributes<HTMLInputElement>['inputMode']};
+    const host=document.createElement('div');host.className='beui-field';native.replaceWith(host);
+    flushSync(()=>createRoot(host).render(<Input nativeUncontrolled {...props} classNames={{field:'h-9 rounded-lg',input:'text-xs'}}/>));
+  }
+  for(const id of Object.keys(buttonSpecs) as (keyof typeof buttonSpecs)[]){
+    const native=document.getElementById(id) as HTMLButtonElement;
+    const host=document.createElement('span');host.className='beui-action';host.hidden=native.hidden;native.after(host);native.classList.add('beui-native');
+    flushSync(()=>createRoot(host).render(<NativeAction id={id} native={native} host={host}/>));
+  }
+  for(const [id,label] of [['remember-billing','Remember billing after link succeeds'],['update-auto','Automatically check for updates']] as const){
+    const native=document.getElementById(id) as HTMLInputElement;
+    const host=document.createElement('span');native.after(host);native.classList.add('beui-native');
+    flushSync(()=>createRoot(host).render(<NativeSwitch native={native} label={label}/>));
+  }
 }

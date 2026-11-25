@@ -49,3 +49,12 @@ test('popup uses the beUI ThemeToggle and upstream light/dark tokens',()=>{
  assert.match(adapter,/offer-toolkit-theme/);
  assert.doesNotMatch(main,/button\('theme'\)|element\('moon'\)|element\('sun'\)/);
 });
+
+test('form inputs, settings switches and secondary actions use vendored beUI controls',()=>{
+ const island=fs.readFileSync('entrypoints/popup/beui/islands.tsx','utf8');
+ assert.match(main,/enhanceFormControls\(\);/);
+ assert.match(island,/<Input nativeUncontrolled/);
+ assert.match(island,/<Switch checked=/);
+ assert.match(island,/<Button variant=\{spec.variant\}/);
+ assert.match(fs.readFileSync('entrypoints/popup/style.css','utf8'),/theme-transition\.css/);
+});

@@ -2,7 +2,7 @@ import { browser } from 'wxt/browser';
 import { validateConfig, validCheckoutUrl, requestCheckout } from '../../utils/checkout';
 import type { CheckoutConfig, CheckoutResult } from '../../utils/checkout';
 import './style.css';
-import { mountBeui } from './beui/islands';
+import { mountBeui, enhanceFormControls, syncBeuiSwitches } from './beui/islands';
 import { reviewCheckoutPrice } from '../../utils/checkout-price';
 import type { PriceReview } from '../../utils/checkout-price';
 import { CHECK_TAB_MESSAGE, isChatGPTUrl } from '../../utils/eligibility-badge';
@@ -17,6 +17,7 @@ function element<T extends HTMLElement = HTMLElement>(id: string): T {
 }
 const field = (id: string) => element<HTMLInputElement>(id);
 const button = (id: string) => element<HTMLButtonElement>(id);
+enhanceFormControls();
 const generate = button('generate');
 function showView(view:'offer'|'settings') {
   const isOffer=view==='offer';
@@ -56,10 +57,12 @@ if (savedBilling) {
 } else {
   billingHint.textContent = 'Select your actual billing country. Its local currency will be suggested.';
 }
+syncBeuiSwitches();
 function forgetBilling() {
   savedBilling = null;
   try { localStorage.removeItem(BILLING_PREFERENCE_KEY); } catch { /* storage may be unavailable */ }
   rememberBilling.checked = false;
+  syncBeuiSwitches();
 }
 rememberBilling.addEventListener('change', () => {
   if (!rememberBilling.checked) forgetBilling();
@@ -113,7 +116,7 @@ async function getActiveChatGPTTab() {
 function renderConnection(ready: boolean) {
   tabReady = ready;
   element('connection').dataset.state = ready ? 'ready' : 'unavailable';
-  element('connection-text').textContent = ready ? 'ChatGPT tab ready · sign-in checked on request' : 'Open chatgpt.com to generate a checkout link';
+  element('connection-text').textContent = ready ? 'Connected to ChatGPT' : 'Open chatgpt.com to generate a checkout link';
   generate.disabled = busy || !tabReady || eligibilityBusy;
   eligibilityButton.disabled = busy || !tabReady || eligibilityBusy;
 }
@@ -314,6 +317,7 @@ function renderUpdate() {
   button('update-download').hidden = !newer;
   button('update-check').disabled = checkingUpdate;
   field('update-auto').checked = updateAuto;
+  syncBeuiSwitches();
   element('update-state').textContent = checkingUpdate ? 'Checking GitHub Releases…' :
     updateState.error ?? (newer ? 'Update available.' : updateState.latest ? 'You are up to date.' : updateState.checkedAt ? 'No stable release yet.' : 'Not checked yet.') +
     (updateState.checkedAt ? ' · '+new Date(updateState.checkedAt).toLocaleString() : '');

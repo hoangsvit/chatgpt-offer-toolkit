@@ -34,6 +34,16 @@ jobs:
       - run: npm install --no-audit --no-fund
       - run: npx wxt build -b ${{ matrix.browser }} --mv3
       - run: node scripts/check-manifest.mjs ${{ matrix.browser }}
+      - if: matrix.browser == 'chrome'
+        run: npx playwright install --with-deps chromium
+      - if: matrix.browser == 'chrome'
+        run: npm run test:popup
+      - if: matrix.browser == 'chrome' && always()
+        uses: actions/upload-artifact@v7.0.2
+        with:
+          name: popup-screenshots
+          path: artifacts/popup/*.png
+          if-no-files-found: ignore
       - run: npx wxt zip -b ${{ matrix.browser }} --mv3
       - uses: actions/upload-artifact@v7.0.2
         with:
