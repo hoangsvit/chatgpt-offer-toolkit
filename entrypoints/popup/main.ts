@@ -2,7 +2,6 @@ import { browser } from 'wxt/browser';
 import { validateConfig, validCheckoutUrl, requestCheckout } from '../../utils/checkout';
 import type { CheckoutConfig, CheckoutResult } from '../../utils/checkout';
 import './style.css';
-import { checkOfferEligibility } from '../../utils/eligibility';
 import { CHECK_TAB_MESSAGE } from '../../utils/eligibility-badge';
 import type { EligibilityResult } from '../../utils/eligibility';
 import { suggestBilling, currencyForCountry } from '../../utils/billing-locale';
@@ -133,14 +132,14 @@ async function runEligibilityCheck(force = false) {
       element('eligibility-state').textContent = 'Not checked';
       return;
     }
-    // Reuse the page's in-flight check or recent in-memory result.
+    // Reuse the page's in-flight check or document-scoped result.
     let result: EligibilityResult | undefined;
     try {
       result = await browser.tabs.sendMessage(tabId,{type:CHECK_TAB_MESSAGE,force}) as EligibilityResult | undefined;
     } catch {
-      // Existing tabs opened before extension installation may lack the content script.
-      const [response] = await browser.scripting.executeScript({target:{tabId},func:checkOfferEligibility});
-      result = response?.result as EligibilityResult | undefined;
+      // Do not inject a second checker after a messaging failure.
+      renderEligibility({state:'unknown',plan:null,campaign:'unknown',reason:'Unable to reach the page checker. Reload ChatGPT after installing or updating the extension.'});
+      return;
     }
     renderEligibility(result);
   } catch { renderEligibility(undefined); }
