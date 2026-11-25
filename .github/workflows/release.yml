@@ -1,0 +1,86 @@
+name: Release browser extensions
+on:
+  push:
+    tags: ['v*']
+permissions:
+  contents: read
+concurrency:
+  group: extension-release
+  cancel-in-progress: false
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Validate tag
+        run: node -e "const v=require('./package.json').version; if(!/^v[0-9]+\\.[0-9]+\\.[0-9]+$/.test(process.env.GITHUB_REF_NAME)||process.env.GITHUB_REF_NAME!=='v'+v)process.exit(1)"
+      - run: npm install --no-audit --no-fund
+      - run: npm run typecheck && npm test && npm run build:all
+      - run: node scripts/check-manifest.mjs chrome && node scripts/check-manifest.mjs firefox
+      - name: Package
+        run: |
+          mkdir -p dist
+          (cd .output/chrome-mv3 && zip -qr ../../dist/chrome.zip .)
+          (cd .output/firefox-mv3 && zip -qr ../../dist/firefox-unsigned.zip .)
+          (cd dist && sha256sum chrome.zip firefox-unsigned.zip > SHA256SUMS.txt)
+      - uses: actions/upload-artifact@v4
+        with:
+          name: unsigned-firefox
+          path: dist/firefox-unsigned.zip
+      - name: Publish stable release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "$GITHUB_REF_NAME" dist/chrome.zip dist/firefox-unsigned.zip dist/SHA256SUMS.txt --verify-tag --generate-notes --latest
+  sign-firefox:
+    needs: release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    env:
+      WEB_EXT_API_KEY: ${{ secrets.AMO_JWT_ISSUER }}
+      WEB_EXT_API_SECRET: ${{ secrets.AMO_JWT_SECRET }}
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - name: Detect signing credentials
+        id: credentials
+        run: |
+          if [ -n "$WEB_EXT_API_KEY" ] && [ -n "$WEB_EXT_API_SECRET" ]; then
+            echo "enabled=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "Signing not configured; unsigned Firefox test build only." >> "$GITHUB_STEP_SUMMARY"
+          fi
+      - uses: actions/checkout@v4
+        if: steps.credentials.outputs.enabled == 'true'
+      - uses: actions/setup-node@v4
+        if: steps.credentials.outputs.enabled == 'true'
+        with:
+          node-version: '24'
+      - uses: actions/download-artifact@v4
+        if: steps.credentials.outputs.enabled == 'true'
+        with:
+          name: unsigned-firefox
+          path: dist
+      - name: Sign unlisted Firefox add-on
+        if: steps.credentials.outputs.enabled == 'true'
+        run: |
+          mkdir -p firefox-build signed
+          unzip -q dist/firefox-unsigned.zip -d firefox-build
+          git archive --format=zip --output=source.zip HEAD
+          npx --yes web-ext@8 sign --channel=unlisted --source-dir=firefox-build --artifacts-dir=signed --upload-source-code=source.zip
+          find signed -name '*.xpi' -type f -print
+          test "$(find signed -name '*.xpi' -type f | wc -l)" -eq 1
+          cp "$(find signed -name '*.xpi' -type f)" dist/firefox.xpi
+      - name: Publish native Firefox update
+        if: steps.credentials.outputs.enabled == 'true'
+        run: |
+          gh release upload "$GITHUB_REF_NAME" dist/firefox.xpi
+          node scripts/firefox-update-manifest.mjs "$GITHUB_REF_NAME" dist/firefox.xpi > dist/updates.json
+          if ! gh release view firefox-updates >/dev/null 2>&1; then
+            gh release create firefox-updates --prerelease --title "Firefox native update feed" --notes "Machine-readable signed XPI update feed." --target "$GITHUB_SHA"
+          fi
+          gh release upload firefox-updates dist/updates.json --clobber
