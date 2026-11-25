@@ -16,3 +16,10 @@ test('only exact HTTPS ChatGPT origin is accepted',()=>{
  assert.equal(isChatGPTUrl('https://chatgpt.com/c/test'),true);
  for(const value of ['https://chatgpt.com.evil.test','http://chatgpt.com','https://chatgpt.com:444',null,'invalid'])assert.equal(isChatGPTUrl(value),false);
 });
+
+test('successful account check without assigned campaign is distinct from an unknown check',()=>{
+ const badge=badgeFor({state:'unknown',campaign:'not_listed'});
+ assert.equal(badge.text,'N/A');assert.match(badge.title,/final eligibility not verified/);
+ assert.equal(badgeFor({state:'unknown',campaign:'unknown'}).text,'?');
+ assert.equal(badgeFor({state:'not_eligible',campaign:'not_listed'}).text,'NO');
+});

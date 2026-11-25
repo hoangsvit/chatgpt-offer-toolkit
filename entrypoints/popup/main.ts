@@ -131,7 +131,8 @@ function renderEligibility(value: EligibilityResult | undefined) {
   const state = element('eligibility-state');
   const labels = {eligible:'Coupon eligible',not_eligible:'Not eligible',unknown:'Unknown',redeemed:'Already redeemed'};
   state.dataset.state = value?.state ?? 'unknown';
-  state.textContent = value ? labels[value.state] : 'Unknown';
+  state.textContent = value?.state === 'unknown' && value.campaign === 'not_listed'
+    ? 'Offer not listed' : value ? labels[value.state] : 'Unknown';
   element('eligibility-plan').textContent = value?.plan ?? '—';
   element('eligibility-campaign').textContent = value?.campaign === 'assigned' ? 'Assigned' : value?.campaign === 'not_listed' ? 'Not listed' : 'Unknown';
   element('eligibility-reason').textContent = value?.reason ?? 'No verified response. Review the official offer page.';
