@@ -2,7 +2,7 @@ import { defineBackground } from 'wxt/utils/define-background';
 import { browser } from 'wxt/browser';
 import { RELEASE_API, UPDATE_KEY, AUTO_KEY, CHECK_MESSAGE, AUTO_CHECK_MESSAGE, ALARM_NAME, normalizeUpdate, releaseVersion, shouldAutoCheck } from '../utils/updates';
 import type { UpdateState } from '../utils/updates';
-import { badgeFor, isChatGPTUrl, ELIGIBILITY_PENDING_MESSAGE, ELIGIBILITY_RESULT_MESSAGE } from '../utils/eligibility-badge';
+import { BADGE_MESSAGE, badgeFor, isChatGPTUrl, ELIGIBILITY_PENDING_MESSAGE, ELIGIBILITY_RESULT_MESSAGE } from '../utils/eligibility-badge';
 
 export default defineBackground(() => {
   let pending: Promise<UpdateState> | null = null;
@@ -64,7 +64,9 @@ export default defineBackground(() => {
   // Toolbar badges are per-tab; never use a global account result or persist it.
   const revision = new Map<number, number>();
   const queues = new Map<number, Promise<unknown>>();
+  const writes = new Map<number, number>();
   function paint(tabId: number, text: string, color: string, title: string) {
+    writes.set(tabId,(writes.get(tabId)??0)+1);
     const next = (queues.get(tabId) ?? Promise.resolve()).catch(()=>{}).then(async()=>{
       await browser.action.setBadgeBackgroundColor({tabId,color});
       await browser.action.setBadgeText({tabId,text});
@@ -87,10 +89,42 @@ export default defineBackground(() => {
   browser.tabs.onUpdated.addListener((tabId,change,tab)=>{
     if(change.status==='loading' || (change.url && !isChatGPTUrl(change.url))) clear(tabId,change.url ?? tab.url);
   });
-  browser.runtime.onInstalled.addListener(()=>run(defaultBadge()));
-  browser.runtime.onStartup.addListener(()=>run(defaultBadge()));
-  run(defaultBadge());
-  browser.tabs.onRemoved.addListener(tabId=>{revision.delete(tabId);queues.delete(tabId);});
+  async function syncActiveBadge(tabId: number) {
+    const version=revision.get(tabId)??0;
+    const write= writes.get(tabId)??0;
+    const current=()=> (revision.get(tabId)??0)===version && (writes.get(tabId)??0)===write;
+    const tab=await browser.tabs.get(tabId);
+    if (!current()) return;
+    if (!isChatGPTUrl(tab.url)) {
+      paint(tabId,offBadge.text,offBadge.color,offBadge.title);
+      return;
+    }
+    let snapshot: {pending?:boolean;result?:unknown}|undefined;
+    try {
+      snapshot=await browser.tabs.sendMessage(tabId,{type:BADGE_MESSAGE},{frameId:0});
+    } catch { /* existing page may need a reload */ }
+    if (!current()) return;
+    const badge=snapshot?.pending
+      ? {text:'…',color:'#64736b',title:'Checking offer eligibility'}
+      : badgeFor(snapshot?.result);
+    paint(tabId,badge.text,badge.color,badge.title);
+  }
+  async function syncFocusedTab() {
+    const tabs=await browser.tabs.query({active:true,lastFocusedWindow:true});
+    if(tabs[0]?.id!=null) await syncActiveBadge(tabs[0].id);
+  }
+  browser.tabs.onActivated.addListener(({tabId})=>run(syncActiveBadge(tabId)));
+  browser.windows.onFocusChanged.addListener(windowId=>{
+    if(windowId!==browser.windows.WINDOW_ID_NONE) run(syncFocusedTab());
+  });
+  async function initializeBadge() {
+    await defaultBadge();
+    await syncFocusedTab();
+  }
+  browser.runtime.onInstalled.addListener(()=>run(initializeBadge()));
+  browser.runtime.onStartup.addListener(()=>run(initializeBadge()));
+  run(initializeBadge());
+  browser.tabs.onRemoved.addListener(tabId=>{revision.delete(tabId);queues.delete(tabId);writes.delete(tabId);});
   browser.runtime.onMessage.addListener((message,sender,sendResponse)=>{
     if(sender.id!==browser.runtime.id || sender.frameId!==0 || sender.tab?.id==null || !isChatGPTUrl(sender.url)) return false;
     if(message?.type!==ELIGIBILITY_PENDING_MESSAGE && message?.type!==ELIGIBILITY_RESULT_MESSAGE) return false;
