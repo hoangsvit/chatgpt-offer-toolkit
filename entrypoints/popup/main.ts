@@ -23,6 +23,7 @@ const billingHint = element('billing-suggestion');
 const rememberBilling = field('remember-billing');
 // A language preference (including en-US) is not proof of billing country.
 let savedBilling: ReturnType<typeof parseBillingPreference> = null;
+let billingEdited = false;
 try { savedBilling = parseBillingPreference(JSON.parse(localStorage.getItem(BILLING_PREFERENCE_KEY) ?? 'null')); } catch { /* ignore invalid or unavailable storage */ }
 if (savedBilling) {
   countryField.value = savedBilling.country;
@@ -33,13 +34,16 @@ if (savedBilling) {
   billingHint.textContent = 'Select your actual billing country. Its local currency will be suggested.';
 }
 function forgetBilling() {
+  savedBilling = null;
   try { localStorage.removeItem(BILLING_PREFERENCE_KEY); } catch { /* storage may be unavailable */ }
   rememberBilling.checked = false;
 }
 rememberBilling.addEventListener('change', () => {
   if (!rememberBilling.checked) forgetBilling();
 });
+currencyField.addEventListener('input', () => { billingEdited = true; });
 countryField.addEventListener('input', () => {
+  billingEdited = true;
   currencyField.value = currencyForCountry(countryField.value) ?? '';
   billingHint.textContent = 'Currency is a local suggestion. Verify the currency supported by ChatGPT.';
 });
@@ -147,6 +151,17 @@ async function runEligibilityCheck(force = false) {
       return;
     }
     renderEligibility(result);
+    const detected = result?.detectedCountry;
+    if (typeof detected === 'string' && /^[A-Z]{2}$/.test(detected) && !['ZZ','EU','XX'].includes(detected)) {
+      if (!billingEdited && !savedBilling) {
+        countryField.value = detected;
+        currencyField.value = currencyForCountry(detected) ?? '';
+        billingHint.textContent = 'Suggested from ChatGPT session: '+detected+'. Confirm actual billing country and supported currency.';
+        resetResult();
+      } else if (countryField.value.trim().toUpperCase() !== detected) {
+        billingHint.textContent = 'ChatGPT session suggests '+detected+'. Verify your selected billing country.';
+      }
+    }
   } catch { renderEligibility(undefined); }
   finally {
     eligibilityBusy = false;
@@ -182,6 +197,7 @@ element<HTMLFormElement>('settings').addEventListener('submit', async event => {
     if (!result?.url) {
       if (result?.code === 'billing_country_mismatch') {
         forgetBilling();
+        billingEdited = true;
         billingHint.textContent = 'Saved billing preference cleared. Correct the actual country and currency before trying again.';
       }
       status(result?.error || 'No checkout response received.');

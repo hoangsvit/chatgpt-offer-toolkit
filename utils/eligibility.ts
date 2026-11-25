@@ -3,13 +3,15 @@ export interface EligibilityResult {
   plan: string | null;
   campaign: 'assigned' | 'not_listed' | 'unknown';
   reason: string;
+  detectedCountry?: string;
 }
 // Serialized into the current ChatGPT tab. All helpers must remain inside the function.
 // Read-only: no checkout, redemption, modification, or third-party requests.
 export async function checkOfferEligibility(): Promise<EligibilityResult> {
   let plan: string | null = null;
   let campaign: EligibilityResult['campaign'] = 'unknown';
-  const result = (state: EligibilityResult['state'], reason: string): EligibilityResult => ({state,plan,campaign,reason});
+  let detectedCountry: string | undefined;
+  const result = (state: EligibilityResult['state'], reason: string): EligibilityResult => ({state,plan,campaign,reason,...(detectedCountry ? {detectedCountry} : {})});
   if (location.origin !== 'https://chatgpt.com') return result('unknown','Open the official ChatGPT site first.');
   const object = (value: unknown): Record<string,unknown> | null =>
     value !== null && typeof value === 'object' && !Array.isArray(value) ? value as Record<string,unknown> : null;
@@ -32,6 +34,9 @@ export async function checkOfferEligibility(): Promise<EligibilityResult> {
     if (sessionResponse.status !== 200) return result('unknown','Session HTTP '+sessionResponse.status+'. Sign in on ChatGPT and retry.');
     const token = sessionResponse.body?.accessToken;
     if (typeof token !== 'string' || !token) return result('unknown','Sign in to ChatGPT first.');
+    // Observed session context: a country hint, not a verified billing address.
+    const country = object(sessionResponse.body?.statsigContext)?.country;
+    if (typeof country === 'string' && /^[A-Z]{2}$/.test(country) && !['ZZ','EU','XX'].includes(country)) detectedCountry = country;
     const headers = {Authorization:'Bearer '+token,Accept:'application/json'};
     stage = 'Account check';
     const response = await request('/backend-api/accounts/check/v4-2023-04-27',{method:'GET',headers});

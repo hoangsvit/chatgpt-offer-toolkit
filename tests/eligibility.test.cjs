@@ -52,3 +52,19 @@ test('unverified personal account ID stops before coupon',async()=>{
  const p=profile();delete p.accounts.default.account.account_id;
  const r=await run([session,{body:p}]);assert.equal(r.result.state,'unknown');assert.equal(r.calls.length,2);
 });
+
+test('session country is available without extra requests even when coupon is unassigned',async()=>{
+ const {result,calls}=await run([{body:{accessToken:'synthetic-token',statsigContext:{country:'VN'}}},{body:profile(false)}]);
+ assert.equal(result.detectedCountry,'VN');assert.equal(result.state,'unknown');assert.equal(calls.length,2);
+ assert.ok(!JSON.stringify(result).includes('synthetic-token'));
+});
+test('session country remains a hint even if account endpoint fails',async()=>{
+ const {result,calls}=await run([{body:{accessToken:'synthetic-token',statsigContext:{country:'VN'}}},{status:403}]);
+ assert.equal(result.detectedCountry,'VN');assert.equal(result.state,'unknown');assert.equal(calls.length,2);
+});
+test('missing, invalid or unsigned-in session country is not used',async()=>{
+ for(const country of [null,'en-US','ZZ','EU','XX','vn',42]){
+  const {result}=await run([{body:{accessToken:'synthetic-token',statsigContext:{country}}},{body:profile(false)}]);assert.equal(result.detectedCountry,undefined);
+ }
+ const {result}=await run([{body:{statsigContext:{country:'VN'}}}]);assert.equal(result.detectedCountry,undefined);
+});
