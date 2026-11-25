@@ -1,12 +1,12 @@
 const test=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm'),ts=require('typescript');
 const source=ts.transpileModule(fs.readFileSync('utils/eligibility.ts','utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText;
 const campaign='team-1-month-free';
-const profile=(assigned=true)=>({accounts:{default:{account:{structure:'personal',plan_type:'plus'},eligible_promo_campaigns:assigned?{team:{id:campaign}}:{}}}});
+const profile=(assigned=true)=>({accounts:{default:{account:{structure:'personal',plan_type:'plus',account_id:'00000000-0000-4000-8000-000000000001'},eligible_promo_campaigns:assigned?{team:{id:campaign}}:{}}}});
 const coupon=(state='eligible',redemption={redeemed:false,redeemed_by_user:false,redeemed_by_workspace:false})=>({coupon:campaign,state,redemption});
 async function run(responses,origin='https://chatgpt.com'){
  const calls=[];
- const ctx=vm.createContext({exports:{},location:{origin},AbortSignal,fetch:async(path,options)=>{
-  calls.push(path);assert.ok(!options.method||options.method==='GET');assert.equal(options.credentials,'same-origin');assert.equal(options.redirect,'error');
+ const ctx=vm.createContext({exports:{},location:{origin},AbortController,setTimeout,clearTimeout,fetch:async(path,options)=>{
+  calls.push(path);assert.ok(path.startsWith('https://chatgpt.com/'));assert.ok(!options.method||options.method==='GET');if(path.includes('check_coupon'))assert.equal(options.headers['ChatGPT-Account-Id'],'00000000-0000-4000-8000-000000000001');assert.equal(options.credentials,'same-origin');assert.equal(options.redirect,'error');
   const value=responses.shift();if(!value)throw Error('unexpected request');
   return {ok:value.status===undefined||value.status===200,status:value.status??200,json:async()=>value.body};
  }});
@@ -40,4 +40,15 @@ test('no session, foreign origin or non-personal account stops safely',async()=>
 });
 test('HTTP failure never reports eligible',async()=>{
  const r=await run([session,{body:profile()},{status:403}]);assert.equal(r.result.state,'unknown');assert.equal(r.calls.length,3);
+});
+
+test('account network failure retains diagnostic stage',async()=>{
+ const r=await run([session]);assert.equal(r.result.state,'unknown');assert.match(r.result.reason,/Account check failed/);
+});
+test('session network failure identifies session stage',async()=>{
+ const r=await run([]);assert.equal(r.result.state,'unknown');assert.match(r.result.reason,/Session failed/);
+});
+test('unverified personal account ID stops before coupon',async()=>{
+ const p=profile();delete p.accounts.default.account.account_id;
+ const r=await run([session,{body:p}]);assert.equal(r.result.state,'unknown');assert.equal(r.calls.length,2);
 });
