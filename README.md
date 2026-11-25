@@ -25,6 +25,10 @@ npm run zip:all
 
 Output directories: `.output/chrome-mv3`, `.output/firefox-mv3`. ZIP packages are in `.output/`. The CI workflow builds and uploads both targets. No store submission or signing is performed.
 
+## Popup design
+
+Modern Minimal: a compact 380px popup, system-aware light/dark theme with a manual toggle, active ChatGPT tab status, seat stepper (2–100), editable country/currency suggestions and checkout actions. The tab indicator does not verify login or offer eligibility; those are checked when requesting checkout.
+
 ## Use
 
 1. Sign in at https://chatgpt.com using your own account.
@@ -37,7 +41,7 @@ Defaults: MyTeam, 5 seats, VN, USD, monthly billing, campaign `team-1-month-free
 
 ## Privacy and permissions
 
-Only `activeTab` and `scripting` are requested. A user-initiated script runs on the active ChatGPT tab, accesses the current session in memory, and sends its token only to the same-origin checkout endpoint. No persistent storage, telemetry, remote scripts, broad host permissions, token logging, or automatic retries. Checkout URLs may be sensitive; do not post them publicly. The extension blocks unexpected destination hosts and offers a direct official promotional page as a fallback.
+Only `activeTab` and `scripting` are requested. A user-initiated script runs on the active ChatGPT tab, accesses the current session in memory, and sends its token only to the same-origin checkout endpoint. Only the light/dark theme preference is stored locally; no tokens, checkout URLs, or billing details are persisted. No telemetry, remote scripts, broad host permissions, token logging, or automatic retries. Checkout URLs may be sensitive; do not post them publicly. The extension blocks unexpected destination hosts and offers a direct official promotional page as a fallback.
 
 ## Tests
 
