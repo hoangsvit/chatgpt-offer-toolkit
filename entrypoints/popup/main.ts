@@ -77,29 +77,6 @@ let eligibilityBusy = false;
 const eligibilityButton = button('eligibility-check');
 
 element('version').textContent = 'v' + browser.runtime.getManifest().version;
-const media = window.matchMedia('(prefers-color-scheme: dark)');
-type Theme = 'light' | 'dark';
-let selectedTheme: Theme | null = null;
-try {
-  const stored = localStorage.getItem('offer-toolkit-theme');
-  if (stored === 'light' || stored === 'dark') selectedTheme = stored;
-} catch { /* private storage may be unavailable */ }
-function applyTheme() {
-  const theme = selectedTheme ?? (media.matches ? 'dark' : 'light');
-  document.documentElement.dataset.theme = theme;
-  document.documentElement.classList.toggle('dark', theme === 'dark');
-  element('moon').hidden = theme === 'dark';
-  element('sun').hidden = theme !== 'dark';
-  button('theme').setAttribute('aria-label', 'Switch to ' + (theme === 'dark' ? 'light' : 'dark') + ' mode');
-}
-button('theme').addEventListener('click', () => {
-  selectedTheme = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
-  try { localStorage.setItem('offer-toolkit-theme', selectedTheme); } catch { /* theme still works in memory */ }
-  applyTheme();
-});
-media.addEventListener('change', applyTheme);
-applyTheme();
-
 function status(message: string) {
   const node = element('status');
   node.textContent = message;

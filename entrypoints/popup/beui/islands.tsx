@@ -3,6 +3,8 @@ import { createRoot } from 'react-dom/client';
 import { flushSync } from 'react-dom';
 import { ArrowRight, Link2, RefreshCw } from 'lucide-react';
 import { Button } from './button';
+import { ThemeToggle } from './theme-toggle';
+import { initTheme } from './extension-theme';
 import { AnimatedBadge, type AnimatedBadgeStatus } from './animated-badge';
 
 function Generate({submit}:{submit:()=>void}) {
@@ -50,8 +52,10 @@ function RefreshEligibility() {
   </Button>;
 }
 export function mountBeui(submit:()=>void) {
+  initTheme();
+  const theme=document.getElementById('beui-theme')!;
   const cta=document.getElementById('beui-generate')!;
   const eligibility=document.getElementById('beui-eligibility')!;
   const refresh=document.getElementById('beui-refresh')!;
-  flushSync(()=>{createRoot(cta).render(<Generate submit={submit}/>);createRoot(eligibility).render(<EligibilityBadge/>);createRoot(refresh).render(<RefreshEligibility/>);});
+  flushSync(()=>{createRoot(theme).render(<ThemeToggle variant="circle" start="top-right" className="icon-button" iconClassName="size-4"/>);createRoot(cta).render(<Generate submit={submit}/>);createRoot(eligibility).render(<EligibilityBadge/>);createRoot(refresh).render(<RefreshEligibility/>);});
 }
