@@ -5,7 +5,8 @@ export interface CheckoutConfig {
   currency: string;
 }
 export type CheckoutInput = Omit<CheckoutConfig, "seats"> & { seats: number | string };
-export type CheckoutResult = { url: string; error?: never; code?: never } | { error: string; url?: never; code?: "billing_country_mismatch" };
+export type CheckoutTotal = {currency: string; minorUnits: number};
+export type CheckoutResult = { url: string; error?: never; code?: never; total?: CheckoutTotal } | { error: string; url?: never; code?: "billing_country_mismatch"; total?: never };
 
 // This function is serialized and injected into the active tab. Keep it self-contained.
 export function validateConfig(input: CheckoutInput): CheckoutConfig {
@@ -59,6 +60,14 @@ export async function requestCheckout(config: CheckoutConfig): Promise<CheckoutR
       (value): value is string => typeof value === "string" && value.trim().length > 0
     );
     if (!url) return {error:"No hosted checkout link returned. Review the offer on the official ChatGPT page."};
+    // Read only the explicit server total when available. Do not infer from discounts.
+    const currency = data?.checkout_state?.currency;
+    const minorUnits = data?.checkout_state?.total?.total?.minorUnitsAmount;
+    if (data?.status === "open" && typeof currency === "string" &&
+        /^[A-Za-z]{3}$/.test(currency) && currency.toUpperCase() === config.currency &&
+        typeof minorUnits === "number" && Number.isSafeInteger(minorUnits) && minorUnits >= 0) {
+      return {url,total:{currency:currency.toUpperCase(),minorUnits}};
+    }
     return {url};
   } catch { return {error:"Request failed. Check your connection or use the official offer page. No automatic retry was performed."}; }
 }
