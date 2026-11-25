@@ -23,7 +23,7 @@ npm run build:all
 npm run zip:all
 ```
 
-Output directories: `.output/chrome-mv3`, `.output/firefox-mv3`. ZIP packages are in `.output/`. The CI workflow builds and uploads both targets. No store submission or signing is performed.
+Output directories: `.output/chrome-mv3`, `.output/firefox-mv3`. ZIP packages are in `.output/`. The CI workflow builds and uploads both targets. The validation workflow does not submit to a store or sign; release signing is optional.
 
 ## Popup design
 
@@ -32,6 +32,15 @@ Modern Minimal: a compact 380px popup, system-aware light/dark theme with a manu
 ## Promotion banner
 
 The extension displays a clearly branded ePlus.DEV promotion on chatgpt.com. Open Banner settings to enable/disable, select top or floating placement, choose a dismissal duration (24 hours, 7 days, or until enabled), or show it again. Changes sync to open tabs locally. The banner only opens the official campaign page; it never checks credentials or performs checkout. The default top banner is inserted into page flow rather than fixed over the header. Actual layout compatibility should be tested in each browser.
+
+## Updates without a public store
+
+The popup Software updates section checks the latest stable GitHub Release every six hours (while the browser is running), with a manual check and an opt-out. An available update is also linked in the promotion banner. No executable code is downloaded or run by the checker.
+
+- Chrome / Edge: download `chrome.zip` from the release, extract the contents into the same unpacked extension directory, then reload the extension. Standard unmanaged Chrome on Windows/macOS does not allow silent self-hosted installs.
+- Firefox: `firefox-unsigned.zip` is only for temporary testing. Install `firefox.xpi` when available; signed self-distributed versions use the separate `firefox-updates` release manifest for native Firefox updates. Browser update settings still apply.
+
+To publish a version, update package.json, merge the change and push a matching `vX.Y.Z` tag. The Release workflow tests, builds and publishes browser ZIPs and SHA256SUMS.txt. For signing, configure repository Actions secrets `AMO_JWT_ISSUER` and `AMO_JWT_SECRET`. Signing is an optional separate job; no unsigned XPI is advertised as a native update. The signed XPI and update manifest are published only after successful signing. Mozilla may require source review or reject signing; see [self-distribution](https://extensionworkshop.com/documentation/publish/self-distribution/). The dedicated prerelease tag firefox-updates is not the latest stable release.
 
 ## Use
 
@@ -47,7 +56,7 @@ Defaults: MyTeam, 5 seats, VN, USD, monthly billing, campaign `team-1-month-free
 
 ## Privacy and permissions
 
-Permissions: `activeTab`, `scripting`, and `storage`. The content script is restricted to `https://chatgpt.com/*`; no broad host access. A user-initiated script runs on the active ChatGPT tab, accesses the current session in memory, and sends its token only to the same-origin checkout endpoint. Only the light/dark theme preference and banner settings are stored locally; no tokens, checkout URLs, or billing details are persisted. No telemetry, remote scripts, broad host permissions, token logging, or automatic retries. Checkout URLs may be sensitive; do not post them publicly. The extension blocks unexpected destination hosts and offers a direct official promotional page as the default claim flow.
+Permissions: `activeTab`, `scripting`, `storage`, and `alarms`. GitHub API host access is used only for public release metadata, without account credentials. The content script is restricted to `https://chatgpt.com/*`; no broad host access. A user-initiated script runs on the active ChatGPT tab, accesses the current session in memory, and sends its token only to the same-origin checkout endpoint. Only the light/dark theme preference, banner settings and update metadata/preferences are stored locally; no tokens, checkout URLs, or billing details are persisted. No telemetry, remote scripts, broad host permissions, token logging, or automatic retries. Checkout URLs may be sensitive; do not post them publicly. The extension blocks unexpected destination hosts and offers a direct official promotional page as the default claim flow.
 
 ## Tests
 

@@ -2,6 +2,8 @@ import { defineContentScript } from 'wxt/utils/define-content-script';
 import { browser } from 'wxt/browser';
 import { BANNER_KEY, OFFER_URL, EPLUS_URL, SUPPORT_URL, normalizeSettings, isVisible, dismissalDeadline } from '../utils/banner-settings';
 
+import { UPDATE_KEY, normalizeUpdate, isNewer, releasePage } from '../utils/updates';
+
 const STYLE = `
 :host{all:initial;display:block;color-scheme:light;--bg:#eaf7ef;--text:#145d40;--muted:#39745a;--border:#c9e4d6;--accent:#146d4b;font:13px/1.4 system-ui,sans-serif}
 :host([data-dark]){color-scheme:dark;--bg:#203c30;--text:#c4f4d9;--muted:#a5cfb9;--border:#385d4b;--accent:#146d4b}
@@ -25,6 +27,8 @@ export default defineContentScript({
   main(ctx) {
     let settings = normalizeSettings(undefined);
     let loaded = false;
+    let update = normalizeUpdate(undefined);
+    let updateLink: HTMLAnchorElement | null = null;
     let host: HTMLElement | null = null;
     let dismissTimer: number | undefined;
     let stopped = false;
@@ -36,7 +40,14 @@ export default defineContentScript({
       const dark = explicit === 'dark' || root.classList.contains('dark') || (explicit !== 'light' && !root.classList.contains('light') && media.matches);
       host?.toggleAttribute('data-dark', dark);
     }
-    function remove() { host?.remove(); host = null; }
+    function remove() { host?.remove(); host = null; updateLink = null; }
+    function renderUpdate() {
+      if(!updateLink) return;
+      const newer = isNewer(update.latest,browser.runtime.getManifest().version);
+      updateLink.hidden = !newer;
+      updateLink.textContent = newer ? 'Update v'+update.latest+' ↗' : '';
+      updateLink.href = releasePage(update.latest);
+    }
     function build() {
       const node = document.createElement('div');
       node.id = HOST_ID;
@@ -48,6 +59,9 @@ export default defineContentScript({
       const title = document.createElement('strong'); title.className = 'title'; title.textContent = 'ChatGPT Business — 1 month free';
       const meta = document.createElement('div'); meta.className = 'meta';
       meta.append('Eligibility applies · Extension by ',makeLink('ePlus.DEV',EPLUS_URL),' · ',makeLink('Telegram',SUPPORT_URL));
+      updateLink = makeLink('',releasePage(update.latest));
+      updateLink.hidden = true;
+      meta.append(updateLink);
       copy.append(title,meta);
       const claim = makeLink('Claim offer ↗',OFFER_URL,'claim');
       const close = document.createElement('button'); close.className = 'close'; close.type = 'button'; close.textContent = '×'; close.setAttribute('aria-label','Dismiss promotion banner');
@@ -78,7 +92,7 @@ export default defineContentScript({
         document.body.prepend(host);
       }
       host.dataset.position = settings.position;
-      theme();
+      theme(); renderUpdate();
     }
     function queueRender() {
       if (queued || stopped) return;
@@ -91,10 +105,12 @@ export default defineContentScript({
     themeObserver.observe(document.documentElement,{attributes:true,attributeFilter:['class','data-theme']});
     media.addEventListener('change',theme);
     const listener: Parameters<typeof browser.storage.onChanged.addListener>[0] = (changes, area) => {
+      if(area==='local' && changes[UPDATE_KEY]) {update=normalizeUpdate(changes[UPDATE_KEY].newValue);renderUpdate();}
       if(area==='local' && changes[BANNER_KEY]) {settings=normalizeSettings(changes[BANNER_KEY].newValue);loaded=true;render();}
     };
     browser.storage.onChanged.addListener(listener);
-    void browser.storage.local.get(BANNER_KEY).then(data => {
+    void browser.storage.local.get([BANNER_KEY,UPDATE_KEY]).then(data => {
+      update=normalizeUpdate(data[UPDATE_KEY]);renderUpdate();
       if(!loaded) {settings=normalizeSettings(data[BANNER_KEY]);loaded=true;render();}
     }).catch(()=>{ /* fail closed if storage unavailable */ });
     ctx.onInvalidated(() => {
