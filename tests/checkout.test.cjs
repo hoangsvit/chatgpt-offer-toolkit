@@ -49,3 +49,17 @@ test("null or missing hosted URL yields a safe error without another checkout",a
   assert.equal(calls,2);
  }
 });
+
+test("billing-country mismatch returns a specific safe error and never retries",async()=>{
+ let calls=0;
+ const c=load({fetch:async()=>++calls===1?{ok:true,json:async()=>({accessToken:"mock-token"})}:{ok:false,status:400,json:async()=>({detail:"Billing country must match request country.",secret:"synthetic-private"})}});
+ const result=await c.requestCheckout(config);
+ assert.equal(result.code,"billing_country_mismatch");assert.match(result.error,/country does not match/);assert.equal(calls,2);
+ assert.ok(!JSON.stringify(result).includes("synthetic-private"));
+});
+test("unrecognized HTTP 400 or malformed body remains a generic failure",async()=>{
+ for(const json of [async()=>({detail:"unrelated private error"}),async()=>{throw Error("bad json");}]){
+  let calls=0;const c=load({fetch:async()=>++calls===1?{ok:true,json:async()=>({accessToken:"mock-token"})}:{ok:false,status:400,json}});
+  const result=await c.requestCheckout(config);assert.equal(result.code,undefined);assert.match(result.error,/HTTP 400/);assert.equal(calls,2);assert.ok(!result.error.includes("private"));
+ }
+});
