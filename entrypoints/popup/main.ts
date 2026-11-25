@@ -77,7 +77,7 @@ async function getActiveChatGPTTab() {
 function renderConnection(ready: boolean) {
   tabReady = ready;
   element('connection').dataset.state = ready ? 'ready' : 'unavailable';
-  element('connection-text').textContent = ready ? 'ChatGPT tab ready · sign-in checked on request' : 'Open ChatGPT to use advanced checkout';
+  element('connection-text').textContent = ready ? 'ChatGPT tab ready · sign-in checked on request' : 'Open chatgpt.com to generate a checkout link';
   generate.disabled = busy || !tabReady;
 }
 async function checkConnection() {

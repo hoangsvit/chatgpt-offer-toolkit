@@ -13,3 +13,5 @@ label{display:block;font-size:12px;font-weight:650;margin-bottom:6px}input{displ
 
 /* Browser action popups are intrinsically sized. Never clamp their width to the initial viewport. */
 .header{gap:10px;padding-bottom:12px}.brand>span{white-space:nowrap}.offer h2{font-size:28px}.offer-top{gap:8px}.privacy{margin:8px 0}.connection{line-height:1.4}.grid{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}footer{gap:8px;flex-wrap:wrap}footer button{white-space:nowrap}.advanced summary{line-height:1.4}
+
+.checkout-section{margin-bottom:14px}.checkout-section h2{font-size:15px;line-height:1.3;margin:0 0 5px}.checkout-intro{color:var(--muted);font-size:12px;line-height:1.45;margin:0 0 12px}.checkout-section #generate{margin-top:3px}.checkout-section input{margin-bottom:10px}.checkout-section .stepper{margin-bottom:10px}.checkout-section .stepper input{margin:0}.checkout-section #result{margin-bottom:10px}.claim-hint{margin-bottom:12px}

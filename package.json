@@ -1,9 +1,9 @@
 {
   "name": "chatgpt-offer-toolkit",
-  "version": "1.4.2",
+  "version": "1.4.3",
   "private": true,
   "type": "module",
-  "description": "Explore ChatGPT Business offers, open official claim pages, generate checkout links, and check for updates. Built by ePlus.DEV.",
+  "description": "Generate ChatGPT Business promotional checkout links, visit the official offer page, and manage updates. Built by ePlus.DEV.",
   "engines": {
     "node": ">=22.12.0"
   },

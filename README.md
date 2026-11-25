@@ -2,14 +2,14 @@
 
 # ChatGPT Offer Toolkit
 
-Explore ChatGPT Business offers, open official claim pages, generate checkout links, and check for updates. Built by ePlus.DEV.
+Generate ChatGPT Business promotional checkout links, visit the official offer page, and manage updates. Built by ePlus.DEV.
 
 A browser extension for Chrome, Edge and Firefox. Independent project by [ePlus.DEV](https://eplus.dev); not affiliated with OpenAI.
 
 ## Features
 
-- **Claim offer:** opens the official ChatGPT Business promotion page. Eligibility and pricing are decided by ChatGPT.
-- **Advanced checkout:** configure workspace, seats, actual billing country and currency, then copy or open a checkout link.
+- **Checkout Generator (primary):** configure workspace, seats, actual billing country and currency, then generate and copy or open the returned checkout link. Available directly in the popup.
+- **Open official offer page:** alternative route to the promotion on ChatGPT. Eligibility and pricing are decided by ChatGPT.
 - **Promotion banner:** optional top or floating banner on chatgpt.com, with dismissal and visibility settings.
 - **Modern popup:** light/dark mode, active-tab status, version and support links.
 - **Update Center:** stable release checks every six hours, manual checking and links to GitHub Releases.
@@ -60,7 +60,7 @@ To publish a version, update package.json, merge the change and push a matching 
 
 ## Use
 
-Click **Claim offer** to open the official campaign page directly. For the existing checkout generator, expand Advanced checkout configuration.
+The **Checkout Generator** is visible by default in the popup. Use **Open official offer page** as an alternative to the generator.
 
 1. Sign in at https://chatgpt.com using your own account.
 2. Open the extension popup.
@@ -72,7 +72,7 @@ Defaults: MyTeam, 5 seats, VN, USD, monthly billing, campaign `team-1-month-free
 
 ## Privacy and permissions
 
-Permissions: `activeTab`, `scripting`, `storage`, and `alarms`. GitHub API host access is used only for public release metadata, without account credentials. The content script is restricted to `https://chatgpt.com/*`; no broad host access. A user-initiated script runs on the active ChatGPT tab, accesses the current session in memory, and sends its token only to the same-origin checkout endpoint. Only the light/dark theme preference, banner settings and update metadata/preferences are stored locally; no tokens, checkout URLs, or billing details are persisted. No telemetry, remote scripts, broad host permissions, token logging, or automatic retries. Checkout URLs may be sensitive; do not post them publicly. The extension blocks unexpected destination hosts and offers a direct official promotional page as the default claim flow.
+Permissions: `activeTab`, `scripting`, `storage`, and `alarms`. GitHub API host access is used only for public release metadata, without account credentials. The content script is restricted to `https://chatgpt.com/*`; no broad host access. A user-initiated script runs on the active ChatGPT tab, accesses the current session in memory, and sends its token only to the same-origin checkout endpoint. Only the light/dark theme preference, banner settings and update metadata/preferences are stored locally; no tokens, checkout URLs, or billing details are persisted. No telemetry, remote scripts, broad host permissions, token logging, or automatic retries. Checkout URLs may be sensitive; do not post them publicly. The extension blocks unexpected destination hosts and offers a direct official promotional page as an alternative.
 
 ## Tests
 
