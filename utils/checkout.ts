@@ -5,7 +5,7 @@ export interface CheckoutConfig {
   currency: string;
 }
 export type CheckoutInput = Omit<CheckoutConfig, "seats"> & { seats: number | string };
-export type CheckoutResult = { url: string; error?: never } | { error: string; url?: never; code?: "billing_country_mismatch" };
+export type CheckoutResult = { url: string; error?: never; code?: never } | { error: string; url?: never; code?: "billing_country_mismatch" };
 
 // This function is serialized and injected into the active tab. Keep it self-contained.
 export function validateConfig(input: CheckoutInput): CheckoutConfig {
