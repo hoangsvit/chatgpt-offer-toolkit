@@ -12,6 +12,17 @@ for (const script of manifest.content_scripts) {
   assert.deepEqual(script.matches, ['https://chatgpt.com/*']);
   for (const file of script.js ?? []) assert.ok(existsSync(directory + file));
 }
+assert.equal(typeof manifest.description, 'string');
+assert.ok(manifest.description.includes('ePlus.DEV') && manifest.description.length <= 132);
+for (const size of [16,32,48,96,128]) {
+  const path = manifest.icons?.[String(size)];
+  assert.ok(path, 'Missing extension icon '+size);
+  const png = readFileSync(directory+path);
+  assert.equal(png.subarray(0,8).toString('hex'),'89504e470d0a1a0a');
+  assert.equal(png.readUInt32BE(16),size);
+  assert.equal(png.readUInt32BE(20),size);
+}
+for (const size of [16,32,48]) assert.ok(existsSync(directory+manifest.action?.default_icon?.[String(size)]));
 assert.ok(manifest.action?.default_popup);
 assert.ok(existsSync(directory + manifest.action.default_popup));
 assert.ok(manifest.host_permissions.includes('https://api.github.com/*'));
