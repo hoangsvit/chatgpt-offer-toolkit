@@ -26,3 +26,26 @@ test("missing session stops checkout",async()=>{let calls=0;const c=load({fetch:
 test("successful request preserves checkout payload",async()=>{let calls=0;const c=load({fetch:async(path,options)=>{calls++;if(calls===1)return{ok:true,json:async()=>({accessToken:"mock-token"})};assert.equal(path,"/backend-api/payments/checkout");assert.equal(options.redirect,"error");assert.equal(options.headers.Authorization,"Bearer mock-token");const data=JSON.parse(options.body);assert.equal(data.team_plan_data.seat_quantity,5);assert.equal(data.promo_campaign.promo_campaign_id,"team-1-month-free");return{ok:true,json:async()=>({url:"https://checkout.stripe.com/c/pay/test"})};}});assert.equal((await c.requestCheckout(config)).url,"https://checkout.stripe.com/c/pay/test");assert.equal(calls,2);});
 test("declined checkout stops without retry",async()=>{let calls=0;const c=load({fetch:async()=>{calls++;return calls===1?{ok:true,json:async()=>({accessToken:"mock-token"})}:{ok:false,status:403};}});assert.match((await c.requestCheckout(config)).error,/403/);assert.equal(calls,2);});
 test("network failure returns safe message",async()=>{const c=load();assert.match((await c.requestCheckout(config)).error,/Request failed/);});
+
+test("accepts OpenAI hosted payment URLs",()=>{
+ const c=load();
+ assert.equal(c.validCheckoutUrl("https://pay.openai.com/c/pay/test"),"https://pay.openai.com/c/pay/test");
+ for(const url of ["https://pay.openai.com.evil.test","https://evil-pay.openai.com","http://pay.openai.com","https://user@pay.openai.com","https://pay.openai.com:444","https://pay.openai.com@evil.test"]) assert.equal(c.validCheckoutUrl(url),null);
+});
+test("hosted response accepts supported URL fields and skips empty or malformed values",async()=>{
+ for(const data of [{url:"https://pay.openai.com/c/pay/test"},{url:" ",stripe_hosted_url:"https://pay.openai.com/c/pay/test"},{url:42,stripe_hosted_url:null,checkout_url:"https://pay.openai.com/c/pay/test"}]){
+  let calls=0;
+  const c=load({fetch:async()=>++calls===1?{ok:true,json:async()=>({accessToken:"mock-token"})}:{ok:true,json:async()=>data}});
+  const result=await c.requestCheckout(config);
+  assert.equal(c.validCheckoutUrl(result.url),"https://pay.openai.com/c/pay/test");
+  assert.equal(calls,2);
+ }
+});
+test("null or missing hosted URL yields a safe error without another checkout",async()=>{
+ for(const data of [null,{}, {url:null}, {url:" "}]) {
+  let calls=0;
+  const c=load({fetch:async()=>++calls===1?{ok:true,json:async()=>({accessToken:"mock-token"})}:{ok:true,json:async()=>data}});
+  assert.match((await c.requestCheckout(config)).error,/No hosted checkout link/);
+  assert.equal(calls,2);
+ }
+});
