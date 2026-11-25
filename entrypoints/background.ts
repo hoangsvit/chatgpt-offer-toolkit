@@ -73,13 +73,23 @@ export default defineBackground(() => {
     queues.set(tabId,next);
     void next.finally(()=>{if(queues.get(tabId)===next)queues.delete(tabId);}).catch(()=>{});
   }
-  function clear(tabId: number) {
-    revision.set(tabId,(revision.get(tabId)??0)+1);
-    paint(tabId,'','#64736b','Offer eligibility not checked');
+  const offBadge = {text:'OFF',color:'#64736b',title:'Inactive — only works on chatgpt.com'};
+  async function defaultBadge() {
+    await browser.action.setBadgeBackgroundColor({color:offBadge.color});
+    await browser.action.setBadgeText({text:offBadge.text});
+    await browser.action.setTitle({title:'ChatGPT Offer Toolkit — '+offBadge.title});
   }
-  browser.tabs.onUpdated.addListener((tabId,change)=>{
-    if(change.status==='loading' || (change.url && !isChatGPTUrl(change.url))) clear(tabId);
+  function clear(tabId: number, url: unknown) {
+    revision.set(tabId,(revision.get(tabId)??0)+1);
+    const badge = isChatGPTUrl(url) ? {text:'',color:'#64736b',title:'Offer eligibility not checked'} : offBadge;
+    paint(tabId,badge.text,badge.color,badge.title);
+  }
+  browser.tabs.onUpdated.addListener((tabId,change,tab)=>{
+    if(change.status==='loading' || (change.url && !isChatGPTUrl(change.url))) clear(tabId,change.url ?? tab.url);
   });
+  browser.runtime.onInstalled.addListener(()=>run(defaultBadge()));
+  browser.runtime.onStartup.addListener(()=>run(defaultBadge()));
+  run(defaultBadge());
   browser.tabs.onRemoved.addListener(tabId=>{revision.delete(tabId);queues.delete(tabId);});
   browser.runtime.onMessage.addListener((message,sender,sendResponse)=>{
     if(sender.id!==browser.runtime.id || sender.frameId!==0 || sender.tab?.id==null || !isChatGPTUrl(sender.url)) return false;
