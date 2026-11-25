@@ -35,3 +35,11 @@ export function suggestBilling(locales: readonly string[]): {country:string;curr
   }
   return null;
 }
+
+export const BILLING_PREFERENCE_KEY = 'offerToolkitConfirmedBillingV1';
+export function parseBillingPreference(value: unknown): {country:string;currency:string} | null {
+  if (!value || typeof value !== 'object') return null;
+  const {country,currency} = value as {country?:unknown;currency?:unknown};
+  return typeof country === 'string' && /^[A-Z]{2}$/.test(country) &&
+    typeof currency === 'string' && /^[A-Z]{3}$/.test(currency) ? {country,currency} : null;
+}

@@ -2,10 +2,9 @@ import { browser } from 'wxt/browser';
 import { validateConfig, validCheckoutUrl, requestCheckout } from '../../utils/checkout';
 import type { CheckoutConfig, CheckoutResult } from '../../utils/checkout';
 import './style.css';
-import { checkOfferEligibility } from '../../utils/eligibility';
 import { CHECK_TAB_MESSAGE } from '../../utils/eligibility-badge';
 import type { EligibilityResult } from '../../utils/eligibility';
-import { suggestBilling, currencyForCountry } from '../../utils/billing-locale';
+import { currencyForCountry, BILLING_PREFERENCE_KEY, parseBillingPreference } from '../../utils/billing-locale';
 import { BANNER_KEY, OFFER_URL, EPLUS_URL, SUPPORT_URL, normalizeSettings } from '../../utils/banner-settings';
 import type { BannerSettings } from '../../utils/banner-settings';
 
@@ -21,23 +20,28 @@ const seats = field('seats');
 const countryField = field('country');
 const currencyField = field('currency');
 const billingHint = element('billing-suggestion');
-const suggested = suggestBilling([...navigator.languages, navigator.language, Intl.DateTimeFormat().resolvedOptions().locale]);
-let currencyEdited = false;
-if (suggested) {
-  countryField.value = suggested.country;
-  currencyField.value = suggested.currency ?? '';
-  billingHint.textContent = suggested.currency
-    ? 'Suggested from browser region: ' + suggested.country + ' / ' + suggested.currency + '. Confirm or edit.'
-    : 'Suggested country: ' + suggested.country + '. Enter your supported billing currency.';
+const rememberBilling = field('remember-billing');
+// A language preference (including en-US) is not proof of billing country.
+let savedBilling: ReturnType<typeof parseBillingPreference> = null;
+try { savedBilling = parseBillingPreference(JSON.parse(localStorage.getItem(BILLING_PREFERENCE_KEY) ?? 'null')); } catch { /* ignore invalid or unavailable storage */ }
+if (savedBilling) {
+  countryField.value = savedBilling.country;
+  currencyField.value = savedBilling.currency;
+  rememberBilling.checked = true;
+  billingHint.textContent = 'Saved billing preference. Confirm it still matches your actual billing details.';
 } else {
-  billingHint.textContent = 'No browser region found. Enter your actual billing country and currency.';
+  billingHint.textContent = 'Select your actual billing country. Its local currency will be suggested.';
 }
-currencyField.addEventListener('input', () => { currencyEdited = true; });
+function forgetBilling() {
+  try { localStorage.removeItem(BILLING_PREFERENCE_KEY); } catch { /* storage may be unavailable */ }
+  rememberBilling.checked = false;
+}
+rememberBilling.addEventListener('change', () => {
+  if (!rememberBilling.checked) forgetBilling();
+});
 countryField.addEventListener('input', () => {
-  if (!currencyEdited) {
-    currencyField.value = currencyForCountry(countryField.value) ?? '';
-  }
-  billingHint.textContent = 'Confirm your billing details before generating a link.';
+  currencyField.value = currencyForCountry(countryField.value) ?? '';
+  billingHint.textContent = 'Currency is a local suggestion. Verify the currency supported by ChatGPT.';
 });
 let currentUrl: string | null = null;
 let busy = false;
@@ -133,14 +137,14 @@ async function runEligibilityCheck(force = false) {
       element('eligibility-state').textContent = 'Not checked';
       return;
     }
-    // Reuse the page's in-flight check or recent in-memory result.
+    // Reuse the page's in-flight check or document-scoped result.
     let result: EligibilityResult | undefined;
     try {
       result = await browser.tabs.sendMessage(tabId,{type:CHECK_TAB_MESSAGE,force}) as EligibilityResult | undefined;
     } catch {
-      // Existing tabs opened before extension installation may lack the content script.
-      const [response] = await browser.scripting.executeScript({target:{tabId},func:checkOfferEligibility});
-      result = response?.result as EligibilityResult | undefined;
+      // Do not inject a second checker after a messaging failure.
+      renderEligibility({state:'unknown',plan:null,campaign:'unknown',reason:'Unable to reach the page checker. Reload ChatGPT after installing or updating the extension.'});
+      return;
     }
     renderEligibility(result);
   } catch { renderEligibility(undefined); }
@@ -166,7 +170,7 @@ element<HTMLFormElement>('settings').addEventListener('submit', async event => {
   generate.disabled = true;
   eligibilityButton.disabled = true;
   element('generate-label').textContent = 'Generating…';
-  const controls = ['workspace','seats','country','currency','minus','plus'];
+  const controls = ['workspace','seats','country','currency','minus','plus','remember-billing'];
   for (const id of controls) element<HTMLInputElement | HTMLButtonElement>(id).disabled = true;
   status('Requesting checkout from your current ChatGPT session…');
   try {
@@ -175,9 +179,19 @@ element<HTMLFormElement>('settings').addEventListener('submit', async event => {
     if (tabId === null) { status('Open chatgpt.com, sign in, and reopen the extension.'); return; }
     const [response] = await browser.scripting.executeScript({target:{tabId},func:requestCheckout,args:[config]});
     const result = response?.result as CheckoutResult | undefined;
-    if (!result?.url) { status(result?.error || 'No checkout response received.'); return; }
+    if (!result?.url) {
+      if (result?.code === 'billing_country_mismatch') {
+        forgetBilling();
+        billingHint.textContent = 'Saved billing preference cleared. Correct the actual country and currency before trying again.';
+      }
+      status(result?.error || 'No checkout response received.');
+      return;
+    }
     currentUrl = validCheckoutUrl(result.url);
     if (!currentUrl) { status('Checkout returned an unrecognized or insecure URL. Use the official offer page instead.'); return; }
+    if (rememberBilling.checked) {
+      try { localStorage.setItem(BILLING_PREFERENCE_KEY,JSON.stringify({country:config.country,currency:config.currency})); } catch { /* storage is optional */ }
+    }
     field('link').value = currentUrl;
     element('result').hidden = false;
     status('Link generated. This does not confirm a free offer. Review the official checkout.');

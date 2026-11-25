@@ -33,7 +33,7 @@ export default defineBackground(() => {
     const data = await browser.storage.local.get([AUTO_KEY,UPDATE_KEY]);
     if(data[AUTO_KEY] === false) {await browser.alarms.clear(ALARM_NAME);return;}
     if(!await browser.alarms.get(ALARM_NAME)) await browser.alarms.create(ALARM_NAME,{periodInMinutes:360});
-    if(Date.now()-normalizeUpdate(data[UPDATE_KEY]).checkedAt >= 21600000) await check();
+    if(Date.now()-normalizeUpdate(data[UPDATE_KEY]).checkedAt >= 21600000) await checkIfDue();
   }
   let autoPending: Promise<UpdateState> | null = null;
   function checkIfDue(): Promise<UpdateState> {
@@ -54,7 +54,7 @@ export default defineBackground(() => {
   function run(task: Promise<unknown>) {void task.catch(()=>{});}
   browser.runtime.onInstalled.addListener(()=>run(configure()));
   browser.runtime.onStartup.addListener(()=>run(configure()));
-  browser.alarms.onAlarm.addListener(alarm=>{if(alarm.name===ALARM_NAME)run((async()=>{const s=await browser.storage.local.get(AUTO_KEY);if(s[AUTO_KEY]!==false)await check();})());});
+  browser.alarms.onAlarm.addListener(alarm=>{if(alarm.name===ALARM_NAME)run(checkIfDue());});
   browser.storage.onChanged.addListener((changes,area)=>{if(area==='local'&&changes[AUTO_KEY])run(configure());});
   browser.runtime.onMessage.addListener((message,sender,sendResponse)=>{
     if(message !== CHECK_MESSAGE || sender.id !== browser.runtime.id || sender.tab) return false;

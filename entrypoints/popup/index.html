@@ -27,7 +27,8 @@
     <div><label for="currency">Currency</label><input id="currency" list="currencies" required maxlength="3" pattern="[A-Za-z]{3}" placeholder="e.g. VND" autocomplete="off"><datalist id="currencies"><option value="USD"></option><option value="VND"></option><option value="SGD"></option><option value="JPY"></option><option value="GBP"></option><option value="EUR"></option><option value="AUD"></option><option value="CAD"></option><option value="INR"></option></datalist></div>
   </div>
   <p id="billing-suggestion" class="hint" role="status" aria-live="polite"></p>
-  <p class="hint">Confirm your actual billing country and a currency supported by ChatGPT. Local suggestions do not verify eligibility. Review the total and renewal price before subscribing.</p>
+  <label class="toggle-row"><span>Remember billing preference after checkout link succeeds</span><input id="remember-billing" type="checkbox"></label>
+  <p class="hint">Choose the actual billing country and a supported currency. Browser language does not establish billing country. Review the official checkout total and renewal price.</p>
   <button id="generate" type="submit" class="primary" disabled><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a4 4 0 0 0 6 0l3-3a4 4 0 0 0-6-6l-2 2m3 5a4 4 0 0 0-6 0l-3 3a4 4 0 0 0 6 6l2-2"/></svg><span id="generate-label">Generate checkout link</span></button>
 </form>
 <p id="status" role="status" aria-live="polite" hidden></p>
