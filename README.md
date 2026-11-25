@@ -84,6 +84,8 @@ Defaults: MyTeam, 5 seats, monthly billing, campaign `team-1-month-free`. Billin
 
 ## Checkout price review
 
+If the existing link-generation response includes an explicit current total and matching currency for an open checkout, the popup reports that amount as a server-reported snapshot. If it is absent or invalid, the price is unknown. This does not change the checkout request or add a request; review the official checkout for final charges and renewal terms.
+
 On an existing checkout on chatgpt.com, open the popup to review the visible due-today amount. Zero due today, paid checkout and unknown are distinct states. No checkout is created or payment submitted by the price reader. External hosted payment sites are outside scope and must be reviewed manually. Renewal terms and activation are not verified by this reader.
 
 ## Privacy and permissions
