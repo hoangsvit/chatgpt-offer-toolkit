@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import { flushSync } from 'react-dom';
-import { ArrowRight, Link2 } from 'lucide-react';
+import { ArrowRight, Link2, RefreshCw } from 'lucide-react';
 import { Button } from './button';
 import { AnimatedBadge, type AnimatedBadgeStatus } from './animated-badge';
 
@@ -33,8 +33,25 @@ function EligibilityBadge() {
   const status:AnimatedBadgeStatus=value.text==='Checking…'?'loading':value.state==='eligible'?'success':value.state==='not_eligible'?'danger':value.state==='redeemed'?'warning':'neutral';
   return <AnimatedBadge status={status} size="sm" pulse={false} aria-hidden="true">{value.text}</AnimatedBadge>;
 }
+function RefreshEligibility() {
+  const native=document.getElementById('eligibility-check') as HTMLButtonElement;
+  const read=()=>({disabled:native.disabled,checking:native.textContent==='Checking…'});
+  const [value,setValue]=useState(read);
+  useEffect(()=>{
+    const observer=new MutationObserver(()=>setValue(read()));
+    observer.observe(native,{attributes:true,attributeFilter:['disabled'],childList:true,subtree:true,characterData:true});
+    setValue(read());
+    return ()=>observer.disconnect();
+  },[]);
+  return <Button variant="ghost" size="icon" disabled={value.disabled}
+    aria-label="Check eligibility again" title="Check eligibility again"
+    onClick={()=>{if(!native.disabled)native.click()}}>
+    <RefreshCw size={15} aria-hidden="true" className={value.checking?'animate-spin':undefined}/>
+  </Button>;
+}
 export function mountBeui(submit:()=>void) {
   const cta=document.getElementById('beui-generate')!;
   const eligibility=document.getElementById('beui-eligibility')!;
-  flushSync(()=>{createRoot(cta).render(<Generate submit={submit}/>);createRoot(eligibility).render(<EligibilityBadge/>);});
+  const refresh=document.getElementById('beui-refresh')!;
+  flushSync(()=>{createRoot(cta).render(<Generate submit={submit}/>);createRoot(eligibility).render(<EligibilityBadge/>);createRoot(refresh).render(<RefreshEligibility/>);});
 }

@@ -12,13 +12,21 @@
 <div id="offer-view">
 <div class="connection" id="connection" data-state="loading" role="status"><span class="dot"></span><span id="connection-text">Checking active tab…</span></div>
 <section class="offer" aria-label="Campaign information"><div class="offer-top"><span>BUSINESS PROMOTION</span><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="8" width="18" height="4" rx="1"/><path d="M5 12v9h14v-9M12 8v13M12 8H7.5A2.5 2.5 0 1 1 10 5.5L12 8Zm0 0h4.5A2.5 2.5 0 1 0 14 5.5L12 8Z"/></svg></div><h2>1 month free</h2><p>Subject to account eligibility</p></section>
-<details class="advanced eligibility-section"><summary><span>Account eligibility</span><span id="eligibility-state" class="sr-only" data-state="unknown">Not checked</span><span id="beui-eligibility"></span></summary>
-<div class="update-row"><span>Default personal plan</span><strong id="eligibility-plan">—</strong></div>
-<div class="update-row"><span>Campaign assignment</span><strong id="eligibility-campaign">—</strong></div>
-<p id="eligibility-reason" class="hint" role="status" aria-live="polite">Automatically checks your signed-in account when this popup opens on ChatGPT. No checkout is created.</p>
-<button id="eligibility-check" type="button" class="secondary" disabled>Check eligibility</button>
-<p class="hint eligibility-total">Coupon status does not verify checkout price.</p>
-</details>
+<section class="account-card" aria-label="Account eligibility">
+  <div class="account-top">
+    <div class="account-label"><span>Account eligibility</span><small>Personal plan · <strong id="eligibility-plan">—</strong></small></div>
+    <span id="eligibility-state" class="sr-only" data-state="unknown" role="status">Not checked</span>
+    <span id="beui-eligibility"></span>
+    <div id="beui-refresh"></div>
+    <button id="eligibility-check" type="button" disabled hidden>Check eligibility</button>
+  </div>
+  <details class="account-details">
+    <summary>Details</summary>
+    <div class="update-row"><span>Campaign assignment</span><strong id="eligibility-campaign">—</strong></div>
+    <p id="eligibility-reason" class="hint" role="status" aria-live="polite">Checking your current personal workspace.</p>
+  </details>
+  <p class="account-note">Final price confirmed at checkout.</p>
+</section>
 <details class="advanced eligibility-section" id="price-panel" hidden><summary>Checkout price review <span id="price-state" data-state="unknown">Price unknown</span></summary>
 <div class="update-row"><span>Displayed due today</span><strong id="price-amount">—</strong></div>
 <p id="price-reason" class="hint" role="status" aria-live="polite">Open the official checkout and open this popup. Only the displayed due-today total is reviewed.</p>

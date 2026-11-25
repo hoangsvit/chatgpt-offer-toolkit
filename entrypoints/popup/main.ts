@@ -146,7 +146,7 @@ function renderEligibility(value: EligibilityResult | undefined) {
   state.dataset.state = value?.state ?? 'unknown';
   state.textContent = value?.state === 'unknown' && value.campaign === 'not_listed'
     ? 'Offer not listed' : value ? labels[value.state] : 'Unknown';
-  element('eligibility-plan').textContent = value?.plan ?? '—';
+  element('eligibility-plan').textContent = value?.plan ? value.plan.charAt(0).toUpperCase() + value.plan.slice(1) : '—';
   element('eligibility-campaign').textContent = value?.campaign === 'assigned' ? 'Assigned' : value?.campaign === 'not_listed' ? 'Not listed' : 'Unknown';
   element('eligibility-reason').textContent = value?.reason ?? 'No verified response. Review the official offer page.';
 }

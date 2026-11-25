@@ -25,3 +25,14 @@ test('promotion overlay and its settings are removed',()=>{
  assert.doesNotMatch(html,/banner-settings|banner-enabled|banner-reset/);
  assert.doesNotMatch(main,/loadBannerSettings|saveBannerSettings|BANNER_KEY/);
 });
+
+test('account status is visible with compact refresh and collapsed diagnostics',()=>{
+ assert.match(html,/<section class="account-card" aria-label="Account eligibility">/);
+ assert.match(html,/id="beui-refresh"/);
+ assert.match(html,/<details class="account-details">/);
+ assert.match(html,/id="eligibility-check" type="button" disabled hidden/);
+ const island=fs.readFileSync('entrypoints/popup/beui/islands.tsx','utf8');
+ assert.match(island,/function RefreshEligibility\(/);
+ assert.match(island,/if\(!native\.disabled\)native\.click\(\)/);
+ assert.match(main,/runEligibilityCheck\(true\)/);
+});
