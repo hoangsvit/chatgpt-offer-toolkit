@@ -17,6 +17,12 @@
 <button id="eligibility-check" type="button" class="secondary" disabled>Check eligibility</button>
 <p class="hint eligibility-total"><strong>Price not verified.</strong> Confirm 5 Standard seats, 0 Premium seats, monthly billing, discount duration, total due today and renewal price on the official checkout.</p>
 </details>
+<details class="advanced eligibility-section" open><summary>Checkout price review <span id="price-state" data-state="unknown">Price unknown</span></summary>
+<div class="update-row"><span>Displayed due today</span><strong id="price-amount">—</strong></div>
+<p id="price-reason" class="hint" role="status" aria-live="polite">Open the official checkout and open this popup. Only the displayed due-today total is reviewed.</p>
+<button id="price-check" type="button" class="secondary">Check checkout price</button>
+<p class="hint">A zero total does not verify renewal terms or activation. Always review the official checkout before subscribing.</p>
+</details>
 <section class="checkout-section" aria-labelledby="checkout-title"><h2 id="checkout-title">Checkout Generator</h2><p class="checkout-intro">Configure your workspace and generate a checkout link using your current ChatGPT session.</p>
 <form id="settings">
   <label for="workspace">Workspace name</label><input id="workspace" required maxlength="100" value="MyTeam" autocomplete="off">
