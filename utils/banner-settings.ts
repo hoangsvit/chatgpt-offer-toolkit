@@ -8,12 +8,12 @@ export const BANNER_KEY = 'offerToolkitBanner';
 export const OFFER_URL = 'https://chatgpt.com/?promo_campaign=team-1-month-free#pricing';
 export const EPLUS_URL = 'https://eplus.dev';
 export const SUPPORT_URL = 'https://t.me/eplus_news';
-export const defaults: BannerSettings = {enabled:true,position:'top',dismiss:'day',hiddenUntil:0};
+export const defaults: BannerSettings = {enabled:true,position:'floating',dismiss:'day',hiddenUntil:0};
 export function normalizeSettings(input: unknown): BannerSettings {
   const v = input && typeof input === 'object' ? input as Partial<BannerSettings> : {};
   return {
     enabled: typeof v.enabled === 'boolean' ? v.enabled : defaults.enabled,
-    position: v.position === 'floating' ? 'floating' : 'top',
+    position: v.position === 'top' ? 'top' : 'floating',
     dismiss: v.dismiss === 'week' || v.dismiss === 'forever' ? v.dismiss : 'day',
     hiddenUntil: typeof v.hiddenUntil === 'number' && Number.isFinite(v.hiddenUntil) && v.hiddenUntil >= 0 ? v.hiddenUntil : 0,
   };
