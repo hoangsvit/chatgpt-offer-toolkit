@@ -246,7 +246,17 @@ element<HTMLFormElement>('settings').addEventListener('submit', async event => {
     }
     field('link').value = currentUrl;
     element('result').hidden = false;
-    status('Link generated. This does not confirm a free offer. Review the official checkout.');
+    if (result.total) {
+      const {currency,minorUnits} = result.total;
+      const format = new Intl.NumberFormat(undefined,{style:'currency',currency});
+      const digits = format.resolvedOptions().maximumFractionDigits ?? 2;
+      const displayed = format.format(minorUnits / 10 ** digits);
+      status(minorUnits === 0
+        ? 'Server-reported current total: '+displayed+'. Review the official checkout, renewal price and terms; activation is not verified.'
+        : 'Paid checkout — server-reported current total: '+displayed+'. Review the official checkout before subscribing.');
+    } else {
+      status('Link generated. Server total unavailable. Review the official checkout; a free offer is not verified.');
+    }
   } catch { status('Unable to access the ChatGPT tab. Reopen the extension and try again.'); }
   finally {
     busy = false;
