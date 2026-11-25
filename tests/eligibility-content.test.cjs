@@ -11,10 +11,13 @@ function harness(check){
  return {request,messages,count:()=>count,dispose:()=>invalidated()};
 }
 const eligible={state:'eligible',plan:'plus',campaign:'assigned',reason:'synthetic'};
-test('automatic load and overlapping popup requests share one check; repeated opens reuse result',async()=>{
- let finish;const h=harness(()=>new Promise(resolve=>{finish=resolve;}));
+test('automatic load and overlapping popup requests share one check; repeated opens reuse result',{timeout:5000},async()=>{
+ let finish, signalStarted;
+ const started=new Promise(resolve=>{signalStarted=resolve;});
+ const h=harness(()=>new Promise(resolve=>{finish=resolve;signalStarted();}));
  const a=h.request(),b=h.request();
- await Promise.resolve();await Promise.resolve();
+ // Wait for the mocked request to actually start, not an assumed number of VM microtasks.
+ await started;
  assert.equal(h.count(),1);finish(eligible);
  assert.equal((await a).state,'eligible');await b;
  assert.equal((await h.request()).state,'eligible');assert.equal(h.count(),1);
