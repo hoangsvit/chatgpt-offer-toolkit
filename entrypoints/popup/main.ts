@@ -2,6 +2,7 @@ import { browser } from 'wxt/browser';
 import { validateConfig, validCheckoutUrl, requestCheckout } from '../../utils/checkout';
 import type { CheckoutConfig, CheckoutResult } from '../../utils/checkout';
 import './style.css';
+import { suggestBilling, currencyForCountry } from '../../utils/billing-locale';
 import { BANNER_KEY, OFFER_URL, EPLUS_URL, SUPPORT_URL, normalizeSettings } from '../../utils/banner-settings';
 import type { BannerSettings } from '../../utils/banner-settings';
 
@@ -14,6 +15,27 @@ const field = (id: string) => element<HTMLInputElement>(id);
 const button = (id: string) => element<HTMLButtonElement>(id);
 const generate = button('generate');
 const seats = field('seats');
+const countryField = field('country');
+const currencyField = field('currency');
+const billingHint = element('billing-suggestion');
+const suggested = suggestBilling([...navigator.languages, navigator.language, Intl.DateTimeFormat().resolvedOptions().locale]);
+let currencyEdited = false;
+if (suggested) {
+  countryField.value = suggested.country;
+  currencyField.value = suggested.currency ?? '';
+  billingHint.textContent = suggested.currency
+    ? 'Suggested from browser region: ' + suggested.country + ' / ' + suggested.currency + '. Confirm or edit.'
+    : 'Suggested country: ' + suggested.country + '. Enter your supported billing currency.';
+} else {
+  billingHint.textContent = 'No browser region found. Enter your actual billing country and currency.';
+}
+currencyField.addEventListener('input', () => { currencyEdited = true; });
+countryField.addEventListener('input', () => {
+  if (!currencyEdited) {
+    currencyField.value = currencyForCountry(countryField.value) ?? '';
+  }
+  billingHint.textContent = 'Confirm your billing details before generating a link.';
+});
 let currentUrl: string | null = null;
 let busy = false;
 let tabReady = false;
