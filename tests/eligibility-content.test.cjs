@@ -1,9 +1,9 @@
 const test=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm'),ts=require('typescript');
 const source=ts.transpileModule(fs.readFileSync('entrypoints/eligibility.content.ts','utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText;
-function harness(check){
+function harness(check,sendHook=async()=>{}){
  let listener,definition,invalidated;const messages=[];let count=0;
  const win={};win.top=win;
- const browser={runtime:{id:'extension-test',sendMessage:async message=>{messages.push(message);},onMessage:{addListener:fn=>{listener=fn;},removeListener:()=>{listener=undefined;}}}};
+ const browser={runtime:{id:'extension-test',sendMessage:async message=>{messages.push(message);await sendHook(message);},onMessage:{addListener:fn=>{listener=fn;},removeListener:()=>{listener=undefined;}}}};
  const modules={'wxt/utils/define-content-script':{defineContentScript:x=>{definition=x;return x;}},'wxt/browser':{browser},'../utils/eligibility':{checkOfferEligibility:()=>{count++;return check();}},'../utils/eligibility-badge':{BADGE_MESSAGE:'badge',CHECK_TAB_MESSAGE:'check',ELIGIBILITY_RESULT_MESSAGE:'result',ELIGIBILITY_PENDING_MESSAGE:'pending'}};
  vm.runInNewContext(source,{exports:{},window:win,require:name=>{assert.ok(modules[name],name);return modules[name];}});
  definition.main({onInvalidated:fn=>{invalidated=fn;}});
@@ -44,5 +44,17 @@ test('active-tab badge snapshot does not start or repeat eligibility requests',{
  const result=h.request();finish(eligible);await result;
  assert.equal(h.snapshot().pending,false);assert.equal(h.snapshot().result.state,'eligible');
  for(let i=0;i<5;i++)assert.equal(h.snapshot().result.state,'eligible');
+ assert.equal(h.count(),1);h.dispose();
+});
+
+test('snapshot shows final result while result notification is still in flight',{timeout:5000},async()=>{
+ let release,notify;
+ const notified=new Promise(resolve=>{notify=resolve;});
+ const h=harness(async()=>eligible,async message=>{
+  if(message.type==='result')await new Promise(resolve=>{release=resolve;notify();});
+ });
+ await notified;
+ assert.equal(h.snapshot().pending,false);assert.equal(h.snapshot().result.state,'eligible');
+ const result=h.request();release();await result;
  assert.equal(h.count(),1);h.dispose();
 });

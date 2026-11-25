@@ -11,26 +11,29 @@ export default defineContentScript({
     let pending: Promise<EligibilityResult> | null = null;
     let latest: EligibilityResult | null = null;
     let stopped = false;
+    let checking = false;
     function check(force = false): Promise<EligibilityResult> {
       if (pending) return pending;
       // Keep the result (including Unknown) for this document. Only explicit refresh starts another check.
       if (!force && latest) return Promise.resolve(latest);
+      checking = true;
       pending = (async () => {
         await browser.runtime.sendMessage({type:ELIGIBILITY_PENDING_MESSAGE}).catch(()=>{});
         const result: EligibilityResult = await checkOfferEligibility().catch(()=>({
           state:'unknown',plan:null,campaign:'unknown',reason:'Eligibility check failed. Use Check again to retry.'
         }));
         latest = result;
+        checking = false;
         if (!stopped) await browser.runtime.sendMessage({type:ELIGIBILITY_RESULT_MESSAGE,result}).catch(()=>{});
         return result;
-      })().finally(()=>{pending=null;});
+      })().finally(()=>{pending=null;checking=false;});
       return pending;
     }
     const listener: Parameters<typeof browser.runtime.onMessage.addListener>[0] = (message,sender,sendResponse) => {
       if (sender.id !== browser.runtime.id) return false;
       if (message?.type === BADGE_MESSAGE) {
         // Active-tab sync is a cache-only read; never starts or awaits an API request.
-        sendResponse({pending:pending !== null,result:latest});
+        sendResponse({pending:checking,result:latest});
         return false;
       }
       if (message?.type !== CHECK_TAB_MESSAGE) return false;
