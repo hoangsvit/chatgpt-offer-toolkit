@@ -29,7 +29,13 @@ Output directories: `.output/chrome-mv3`, `.output/firefox-mv3`. ZIP packages ar
 
 Modern Minimal: a compact 380px popup, system-aware light/dark theme with a manual toggle, active ChatGPT tab status, seat stepper (2–100), editable country/currency suggestions and checkout actions. The tab indicator does not verify login or offer eligibility; those are checked when requesting checkout.
 
+## Promotion banner
+
+The extension displays a clearly branded ePlus.DEV promotion on chatgpt.com. Open Banner settings to enable/disable, select top or floating placement, choose a dismissal duration (24 hours, 7 days, or until enabled), or show it again. Changes sync to open tabs locally. The banner only opens the official campaign page; it never checks credentials or performs checkout. The default top banner is inserted into page flow rather than fixed over the header. Actual layout compatibility should be tested in each browser.
+
 ## Use
+
+Click **Claim offer** to open the official campaign page directly. For the existing checkout generator, expand Advanced checkout configuration.
 
 1. Sign in at https://chatgpt.com using your own account.
 2. Open the extension popup.
@@ -41,7 +47,7 @@ Defaults: MyTeam, 5 seats, VN, USD, monthly billing, campaign `team-1-month-free
 
 ## Privacy and permissions
 
-Only `activeTab` and `scripting` are requested. A user-initiated script runs on the active ChatGPT tab, accesses the current session in memory, and sends its token only to the same-origin checkout endpoint. Only the light/dark theme preference is stored locally; no tokens, checkout URLs, or billing details are persisted. No telemetry, remote scripts, broad host permissions, token logging, or automatic retries. Checkout URLs may be sensitive; do not post them publicly. The extension blocks unexpected destination hosts and offers a direct official promotional page as a fallback.
+Permissions: `activeTab`, `scripting`, and `storage`. The content script is restricted to `https://chatgpt.com/*`; no broad host access. A user-initiated script runs on the active ChatGPT tab, accesses the current session in memory, and sends its token only to the same-origin checkout endpoint. Only the light/dark theme preference and banner settings are stored locally; no tokens, checkout URLs, or billing details are persisted. No telemetry, remote scripts, broad host permissions, token logging, or automatic retries. Checkout URLs may be sensitive; do not post them publicly. The extension blocks unexpected destination hosts and offers a direct official promotional page as the default claim flow.
 
 ## Tests
 
@@ -50,3 +56,7 @@ Run `npm test` after installing dependencies. Tests mock session and checkout re
 ## Limitations
 
 The checkout endpoint and campaign identifier are undocumented and may change or be unavailable. The service decides eligibility and price. Use the official offer page if the checkout request fails. This project is not affiliated with or endorsed by OpenAI. No browser-store publication is provided.
+
+## Support
+
+[ePlus.DEV](https://eplus.dev) · [Telegram channel](https://t.me/eplus_news) · [GitHub issues](https://github.com/hoangsvit/chatgpt-offer-toolkit/issues)
