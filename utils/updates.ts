@@ -5,14 +5,19 @@ export const AUTO_KEY = 'offerToolkitAutoUpdate';
 export const CHECK_MESSAGE = 'offer-toolkit:check-updates';
 export const ALARM_NAME = 'offer-toolkit-update-check';
 export interface UpdateState { latest: string | null; checkedAt: number; error: string | null; }
-export function parseVersion(value: unknown): number[] | null {
+type Version = readonly [number, number, number];
+export function parseVersion(value: unknown): Version | null {
   if(typeof value !== 'string' || !/^v?(0|[1-9]\d{0,5})\.(0|[1-9]\d{0,5})\.(0|[1-9]\d{0,5})$/.test(value)) return null;
-  return value.replace(/^v/,'').split('.').map(Number);
+  const [major, minor, patch] = value.replace(/^v/,'').split('.');
+  if (major === undefined || minor === undefined || patch === undefined) return null;
+  return [Number(major), Number(minor), Number(patch)];
 }
 export function isNewer(latest: unknown, current: unknown): boolean {
   const a = parseVersion(latest), b = parseVersion(current);
   if(!a || !b) return false;
-  for(let i=0;i<3;i++) if(a[i] !== b[i]) return a[i] > b[i];
+  for (const i of [0, 1, 2] as const) {
+    if (a[i] !== b[i]) return a[i] > b[i];
+  }
   return false;
 }
 export function releaseVersion(input: unknown): string | null {
