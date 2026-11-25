@@ -3,6 +3,7 @@ import { validateConfig, validCheckoutUrl, requestCheckout } from '../../utils/c
 import type { CheckoutConfig, CheckoutResult } from '../../utils/checkout';
 import './style.css';
 import { checkOfferEligibility } from '../../utils/eligibility';
+import { CHECK_TAB_MESSAGE } from '../../utils/eligibility-badge';
 import type { EligibilityResult } from '../../utils/eligibility';
 import { suggestBilling, currencyForCountry } from '../../utils/billing-locale';
 import { BANNER_KEY, OFFER_URL, EPLUS_URL, SUPPORT_URL, normalizeSettings } from '../../utils/banner-settings';
@@ -107,11 +108,6 @@ function renderConnection(ready: boolean) {
   generate.disabled = busy || !tabReady || eligibilityBusy;
   eligibilityButton.disabled = busy || !tabReady || eligibilityBusy;
 }
-async function checkConnection() {
-  try { renderConnection((await getActiveChatGPTTab()) !== null); }
-  catch { renderConnection(false); }
-}
-void checkConnection();
 function renderEligibility(value: EligibilityResult | undefined) {
   const state = element('eligibility-state');
   const labels = {eligible:'Coupon eligible',not_eligible:'Not eligible',unknown:'Unknown',redeemed:'Already redeemed'};
@@ -121,26 +117,42 @@ function renderEligibility(value: EligibilityResult | undefined) {
   element('eligibility-campaign').textContent = value?.campaign === 'assigned' ? 'Assigned' : value?.campaign === 'not_listed' ? 'Not listed' : 'Unknown';
   element('eligibility-reason').textContent = value?.reason ?? 'No verified response. Review the official offer page.';
 }
-eligibilityButton.addEventListener('click', async () => {
+async function runEligibilityCheck(force = false) {
   if (busy || eligibilityBusy) return;
   eligibilityBusy = true;
   eligibilityButton.disabled = true;
   generate.disabled = true;
   eligibilityButton.textContent = 'Checking…';
   renderEligibility({state:'unknown',plan:null,campaign:'unknown',reason:'Checking your current personal workspace…'});
+  element('eligibility-state').textContent = 'Checking…';
   try {
     const tabId = await getActiveChatGPTTab();
     renderConnection(tabId !== null);
-    if (tabId === null) return renderEligibility(undefined);
-    const [response] = await browser.scripting.executeScript({target:{tabId},func:checkOfferEligibility});
-    renderEligibility(response?.result as EligibilityResult | undefined);
+    if (tabId === null) {
+      renderEligibility({state:'unknown',plan:null,campaign:'unknown',reason:'Open chatgpt.com and reopen this popup to check eligibility.'});
+      element('eligibility-state').textContent = 'Not checked';
+      return;
+    }
+    // Reuse the page's in-flight check or recent in-memory result.
+    let result: EligibilityResult | undefined;
+    try {
+      result = await browser.tabs.sendMessage(tabId,{type:CHECK_TAB_MESSAGE,force}) as EligibilityResult | undefined;
+    } catch {
+      // Existing tabs opened before extension installation may lack the content script.
+      const [response] = await browser.scripting.executeScript({target:{tabId},func:checkOfferEligibility});
+      result = response?.result as EligibilityResult | undefined;
+    }
+    renderEligibility(result);
   } catch { renderEligibility(undefined); }
   finally {
     eligibilityBusy = false;
-    eligibilityButton.textContent = 'Check eligibility';
+    eligibilityButton.textContent = 'Check again';
     renderConnection(tabReady);
   }
-});
+}
+eligibilityButton.addEventListener('click', () => void runEligibilityCheck(true));
+// Reuse the current tab's automatic eligibility check; no checkout.
+void runEligibilityCheck();
 
 element<HTMLFormElement>('settings').addEventListener('submit', async event => {
   event.preventDefault();

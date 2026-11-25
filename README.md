@@ -8,7 +8,7 @@ A browser extension for Chrome, Edge and Firefox. Independent project by [ePlus.
 
 ## Features
 
-- **Eligibility Checker (read-only):** manually checks the assigned Business campaign and coupon status for the default personal workspace. Coupon eligibility is distinct from a zero-cost checkout.
+- **Eligibility Checker (read-only):** automatically checks the assigned Business campaign when the popup opens and coupon status for the default personal workspace. Coupon eligibility is distinct from a zero-cost checkout.
 
 - **Checkout Generator (primary):** configure workspace, seats, actual billing country and currency, then generate and copy or open the returned checkout link. Available directly in the popup.
 - **Open official offer page:** alternative route to the promotion on ChatGPT. Eligibility and pricing are decided by ChatGPT.
@@ -62,13 +62,13 @@ To publish a version, update package.json, merge the change and push a matching 
 
 ## Eligibility Checker
 
-Open ChatGPT in your personal workspace, then click **Check eligibility** in the popup. The checker reads the current account's campaign assignment and, only if the specific campaign is already assigned, validates that coupon through observed internal ChatGPT GET endpoints. It does not create checkout sessions, redeem promotions, change account state, test alternative countries or alter eligibility. Results are not persisted; session credentials remain in the ChatGPT tab and are sent only to ChatGPT.
+Open ChatGPT in your personal workspace, then open the extension popup. Eligibility is checked automatically when a ChatGPT page loads, even with the popup closed. The toolbar badge shows green **OK** only for a server-confirmed eligible coupon (not a verified zero price), red **NO** for explicit rejection, and no badge for unknown or redeemed. A gray ellipsis indicates checking. Results are isolated per tab and kept in memory only. Opening the popup reuses the page check; returning to a visible tab can refresh after a 60-second cache. Click **Check again** for a manual refresh. There is no timer-based polling, automatic retry, or request on unrelated sites. Refresh existing ChatGPT tabs after installing the extension. The checker reads the current account's campaign assignment and, only if the specific campaign is already assigned, validates that coupon through observed internal ChatGPT GET endpoints. It does not create checkout sessions, redeem promotions, change account state, test alternative countries or alter eligibility. Results are not persisted; session credentials remain in the ChatGPT tab and are sent only to ChatGPT.
 
 - **Coupon eligible:** the server explicitly reports eligible and all redemption flags false. No price, seat coverage, or subscription activation is verified.
 - **Not eligible / Already redeemed:** explicit negative server response.
 - **Unknown:** missing campaign, ambiguous personal workspace, HTTP error or unexpected data. A missing assignment alone is not treated as a definitive denial.
 
-Use the official checkout to verify 5 Standard seats, 0 Premium seats, monthly billing, a one-month discount, total due today and renewal amount. The private endpoints are not supported public APIs and may change. No account identifiers, tokens or raw HAR data are included in diagnostics or tests.
+Use the official checkout to verify 5 Standard seats, 0 Premium seats, monthly billing, a one-month discount, total due today and renewal amount. The private endpoints are not supported public APIs and may change. If the checker reports Unknown, its diagnostic identifies whether the session, account check, or coupon check failed. The coupon request is scoped to the verified default personal workspace; no other workspace is probed. No raw error bodies, account IDs or session tokens are displayed. No account identifiers, tokens or raw HAR data are included in diagnostics or tests.
 
 ## Use
 

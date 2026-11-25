@@ -2,6 +2,7 @@ import { defineBackground } from 'wxt/utils/define-background';
 import { browser } from 'wxt/browser';
 import { RELEASE_API, UPDATE_KEY, AUTO_KEY, CHECK_MESSAGE, ALARM_NAME, normalizeUpdate, releaseVersion } from '../utils/updates';
 import type { UpdateState } from '../utils/updates';
+import { badgeFor, isChatGPTUrl, ELIGIBILITY_PENDING_MESSAGE, ELIGIBILITY_RESULT_MESSAGE } from '../utils/eligibility-badge';
 
 export default defineBackground(() => {
   let pending: Promise<UpdateState> | null = null;
@@ -42,6 +43,41 @@ export default defineBackground(() => {
   browser.runtime.onMessage.addListener((message,sender,sendResponse)=>{
     if(message !== CHECK_MESSAGE || sender.id !== browser.runtime.id || sender.tab) return false;
     void check().then(sendResponse,()=>sendResponse({latest:null,checkedAt:Date.now(),error:'Unable to check for updates.'}));
+    return true;
+  });
+  // Toolbar badges are per-tab; never use a global account result or persist it.
+  const revision = new Map<number, number>();
+  const queues = new Map<number, Promise<unknown>>();
+  function paint(tabId: number, text: string, color: string, title: string) {
+    const next = (queues.get(tabId) ?? Promise.resolve()).catch(()=>{}).then(async()=>{
+      await browser.action.setBadgeBackgroundColor({tabId,color});
+      await browser.action.setBadgeText({tabId,text});
+      await browser.action.setTitle({tabId,title:'ChatGPT Offer Toolkit — '+title});
+    });
+    queues.set(tabId,next);
+    void next.finally(()=>{if(queues.get(tabId)===next)queues.delete(tabId);}).catch(()=>{});
+  }
+  function clear(tabId: number) {
+    revision.set(tabId,(revision.get(tabId)??0)+1);
+    paint(tabId,'','#64736b','Offer eligibility not checked');
+  }
+  browser.tabs.onUpdated.addListener((tabId,change)=>{
+    if(change.status==='loading' || (change.url && !isChatGPTUrl(change.url))) clear(tabId);
+  });
+  browser.tabs.onRemoved.addListener(tabId=>{revision.delete(tabId);queues.delete(tabId);});
+  browser.runtime.onMessage.addListener((message,sender,sendResponse)=>{
+    if(sender.id!==browser.runtime.id || sender.frameId!==0 || sender.tab?.id==null || !isChatGPTUrl(sender.url)) return false;
+    if(message?.type!==ELIGIBILITY_PENDING_MESSAGE && message?.type!==ELIGIBILITY_RESULT_MESSAGE) return false;
+    const tabId=sender.tab.id;
+    const version=revision.get(tabId)??0;
+    void (async()=>{
+      const tab=await browser.tabs.get(tabId);
+      if(!isChatGPTUrl(tab.url ?? sender.tab?.url) || (revision.get(tabId)??0)!==version) return;
+      const badge=message.type===ELIGIBILITY_PENDING_MESSAGE
+        ? {text:'…',color:'#64736b',title:'Checking offer eligibility'}
+        : badgeFor(message.result);
+      paint(tabId,badge.text,badge.color,badge.title);
+    })().then(()=>sendResponse(true),()=>sendResponse(false));
     return true;
   });
   run(configure());
