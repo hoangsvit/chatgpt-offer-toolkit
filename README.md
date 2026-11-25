@@ -44,9 +44,9 @@ Output directories: `.output/chrome-mv3`, `.output/firefox-mv3`. ZIP packages ar
 
 ## Popup design
 
-BeUI popup (Offer / Settings): uses locally vendored MIT-licensed BeUI Button, AnimatedBadge and ThemeToggle components with React, Motion and Tailwind CSS. The Offer screen shows the primary Generate action only; editable checkout defaults are in Settings and open automatically if required fields are missing. The toolbar badge and payment logic are unchanged. See public/beui-LICENSE.txt for upstream attribution.
+BeUI popup (Offer / Settings): uses locally vendored MIT-licensed BeUI Button, Input, Switch, AnimatedBadge, ActionSwap and ThemeToggle components with React, Motion and Tailwind CSS. The Offer screen shows the primary Generate action only; editable checkout defaults are in Settings and open automatically if required fields are missing. The toolbar badge and payment logic are unchanged. See public/beui-LICENSE.txt for upstream attribution.
 
-Two-view popup (Offer / Settings): eligibility details collapse by default, checkout fields share compact rows, price review appears only on a supported checkout page, and checkout/update preferences live under Settings with an update indicator. Modern Minimal: a compact 384px popup with an explicit root width to prevent browser popup shrinkage, official beUI light/dark tokens and animated ThemeToggle, with system preference and persisted manual override, active ChatGPT tab status, seat stepper (2–100), editable country/currency suggestions and checkout actions. The tab indicator does not verify login or offer eligibility; those are checked when requesting checkout.
+Two-view popup (Offer / Settings): eligibility details collapse by default, checkout fields share compact rows, price review appears only on a supported checkout page, and checkout/update preferences live under Settings with an update indicator. Modern Minimal: a compact 384px popup with an explicit root width to prevent browser popup shrinkage, official beUI light/dark tokens and animated ThemeToggle (transition stylesheet bundled locally), with system preference and persisted manual override, active ChatGPT tab status, seat stepper (2–100), editable country/currency suggestions and checkout actions. The tab indicator does not verify login or offer eligibility; those are checked when requesting checkout.
 
 ## Updates without a public store
 
@@ -100,3 +100,11 @@ The checkout endpoint and campaign identifier are undocumented and may change or
 ## Support
 
 [ePlus.DEV](https://eplus.dev) · [Telegram channel](https://t.me/eplus_news) · [GitHub issues](https://github.com/hoangsvit/chatgpt-offer-toolkit/issues)
+
+## Popup visual regression
+
+Playwright popup validation is temporarily disabled by default to speed up CI. Set the GitHub Actions repository variable `RUN_POPUP_PLAYWRIGHT` to `true` to enable Chromium tests and screenshot uploads again. The existing `npm run test:popup` script remains available for local testing after building the Chrome extension and installing Chromium. The test does not create a checkout or access account data.
+
+### PR build downloads
+
+The validation workflow uses one runner and one npm install, inspired by ePlus-DEV/google-cloud-skills-boost-helper. It runs on PRs, pushes to main and manual dispatch; cached npm downloads use package.json because the repository has no lockfile. Typecheck, unit tests, both browser builds and manifest checks remain required. Playwright remains opt-in with `RUN_POPUP_PLAYWRIGHT=true`. Each browser is built once and the artifact ZIP directly contains the unpacked extension (extract once, then load the folder containing manifest.json). For same-repository PRs the bot updates one comment, hides old download links at the start, and publishes current-attempt artifact links only after the entire job succeeds. Fork and Dependabot PRs use the Actions artifacts page instead. Preview artifacts expire after 7 days and downloads may require GitHub login. Stable release and signed Firefox publishing are unchanged.

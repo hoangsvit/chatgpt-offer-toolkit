@@ -1,6 +1,6 @@
 {
   "name": "chatgpt-offer-toolkit",
-  "version": "1.4.13",
+  "version": "1.4.14",
   "private": true,
   "type": "module",
   "description": "Generate ChatGPT Business promotional checkout links, visit the official offer page, and manage updates. Built by ePlus.DEV.",
@@ -19,7 +19,8 @@
     "postinstall": "npm run icons && wxt prepare",
     "typecheck": "tsc --noEmit",
     "test": "node --test tests/*.test.cjs",
-    "icons": "node scripts/generate-icons.mjs"
+    "icons": "node scripts/generate-icons.mjs",
+    "test:popup": "node scripts/popup-preview.mjs"
   },
   "devDependencies": {
     "wxt": "0.21.5",
@@ -27,7 +28,8 @@
     "@types/react": "19.1.12",
     "@types/react-dom": "19.1.9",
     "tailwindcss": "4.1.13",
-    "@tailwindcss/vite": "4.1.13"
+    "@tailwindcss/vite": "4.1.13",
+    "playwright": "1.56.1"
   },
   "dependencies": {
     "react": "19.1.1",
