@@ -1,12 +1,31 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>ChatGPT Offer Toolkit</title></head>
-<body><header><span class="eyebrow">UNOFFICIAL TOOLKIT</span><h1>ChatGPT Offer Toolkit</h1><p>Business · Monthly checkout</p></header>
-<form id="settings"><label>Workspace name<input id="workspace" required maxlength="100" value="MyTeam"></label>
-<div class="grid"><label>Seats<input id="seats" type="number" min="2" max="100" step="1" required value="5"></label><label>Country (ISO)<input id="country" required maxlength="2" pattern="[A-Za-z]{2}" value="VN"></label></div>
-<label>Currency (ISO)<input id="currency" required maxlength="3" pattern="[A-Za-z]{3}" value="USD"></label>
-<div class="offer"><strong>Campaign: one month free</strong><span>Subject to eligibility. Use your actual billing details. Review the total and renewal price before subscribing.</span></div>
-<button id="generate" type="submit">Generate checkout link</button></form>
-<p id="status" role="status" aria-live="polite"></p>
-<section id="result" hidden><label>Checkout link<input id="link" readonly></label><div class="grid"><button id="copy" type="button" class="secondary">Copy link</button><button id="open" type="button">Open checkout</button></div></section>
-<button id="official" type="button" class="secondary">Open official offer page</button><footer>No telemetry. No stored tokens. No automatic payment.</footer>
-<script type="module" src="./main.ts"></script></body></html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>ChatGPT Offer Toolkit</title></head>
+<body>
+<header class="header">
+  <div class="brand-icon"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8V5h18v3a4 4 0 0 0 0 8v3H3v-3a4 4 0 0 0 0-8Z"/><path d="m9 15 6-6"/><circle cx="9" cy="9" r=".7"/><circle cx="15" cy="15" r=".7"/></svg></div>
+  <div class="brand"><h1>Offer Toolkit</h1><span>ChatGPT · <span id="version"></span></span></div>
+  <button type="button" id="theme" class="icon-button" aria-label="Switch color theme" title="Switch color theme"><span id="moon"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20.9 13.35A9 9 0 0 1 10.65 3.1 9 9 0 1 0 20.9 13.35Z"/></svg></span><span id="sun" hidden><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M5 19l1.5-1.5m11-11L19 5"/></svg></span></button>
+</header>
+<div class="connection" id="connection" data-state="loading" role="status"><span class="dot"></span><span id="connection-text">Checking active tab…</span></div>
+<main>
+<section class="offer" aria-label="Campaign information"><div class="offer-top"><span>BUSINESS PROMOTION</span><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="8" width="18" height="4" rx="1"/><path d="M5 12v9h14v-9M12 8v13M12 8H7.5A2.5 2.5 0 1 1 10 5.5L12 8Zm0 0h4.5A2.5 2.5 0 1 0 14 5.5L12 8Z"/></svg></div><h2>1 month free</h2><p>Subject to account eligibility</p></section>
+<form id="settings">
+  <label for="workspace">Workspace name</label><input id="workspace" required maxlength="100" value="MyTeam" autocomplete="off">
+  <label for="seats">Number of seats</label>
+  <div class="stepper"><button id="minus" type="button" class="icon-button" aria-label="Decrease seats">−</button><input id="seats" type="number" min="2" max="100" step="1" required value="5" inputmode="numeric"><button id="plus" type="button" class="icon-button" aria-label="Increase seats">+</button></div>
+  <div class="grid">
+    <div><label for="country">Billing country</label><input id="country" list="countries" required maxlength="2" pattern="[A-Za-z]{2}" value="VN" autocomplete="off"><datalist id="countries"><option value="VN" label="Vietnam"></option><option value="US" label="United States"></option><option value="SG" label="Singapore"></option><option value="JP" label="Japan"></option><option value="GB" label="United Kingdom"></option><option value="DE" label="Germany"></option><option value="FR" label="France"></option><option value="AU" label="Australia"></option><option value="CA" label="Canada"></option><option value="IN" label="India"></option></datalist></div>
+    <div><label for="currency">Currency</label><input id="currency" list="currencies" required maxlength="3" pattern="[A-Za-z]{3}" value="USD" autocomplete="off"><datalist id="currencies"><option value="USD"></option><option value="VND"></option><option value="SGD"></option><option value="JPY"></option><option value="GBP"></option><option value="EUR"></option><option value="AUD"></option><option value="CAD"></option><option value="INR"></option></datalist></div>
+  </div>
+  <p class="hint">Use your actual billing details. Review the total and renewal price before subscribing.</p>
+  <button id="generate" type="submit" class="primary" disabled><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a4 4 0 0 0 6 0l3-3a4 4 0 0 0-6-6l-2 2m3 5a4 4 0 0 0-6 0l-3 3a4 4 0 0 0 6 6l2-2"/></svg><span id="generate-label">Generate checkout link</span></button>
+</form>
+<p id="status" role="status" aria-live="polite" hidden></p>
+<section id="result" hidden><label for="link">Checkout link</label><input id="link" readonly><div class="grid result-actions"><button id="copy" type="button" class="secondary">Copy link</button><button id="open" type="button" class="primary">Open checkout</button></div></section>
+<button id="official" type="button" class="text-button">Open official offer page ↗</button>
+<div class="privacy"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-11V5l-8-3-8 3v6c0 7 8 11 8 11Z"/><path d="m9 12 2 2 4-4"/></svg><span>No stored tokens · Privacy first</span></div>
+</main>
+<footer><button id="github" type="button" class="text-button">GitHub ↗</button><span>Unofficial extension</span></footer>
+<script type="module" src="./main.ts"></script>
+</body></html>
