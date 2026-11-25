@@ -21,7 +21,7 @@ export function validateConfig(input: CheckoutInput): CheckoutConfig {
 export function validCheckoutUrl(value: string): string | null {
   try {
     const url = new URL(value);
-    return url.protocol === "https:" && !url.username && !url.password && !url.port && ["checkout.stripe.com", "chatgpt.com", "openai.com"].includes(url.hostname) ? url.href : null;
+    return url.protocol === "https:" && !url.username && !url.password && !url.port && ["checkout.stripe.com", "chatgpt.com", "openai.com", "pay.openai.com"].includes(url.hostname) ? url.href : null;
   } catch { return null; }
 }
 export async function requestCheckout(config: CheckoutConfig): Promise<CheckoutResult> {
@@ -46,8 +46,10 @@ export async function requestCheckout(config: CheckoutConfig): Promise<CheckoutR
     });
     if (!resp.ok) return {error:"Checkout request declined (HTTP "+resp.status+"). Check eligibility on the official offer page."};
     const data = await resp.json();
-    const url = data.url || data.stripe_hosted_url || data.checkout_url;
-    if (typeof url !== "string") return {error:"No checkout link returned. The offer may be unavailable."};
+    const url = [data?.url, data?.stripe_hosted_url, data?.checkout_url].find(
+      (value): value is string => typeof value === "string" && value.trim().length > 0
+    );
+    if (!url) return {error:"No hosted checkout link returned. Review the offer on the official ChatGPT page."};
     return {url};
   } catch { return {error:"Request failed. Check your connection or use the official offer page. No automatic retry was performed."}; }
 }
