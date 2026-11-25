@@ -48,19 +48,27 @@ const rememberBilling = field('remember-billing');
 // A language preference (including en-US) is not proof of billing country.
 let savedBilling: ReturnType<typeof parseBillingPreference> = null;
 let billingEdited = false;
-try { savedBilling = parseBillingPreference(JSON.parse(localStorage.getItem(BILLING_PREFERENCE_KEY) ?? 'null')); } catch { /* ignore invalid or unavailable storage */ }
-if (savedBilling) {
-  countryField.value = savedBilling.country;
-  currencyField.value = savedBilling.currency;
-  rememberBilling.checked = true;
-  billingHint.textContent = 'Saved billing preference. Confirm it still matches your actual billing details.';
-} else {
-  billingHint.textContent = 'Select your actual billing country. Its local currency will be suggested.';
+
+async function loadBillingPreference() {
+  try {
+    const data = await browser.storage.local.get(BILLING_PREFERENCE_KEY);
+    savedBilling = parseBillingPreference(data[BILLING_PREFERENCE_KEY]);
+    if (savedBilling) {
+      countryField.value = savedBilling.country;
+      currencyField.value = savedBilling.currency;
+      rememberBilling.checked = true;
+      billingHint.textContent = 'Saved billing preference. Confirm it still matches your actual billing details.';
+    } else {
+      billingHint.textContent = 'Select your actual billing country. Its local currency will be suggested.';
+    }
+    syncBeuiSwitches();
+  } catch { /* ignore */ }
 }
-syncBeuiSwitches();
+void loadBillingPreference();
+
 function forgetBilling() {
   savedBilling = null;
-  try { localStorage.removeItem(BILLING_PREFERENCE_KEY); } catch { /* storage may be unavailable */ }
+  void browser.storage.local.remove(BILLING_PREFERENCE_KEY).catch(() => {});
   rememberBilling.checked = false;
   syncBeuiSwitches();
 }
@@ -252,15 +260,27 @@ element<HTMLFormElement>('settings').addEventListener('submit', async event => {
     currentUrl = validCheckoutUrl(result.url);
     if (!currentUrl) { status('Checkout returned an unrecognized or insecure URL. Use the official offer page instead.'); return; }
     if (rememberBilling.checked) {
-      try { localStorage.setItem(BILLING_PREFERENCE_KEY,JSON.stringify({country:config.country,currency:config.currency})); } catch { /* storage is optional */ }
+      try {
+        await browser.storage.local.set({
+          [BILLING_PREFERENCE_KEY]: {country: config.country, currency: config.currency}
+        });
+      } catch { /* storage is optional */ }
     }
     field('link').value = currentUrl;
     element('result').hidden = false;
     if (result.total) {
-      const {currency,minorUnits} = result.total;
-      const format = new Intl.NumberFormat(undefined,{style:'currency',currency});
-      const digits = format.resolvedOptions().maximumFractionDigits ?? 2;
-      const displayed = format.format(minorUnits / 10 ** digits);
+      const {currency, minorUnits} = result.total;
+      const zeroDecimal = new Set([
+        'BIF','CLP','DJF','GNF','JPY','KMF','KRW','MGA','PYG','RWF',
+        'UGX','VND','VUV','XAF','XOF','XPF'
+      ]);
+      const digits = zeroDecimal.has(currency) ? 0 : 2;
+      const displayed = new Intl.NumberFormat(undefined, {
+        style: 'currency',
+        currency,
+        minimumFractionDigits: digits,
+        maximumFractionDigits: digits
+      }).format(minorUnits / 10 ** digits);
       status(minorUnits === 0
         ? 'Server-reported current total: '+displayed+'. Review the official checkout, renewal price and terms; activation is not verified.'
         : 'Paid checkout — server-reported current total: '+displayed+'. Review the official checkout before subscribing.');
