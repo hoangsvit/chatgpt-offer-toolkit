@@ -12,6 +12,8 @@ export function badgeFor(value: unknown): {text:string;color:string;title:string
   if (state === 'eligible' && (value as Partial<EligibilityResult>).campaign === 'assigned')
     return {text:'OK',color:'#16845b',title:'Coupon eligible — final price not verified'};
   if (state === 'not_eligible') return {text:'NO',color:'#b43b35',title:'Coupon not eligible'};
-  if (state === 'redeemed') return {text:'',color:'#64736b',title:'Coupon already redeemed'};
-  return {text:'',color:'#64736b',title:'Offer eligibility unknown'};
+  if (state === 'redeemed') return {text:'USED',color:'#64736b',title:'Coupon already redeemed'};
+  if (state === 'unknown' && (value as Partial<EligibilityResult>).campaign === 'not_listed')
+    return {text:'N/A',color:'#64736b',title:'Offer not listed for this account — final eligibility not verified'};
+  return {text:'?',color:'#64736b',title:'Offer eligibility unknown'};
 }

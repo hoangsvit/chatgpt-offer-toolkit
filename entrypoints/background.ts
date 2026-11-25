@@ -83,7 +83,7 @@ export default defineBackground(() => {
   }
   function clear(tabId: number, url: unknown) {
     revision.set(tabId,(revision.get(tabId)??0)+1);
-    const badge = isChatGPTUrl(url) ? {text:'',color:'#64736b',title:'Offer eligibility not checked'} : offBadge;
+    const badge = isChatGPTUrl(url) ? {text:'…',color:'#64736b',title:'Waiting for ChatGPT page checker'} : offBadge;
     paint(tabId,badge.text,badge.color,badge.title);
   }
   browser.tabs.onUpdated.addListener((tabId,change,tab)=>{
@@ -106,7 +106,7 @@ export default defineBackground(() => {
     if (!current()) return;
     const badge=snapshot?.pending
       ? {text:'…',color:'#64736b',title:'Checking offer eligibility'}
-      : badgeFor(snapshot?.result);
+      : snapshot ? badgeFor(snapshot.result) : {text:'?',color:'#64736b',title:'Page checker unavailable — reload ChatGPT'};
     paint(tabId,badge.text,badge.color,badge.title);
   }
   async function syncFocusedTab() {
