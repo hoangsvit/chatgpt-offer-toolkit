@@ -2,7 +2,7 @@ import { defineContentScript } from 'wxt/utils/define-content-script';
 import { browser } from 'wxt/browser';
 import { checkOfferEligibility } from '../utils/eligibility';
 import type { EligibilityResult } from '../utils/eligibility';
-import { CHECK_TAB_MESSAGE, ELIGIBILITY_RESULT_MESSAGE, ELIGIBILITY_PENDING_MESSAGE } from '../utils/eligibility-badge';
+import { BADGE_MESSAGE, CHECK_TAB_MESSAGE, ELIGIBILITY_RESULT_MESSAGE, ELIGIBILITY_PENDING_MESSAGE } from '../utils/eligibility-badge';
 export default defineContentScript({
   matches: ['https://chatgpt.com/*'],
   runAt: 'document_idle',
@@ -27,7 +27,13 @@ export default defineContentScript({
       return pending;
     }
     const listener: Parameters<typeof browser.runtime.onMessage.addListener>[0] = (message,sender,sendResponse) => {
-      if (sender.id !== browser.runtime.id || message?.type !== CHECK_TAB_MESSAGE) return false;
+      if (sender.id !== browser.runtime.id) return false;
+      if (message?.type === BADGE_MESSAGE) {
+        // Active-tab sync is a cache-only read; never starts or awaits an API request.
+        sendResponse({pending:pending !== null,result:latest});
+        return false;
+      }
+      if (message?.type !== CHECK_TAB_MESSAGE) return false;
       void check(message.force === true).then(sendResponse,()=>sendResponse(null));
       return true;
     };
