@@ -7,8 +7,10 @@ const code = ts.transpileModule(fs.readFileSync('utils/banner-settings.ts','utf8
 const context = vm.createContext({exports:{},Date,Number});
 vm.runInContext(code,context);
 const b = context.exports;
-test('defaults show the top banner',()=>{const s=b.normalizeSettings(null);assert.equal(s.enabled,true);assert.equal(s.position,'top');assert.equal(b.isVisible(s,100),true);});
-test('invalid persisted values are normalized',()=>{const s=b.normalizeSettings({enabled:'yes',position:'other',dismiss:'other',hiddenUntil:-1});assert.equal(s.enabled,true);assert.equal(s.position,'top');assert.equal(s.dismiss,'day');assert.equal(s.hiddenUntil,0);});
+test('defaults show the floating banner',()=>{const s=b.normalizeSettings(null);assert.equal(s.enabled,true);assert.equal(s.position,'floating');assert.equal(b.isVisible(s,100),true);});
+test('invalid persisted values are normalized',()=>{const s=b.normalizeSettings({enabled:'yes',position:'other',dismiss:'other',hiddenUntil:-1});assert.equal(s.enabled,true);assert.equal(s.position,'floating');assert.equal(s.dismiss,'day');assert.equal(s.hiddenUntil,0);});
 test('disabled or dismissed banners stay hidden',()=>{assert.equal(b.isVisible({...b.defaults,enabled:false},100),false);assert.equal(b.isVisible({...b.defaults,hiddenUntil:101},100),false);assert.equal(b.isVisible({...b.defaults,hiddenUntil:100},100),true);});
 test('dismissal periods',()=>{assert.equal(b.dismissalDeadline('day',100),86400100);assert.equal(b.dismissalDeadline('week',100),604800100);assert.equal(b.dismissalDeadline('forever',100),Number.MAX_SAFE_INTEGER);});
 test('official campaign URL and support',()=>{assert.equal(b.OFFER_URL,'https://chatgpt.com/?promo_campaign=team-1-month-free#pricing');assert.equal(b.SUPPORT_URL,'https://t.me/eplus_news');});
+
+test('explicit top placement is preserved',()=>{assert.equal(b.normalizeSettings({position:'top'}).position,'top');});
