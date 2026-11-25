@@ -1,0 +1,1 @@
+Vendored from https://github.com/starc007/ui-components at 1d7fd243371decc96a3d52cda4e32ed7606311f0. MIT License (see public/beui-LICENSE.txt). Button and AnimatedBadge plus supporting utilities. Only import paths changed. React islands connect to the existing popup controller without changing checkout or account behavior.

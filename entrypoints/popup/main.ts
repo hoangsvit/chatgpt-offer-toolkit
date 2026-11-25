@@ -2,6 +2,7 @@ import { browser } from 'wxt/browser';
 import { validateConfig, validCheckoutUrl, requestCheckout } from '../../utils/checkout';
 import type { CheckoutConfig, CheckoutResult } from '../../utils/checkout';
 import './style.css';
+import { mountBeui } from './beui/islands';
 import { reviewCheckoutPrice } from '../../utils/checkout-price';
 import type { PriceReview } from '../../utils/checkout-price';
 import { CHECK_TAB_MESSAGE, isChatGPTUrl } from '../../utils/eligibility-badge';
@@ -24,9 +25,21 @@ function showView(view:'offer'|'settings') {
   element('settings-view').hidden=isOffer;
   button('view-offer').setAttribute('aria-pressed',String(isOffer));
   button('view-settings').setAttribute('aria-pressed',String(!isOffer));
+  button('view-offer').hidden=isOffer;
+  button('view-settings').hidden=!isOffer;
 }
 button('view-offer').addEventListener('click',()=>showView('offer'));
 button('view-settings').addEventListener('click',()=>showView('settings'));
+mountBeui(() => {
+  const form=element<HTMLFormElement>('settings');
+  if(!form.checkValidity()) {
+    showView('settings');
+    element<HTMLDetailsElement>('checkout-preferences').open=true;
+    form.reportValidity();
+    return;
+  }
+  form.requestSubmit();
+});
 const seats = field('seats');
 const countryField = field('country');
 const currencyField = field('currency');
@@ -75,6 +88,7 @@ try {
 function applyTheme() {
   const theme = selectedTheme ?? (media.matches ? 'dark' : 'light');
   document.documentElement.dataset.theme = theme;
+  document.documentElement.classList.toggle('dark', theme === 'dark');
   element('moon').hidden = theme === 'dark';
   element('sun').hidden = theme !== 'dark';
   button('theme').setAttribute('aria-label', 'Switch to ' + (theme === 'dark' ? 'light' : 'dark') + ' mode');
@@ -226,6 +240,7 @@ void runPriceReview();
 element<HTMLFormElement>('settings').addEventListener('submit', async event => {
   event.preventDefault();
   if (busy || eligibilityBusy) return;
+  showView('offer');
   resetResult();
   let config: CheckoutConfig;
   try {
@@ -248,6 +263,8 @@ element<HTMLFormElement>('settings').addEventListener('submit', async event => {
       if (result?.code === 'billing_country_mismatch') {
         forgetBilling();
         billingEdited = true;
+        showView('settings');
+        element<HTMLDetailsElement>('checkout-preferences').open=true;
         billingHint.textContent = 'Saved billing preference cleared. Correct the actual country and currency before trying again.';
       }
       status(result?.error || 'No checkout response received.');

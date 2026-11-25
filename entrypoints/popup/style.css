@@ -1,3 +1,12 @@
+@import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));
+@theme inline {
+ --color-primary:var(--be-primary); --color-primary-foreground:#fff;
+ --color-background:var(--bg); --color-foreground:var(--text);
+ --color-card:var(--surface); --color-muted:var(--soft);
+ --color-muted-foreground:var(--muted); --color-border:var(--border);
+ --color-destructive:var(--danger);
+}
 :root {
   color-scheme: light; --bg:#f7f8fa; --surface:#fff; --text:#18221e; --muted:#64716b;
   --border:#dce3df; --field:#fff; --accent:#11754f; --accent-hover:#0c6241;
@@ -80,3 +89,31 @@ input:read-only{background:var(--soft)}
 footer{display:flex;justify-content:space-between;align-items:center;gap:6px;border-top:1px solid var(--border);padding:3px 0 0}
 .text-button{border:0;background:transparent;color:var(--muted);padding:7px 0;font-size:10px;white-space:nowrap}
 .text-button:hover{color:var(--text);text-decoration:underline}
+
+/* Compact BeUI layout; local styles complement the vendored motion components. */
+:root{--bg:#fff;--surface:#fff;--text:#171b19;--muted:#646d68;--border:#e2e7e4;--soft:#f4f6f5;--be-primary:#127650}
+:root[data-theme=dark]{--bg:#191d1b;--surface:#1f2421;--text:#edf3ef;--muted:#a3afa7;--border:#363f39;--soft:#252d28;--be-primary:#127650}
+html{width:384px;min-width:384px}body{padding:17px 18px 10px}
+.header{padding:0 0 13px;border-bottom:1px solid var(--border);margin-bottom:15px}
+.brand h1{font-size:16px}.brand span{font-size:11px}
+.settings-trigger{position:relative}.settings-trigger .nav-dot{position:absolute;right:1px;top:1px}
+.connection{margin:0 0 18px}
+.offer{background:none;color:var(--text);padding:0;margin-bottom:18px}
+.offer-top{font-size:10px;letter-spacing:1.4px;color:var(--muted)}
+.offer-top svg{color:var(--offer-text)}
+.offer h2{font-size:33px;letter-spacing:-1.2px;margin:5px 0}
+.offer p{color:var(--muted);font-size:12px}
+.eligibility-section{background:var(--soft);border:1px solid var(--border);margin-bottom:18px}
+.eligibility-section summary{display:flex;align-items:center;justify-content:space-between;gap:5px;list-style:none;min-height:28px}
+.eligibility-section summary::-webkit-details-marker{display:none}
+.eligibility-section summary>span:first-child{font-size:12px;color:var(--text);float:none;max-width:none}
+.eligibility-section summary #beui-eligibility{float:none;max-width:none;text-align:initial}
+.eligibility-section summary #beui-eligibility span{float:none;max-width:none}
+.checkout-section{border:0;background:transparent;padding:0;margin-bottom:8px}
+#beui-generate button{min-height:44px}
+.claim-button{border:0;background:transparent;color:var(--muted)}
+#settings-view .advanced{background:var(--surface)}
+#settings-view .section-heading{font-size:20px;letter-spacing:-.5px;margin:0 0 14px}
+#settings-view .advanced summary{font-size:13px}
+#status{line-height:1.5}
+footer{margin-top:10px}.privacy{margin-top:15px}

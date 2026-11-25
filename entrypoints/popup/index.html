@@ -6,13 +6,13 @@
   <div class="brand-icon" style="background:transparent"><img src="/icon.svg" alt="" width="42" height="42"></div>
   <div class="brand"><h1>Offer Toolkit</h1><span>ChatGPT · <span id="version"></span></span></div>
   <button type="button" id="theme" class="icon-button" aria-label="Switch color theme" title="Switch color theme"><span id="moon"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20.9 13.35A9 9 0 0 1 10.65 3.1 9 9 0 1 0 20.9 13.35Z"/></svg></span><span id="sun" hidden><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M5 19l1.5-1.5m11-11L19 5"/></svg></span></button>
-</header>
-<nav class="view-nav" aria-label="Popup navigation"><button type="button" id="view-offer" aria-pressed="true" aria-controls="offer-view">Offer</button><button type="button" id="view-settings" aria-pressed="false" aria-controls="settings-view">Settings <span id="nav-update-dot" hidden aria-label="Update available" class="nav-dot"></span></button></nav>
+<button type="button" id="view-offer" aria-pressed="true" aria-controls="offer-view" class="icon-button" hidden aria-label="Back to offer" title="Back to offer">←</button><button type="button" id="view-settings" aria-pressed="false" aria-controls="settings-view" class="icon-button settings-trigger" aria-label="Settings" title="Settings"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="3"/><path d="M12 2v4m0 12v4M2 12h4m12 0h4M5 5l3 3m8 8 3 3m0-14-3 3M8 16l-3 3"/></svg><span id="nav-update-dot" hidden aria-label="Update available" class="nav-dot"></span></button></header>
+
 <main>
 <div id="offer-view">
 <div class="connection" id="connection" data-state="loading" role="status"><span class="dot"></span><span id="connection-text">Checking active tab…</span></div>
 <section class="offer" aria-label="Campaign information"><div class="offer-top"><span>BUSINESS PROMOTION</span><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="8" width="18" height="4" rx="1"/><path d="M5 12v9h14v-9M12 8v13M12 8H7.5A2.5 2.5 0 1 1 10 5.5L12 8Zm0 0h4.5A2.5 2.5 0 1 0 14 5.5L12 8Z"/></svg></div><h2>1 month free</h2><p>Subject to account eligibility</p></section>
-<details class="advanced eligibility-section"><summary>Account eligibility <span id="eligibility-state" data-state="unknown">Not checked</span></summary>
+<details class="advanced eligibility-section"><summary><span>Account eligibility</span><span id="eligibility-state" class="sr-only" data-state="unknown">Not checked</span><span id="beui-eligibility"></span></summary>
 <div class="update-row"><span>Default personal plan</span><strong id="eligibility-plan">—</strong></div>
 <div class="update-row"><span>Campaign assignment</span><strong id="eligibility-campaign">—</strong></div>
 <p id="eligibility-reason" class="hint" role="status" aria-live="polite">Automatically checks your signed-in account when this popup opens on ChatGPT. No checkout is created.</p>
@@ -25,8 +25,18 @@
 <button id="price-check" type="button" class="secondary">Check checkout price</button>
 <p class="hint">A zero total does not verify renewal terms or activation. Always review the official checkout before subscribing.</p>
 </details>
-<section class="checkout-section" aria-labelledby="checkout-title"><h2 id="checkout-title">Create checkout</h2>
-<form id="settings">
+<section class="checkout-section" aria-label="Create checkout"><h2 id="checkout-title" class="sr-only">Create checkout</h2>
+<div id="beui-generate"></div>
+<p id="status" role="status" aria-live="polite" hidden></p>
+<section id="result" hidden><label for="link">Checkout link</label><input id="link" readonly><div class="grid result-actions"><button id="copy" type="button" class="secondary">Copy link</button><button id="open" type="button" class="primary">Open checkout</button></div></section>
+</section>
+<button id="official" type="button" class="secondary claim-button">Open official offer page <span aria-hidden="true">↗</span></button>
+
+<p id="claim-status" role="status" aria-live="polite" hidden></p>
+</div>
+<div id="settings-view" hidden>
+<h2 class="section-heading">Preferences</h2>
+<details class="advanced" id="checkout-preferences" open><summary>Checkout defaults</summary><form id="settings">
   <div class="grid workspace-grid"><div><label for="workspace">Workspace</label><input id="workspace" required maxlength="100" value="MyTeam" autocomplete="off"></div>
   <div><label for="seats">Seats</label>
   <div class="stepper"><button id="minus" type="button" class="icon-button" aria-label="Decrease seats">−</button><input id="seats" type="number" min="2" max="100" step="1" required value="5" inputmode="numeric"><button id="plus" type="button" class="icon-button" aria-label="Increase seats">+</button></div></div></div>
@@ -37,17 +47,8 @@
   <p id="billing-suggestion" class="hint" role="status" aria-live="polite"></p>
   <label class="toggle-row"><span>Remember billing after link succeeds</span><input id="remember-billing" type="checkbox"></label>
   <p class="hint">Confirm actual billing details before continuing.</p>
-  <button id="generate" type="submit" class="primary" disabled><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a4 4 0 0 0 6 0l3-3a4 4 0 0 0-6-6l-2 2m3 5a4 4 0 0 0-6 0l-3 3a4 4 0 0 0 6 6l2-2"/></svg><span id="generate-label">Generate checkout link</span></button>
-</form>
-<p id="status" role="status" aria-live="polite" hidden></p>
-<section id="result" hidden><label for="link">Checkout link</label><input id="link" readonly><div class="grid result-actions"><button id="copy" type="button" class="secondary">Copy link</button><button id="open" type="button" class="primary">Open checkout</button></div></section>
-</section>
-<button id="official" type="button" class="secondary claim-button">Open official offer page <span aria-hidden="true">↗</span></button>
-
-<p id="claim-status" role="status" aria-live="polite" hidden></p>
-</div>
-<div id="settings-view" hidden>
-<h2 class="section-heading">Preferences</h2>
+  <button id="generate" type="submit" disabled hidden><span id="generate-label">Generate checkout link</span></button>
+</form></details>
 <details class="advanced banner-settings" open><summary>Promotion banner</summary>
 <label class="toggle-row"><span>Show promotion banner</span><input id="banner-enabled" type="checkbox" checked></label>
 <label for="banner-position">Banner position</label><select id="banner-position"><option value="top">Top-right overlay</option><option value="floating">Floating bottom right</option></select>
