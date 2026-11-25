@@ -11,7 +11,7 @@ Download the browser-specific ZIP artifact from a successful [GitHub Actions run
 
 ## Develop and build
 
-Requires Node.js 22.12+ (CI uses Node 24). WXT 0.21.5 generates separate Manifest V3 builds.
+Requires Node.js 22.12+; Node.js 26 LTS is recommended and used by CI (see `.nvmrc`). WXT 0.21.5 generates separate Manifest V3 builds.
 
 ```sh
 npm install
@@ -27,7 +27,7 @@ Output directories: `.output/chrome-mv3`, `.output/firefox-mv3`. ZIP packages ar
 
 ## Popup design
 
-Modern Minimal: a compact 380px popup, system-aware light/dark theme with a manual toggle, active ChatGPT tab status, seat stepper (2–100), editable country/currency suggestions and checkout actions. The tab indicator does not verify login or offer eligibility; those are checked when requesting checkout.
+Modern Minimal: a compact 400px popup with an explicit root width to prevent browser popup shrinkage, system-aware light/dark theme with a manual toggle, active ChatGPT tab status, seat stepper (2–100), editable country/currency suggestions and checkout actions. The tab indicator does not verify login or offer eligibility; those are checked when requesting checkout.
 
 ## Promotion banner
 
