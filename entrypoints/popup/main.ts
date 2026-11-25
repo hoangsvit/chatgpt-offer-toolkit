@@ -108,7 +108,7 @@ element<HTMLFormElement>('settings').addEventListener('submit', async event => {
     const result = response?.result as CheckoutResult | undefined;
     if (!result?.url) { status(result?.error || 'No checkout response received.'); return; }
     currentUrl = validCheckoutUrl(result.url);
-    if (!currentUrl) { status('Unexpected checkout URL blocked.'); return; }
+    if (!currentUrl) { status('Checkout returned an unrecognized or insecure URL. Use the official offer page instead.'); return; }
     field('link').value = currentUrl;
     element('result').hidden = false;
     status('Link generated. This does not confirm a free offer. Review the official checkout.');
