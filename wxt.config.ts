@@ -1,4 +1,5 @@
 import { defineConfig } from 'wxt';
+import tailwindcss from '@tailwindcss/vite';
 
 export default defineConfig({
   manifest: ({ browser }) => ({
@@ -16,6 +17,7 @@ export default defineConfig({
     } : { minimum_chrome_version: '102' }),
   }),
   vite: () => ({
+    plugins: [tailwindcss()],
     build: { target: 'es2022' },
   }),
 });

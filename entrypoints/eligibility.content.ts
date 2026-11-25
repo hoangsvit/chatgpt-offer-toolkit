@@ -1,5 +1,6 @@
 import { defineContentScript } from 'wxt/utils/define-content-script';
 import { browser } from 'wxt/browser';
+import { AUTO_CHECK_MESSAGE } from '../utils/updates';
 import { checkOfferEligibility } from '../utils/eligibility';
 import type { EligibilityResult } from '../utils/eligibility';
 import { BADGE_MESSAGE, CHECK_TAB_MESSAGE, ELIGIBILITY_RESULT_MESSAGE, ELIGIBILITY_PENDING_MESSAGE } from '../utils/eligibility-badge';
@@ -8,6 +9,8 @@ export default defineContentScript({
   runAt: 'document_idle',
   main(ctx) {
     if (window.top !== window) return;
+    // Preserve page-load update checks independently of the removed promotion banner.
+    void browser.runtime.sendMessage(AUTO_CHECK_MESSAGE).catch(()=>{});
     let pending: Promise<EligibilityResult> | null = null;
     let latest: EligibilityResult | null = null;
     let stopped = false;

@@ -2,13 +2,13 @@ import { browser } from 'wxt/browser';
 import { validateConfig, validCheckoutUrl, requestCheckout } from '../../utils/checkout';
 import type { CheckoutConfig, CheckoutResult } from '../../utils/checkout';
 import './style.css';
+import { mountBeui } from './beui/islands';
 import { reviewCheckoutPrice } from '../../utils/checkout-price';
 import type { PriceReview } from '../../utils/checkout-price';
 import { CHECK_TAB_MESSAGE, isChatGPTUrl } from '../../utils/eligibility-badge';
 import type { EligibilityResult } from '../../utils/eligibility';
 import { currencyForCountry, BILLING_PREFERENCE_KEY, parseBillingPreference } from '../../utils/billing-locale';
-import { BANNER_KEY, OFFER_URL, EPLUS_URL, SUPPORT_URL, normalizeSettings } from '../../utils/banner-settings';
-import type { BannerSettings } from '../../utils/banner-settings';
+import { OFFER_URL, EPLUS_URL, SUPPORT_URL } from '../../utils/links';
 
 function element<T extends HTMLElement = HTMLElement>(id: string): T {
   const node = document.getElementById(id);
@@ -24,9 +24,21 @@ function showView(view:'offer'|'settings') {
   element('settings-view').hidden=isOffer;
   button('view-offer').setAttribute('aria-pressed',String(isOffer));
   button('view-settings').setAttribute('aria-pressed',String(!isOffer));
+  button('view-offer').hidden=isOffer;
+  button('view-settings').hidden=!isOffer;
 }
 button('view-offer').addEventListener('click',()=>showView('offer'));
 button('view-settings').addEventListener('click',()=>showView('settings'));
+mountBeui(() => {
+  const form=element<HTMLFormElement>('settings');
+  if(!form.checkValidity()) {
+    showView('settings');
+    element<HTMLDetailsElement>('checkout-preferences').open=true;
+    form.reportValidity();
+    return;
+  }
+  form.requestSubmit();
+});
 const seats = field('seats');
 const countryField = field('country');
 const currencyField = field('currency');
@@ -65,28 +77,6 @@ let eligibilityBusy = false;
 const eligibilityButton = button('eligibility-check');
 
 element('version').textContent = 'v' + browser.runtime.getManifest().version;
-const media = window.matchMedia('(prefers-color-scheme: dark)');
-type Theme = 'light' | 'dark';
-let selectedTheme: Theme | null = null;
-try {
-  const stored = localStorage.getItem('offer-toolkit-theme');
-  if (stored === 'light' || stored === 'dark') selectedTheme = stored;
-} catch { /* private storage may be unavailable */ }
-function applyTheme() {
-  const theme = selectedTheme ?? (media.matches ? 'dark' : 'light');
-  document.documentElement.dataset.theme = theme;
-  element('moon').hidden = theme === 'dark';
-  element('sun').hidden = theme !== 'dark';
-  button('theme').setAttribute('aria-label', 'Switch to ' + (theme === 'dark' ? 'light' : 'dark') + ' mode');
-}
-button('theme').addEventListener('click', () => {
-  selectedTheme = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
-  try { localStorage.setItem('offer-toolkit-theme', selectedTheme); } catch { /* theme still works in memory */ }
-  applyTheme();
-});
-media.addEventListener('change', applyTheme);
-applyTheme();
-
 function status(message: string) {
   const node = element('status');
   node.textContent = message;
@@ -133,7 +123,7 @@ function renderEligibility(value: EligibilityResult | undefined) {
   state.dataset.state = value?.state ?? 'unknown';
   state.textContent = value?.state === 'unknown' && value.campaign === 'not_listed'
     ? 'Offer not listed' : value ? labels[value.state] : 'Unknown';
-  element('eligibility-plan').textContent = value?.plan ?? '—';
+  element('eligibility-plan').textContent = value?.plan ? value.plan.charAt(0).toUpperCase() + value.plan.slice(1) : '—';
   element('eligibility-campaign').textContent = value?.campaign === 'assigned' ? 'Assigned' : value?.campaign === 'not_listed' ? 'Not listed' : 'Unknown';
   element('eligibility-reason').textContent = value?.reason ?? 'No verified response. Review the official offer page.';
 }
@@ -226,6 +216,7 @@ void runPriceReview();
 element<HTMLFormElement>('settings').addEventListener('submit', async event => {
   event.preventDefault();
   if (busy || eligibilityBusy) return;
+  showView('offer');
   resetResult();
   let config: CheckoutConfig;
   try {
@@ -248,6 +239,8 @@ element<HTMLFormElement>('settings').addEventListener('submit', async event => {
       if (result?.code === 'billing_country_mismatch') {
         forgetBilling();
         billingEdited = true;
+        showView('settings');
+        element<HTMLDetailsElement>('checkout-preferences').open=true;
         billingHint.textContent = 'Saved billing preference cleared. Correct the actual country and currency before trying again.';
       }
       status(result?.error || 'No checkout response received.');
@@ -302,60 +295,6 @@ button('github').addEventListener('click', () => openUrl('https://github.com/hoa
 
 button('eplus').addEventListener('click', () => openUrl(EPLUS_URL));
 button('telegram').addEventListener('click', () => openUrl(SUPPORT_URL));
-const bannerEnabled = field('banner-enabled');
-const bannerPosition = element<HTMLSelectElement>('banner-position');
-const bannerDismiss = element<HTMLSelectElement>('banner-dismiss');
-const bannerReset = button('banner-reset');
-let bannerSettings = normalizeSettings(undefined);
-let saving = false;
-function renderBannerSettings() {
-  bannerEnabled.checked = bannerSettings.enabled;
-  bannerEnabled.disabled = saving;
-  bannerPosition.value = bannerSettings.position;
-  bannerDismiss.value = bannerSettings.dismiss;
-  bannerPosition.disabled = saving || !bannerSettings.enabled;
-  bannerDismiss.disabled = saving || !bannerSettings.enabled;
-  bannerReset.disabled = saving;
-}
-function bannerMessage(value: string) {
-  const node = element('banner-status');
-  node.textContent = value;
-  node.hidden = !value;
-}
-async function loadBannerSettings() {
-  saving = true;
-  renderBannerSettings();
-  try {
-    const data = await browser.storage.local.get(BANNER_KEY);
-    bannerSettings = normalizeSettings(data[BANNER_KEY]);
-  } catch { bannerMessage('Unable to load banner settings.'); }
-  finally { saving = false; renderBannerSettings(); }
-}
-async function saveBannerSettings(patch: Partial<BannerSettings>) {
-  if (saving) return;
-  saving = true;
-  renderBannerSettings();
-  try {
-    const latest = await browser.storage.local.get(BANNER_KEY);
-    const next = normalizeSettings({...normalizeSettings(latest[BANNER_KEY]), ...patch});
-    await browser.storage.local.set({[BANNER_KEY]: next});
-    bannerSettings = next;
-    bannerMessage('Saved. Changes apply to open ChatGPT tabs.');
-  } catch { bannerMessage('Unable to save banner settings.'); }
-  finally { saving = false; renderBannerSettings(); }
-}
-bannerEnabled.addEventListener('change', () => void saveBannerSettings({enabled:bannerEnabled.checked, ...(bannerEnabled.checked ? {hiddenUntil:0} : {})}));
-bannerPosition.addEventListener('change', () => void saveBannerSettings({position:bannerPosition.value === 'floating' ? 'floating' : 'top'}));
-bannerDismiss.addEventListener('change', () => void saveBannerSettings({dismiss:bannerDismiss.value === 'week' ? 'week' : bannerDismiss.value === 'forever' ? 'forever' : 'day'}));
-bannerReset.addEventListener('click', () => void saveBannerSettings({enabled:true,hiddenUntil:0}));
-browser.storage.onChanged.addListener((changes, area) => {
-  if (area === 'local' && changes[BANNER_KEY]) {
-    bannerSettings = normalizeSettings(changes[BANNER_KEY].newValue);
-    renderBannerSettings();
-  }
-});
-void loadBannerSettings();
-
 import { UPDATE_KEY, AUTO_KEY, CHECK_MESSAGE, AUTO_CHECK_MESSAGE, normalizeUpdate, isNewer, releasePage } from '../../utils/updates';
 import type { UpdateState } from '../../utils/updates';
 

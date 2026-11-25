@@ -4,7 +4,7 @@ function harness(check,sendHook=async()=>{}){
  let listener,definition,invalidated;const messages=[];let count=0;
  const win={};win.top=win;
  const browser={runtime:{id:'extension-test',sendMessage:async message=>{messages.push(message);await sendHook(message);},onMessage:{addListener:fn=>{listener=fn;},removeListener:()=>{listener=undefined;}}}};
- const modules={'wxt/utils/define-content-script':{defineContentScript:x=>{definition=x;return x;}},'wxt/browser':{browser},'../utils/eligibility':{checkOfferEligibility:()=>{count++;return check();}},'../utils/eligibility-badge':{BADGE_MESSAGE:'badge',CHECK_TAB_MESSAGE:'check',ELIGIBILITY_RESULT_MESSAGE:'result',ELIGIBILITY_PENDING_MESSAGE:'pending'}};
+ const modules={'wxt/utils/define-content-script':{defineContentScript:x=>{definition=x;return x;}},'wxt/browser':{browser},'../utils/updates':{AUTO_CHECK_MESSAGE:'auto-update'},'../utils/eligibility':{checkOfferEligibility:()=>{count++;return check();}},'../utils/eligibility-badge':{BADGE_MESSAGE:'badge',CHECK_TAB_MESSAGE:'check',ELIGIBILITY_RESULT_MESSAGE:'result',ELIGIBILITY_PENDING_MESSAGE:'pending'}};
  vm.runInNewContext(source,{exports:{},window:win,require:name=>{assert.ok(modules[name],name);return modules[name];}});
  definition.main({onInvalidated:fn=>{invalidated=fn;}});
  const request=(force=false)=>new Promise(resolve=>{assert.equal(listener({type:'check',force},{id:'extension-test'},resolve),true);});
@@ -57,4 +57,10 @@ test('snapshot shows final result while result notification is still in flight',
  assert.equal(h.snapshot().pending,false);assert.equal(h.snapshot().result.state,'eligible');
  const result=h.request();release();await result;
  assert.equal(h.count(),1);h.dispose();
+});
+
+test('page load retains one automatic update trigger after banner removal',async()=>{
+ const h=harness(async()=>eligible);await h.request();
+ assert.equal(h.messages.filter(m=>m==='auto-update').length,1);
+ await h.request();h.snapshot();assert.equal(h.messages.filter(m=>m==='auto-update').length,1);h.dispose();
 });
