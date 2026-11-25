@@ -68,7 +68,7 @@ The **Checkout Generator** is visible by default in the popup. Use **Open offici
 4. Click **Generate checkout link**. Copy or open the returned link privately.
 5. Review the official checkout price, taxes, eligibility, renewal price and terms before making any purchase.
 
-Defaults: MyTeam, 5 seats, VN, USD, monthly billing, campaign `team-1-month-free`. Adjust billing details to match your actual billing situation. The extension does not override eligibility, guarantee a discount, submit payment or change any subscription automatically.
+Defaults: MyTeam, 5 seats, monthly billing, campaign `team-1-month-free`. Billing country and local currency are suggested from an explicit region in the browser's language preferences (for example, vi-VN → VN / VND or en-GB → GB / GBP). No IP lookup, account billing lookup, location permission or extra network request is used. A browser region is only a hint, not a verified billing address or supported checkout currency. If no explicit region or currency mapping exists, enter the missing fields manually. Changing country suggests its local currency until the currency is manually edited; both fields remain editable. Confirm the actual country and supported currency before generating a link. The extension does not override eligibility, guarantee a discount, submit payment or change any subscription automatically.
 
 ## Privacy and permissions
 
