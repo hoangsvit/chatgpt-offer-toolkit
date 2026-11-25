@@ -19,3 +19,9 @@ test('BeUI CTA and native checkout defaults are separated',()=>{
  assert.match(main,/form\.checkValidity\(\)/);
  assert.match(main,/form\.requestSubmit\(\)/);
 });
+
+test('promotion overlay and its settings are removed',()=>{
+ assert.equal(fs.existsSync('entrypoints/promotion.content.ts'),false);
+ assert.doesNotMatch(html,/banner-settings|banner-enabled|banner-reset/);
+ assert.doesNotMatch(main,/loadBannerSettings|saveBannerSettings|BANNER_KEY/);
+});

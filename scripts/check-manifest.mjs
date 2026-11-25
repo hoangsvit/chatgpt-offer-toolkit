@@ -7,7 +7,9 @@ const manifest = JSON.parse(readFileSync(directory + 'manifest.json', 'utf8'));
 assert.equal(manifest.manifest_version, 3);
 assert.deepEqual([...manifest.permissions].sort(), ['activeTab','alarms','scripting','storage']);
 assert.ok((manifest.host_permissions ?? []).every(p => ['https://chatgpt.com/*','https://api.github.com/*'].includes(p)));
-assert.ok(manifest.content_scripts?.length);
+assert.equal(manifest.content_scripts?.length, 1, 'Only eligibility content script should remain');
+assert.ok(manifest.content_scripts[0].js?.some(file => /eligibility/.test(file)));
+assert.ok(!existsSync(directory + 'content-scripts/promotion.js'), 'Promotion overlay must not be packaged');
 for (const script of manifest.content_scripts) {
   assert.deepEqual(script.matches, ['https://chatgpt.com/*']);
   for (const file of script.js ?? []) assert.ok(existsSync(directory + file));

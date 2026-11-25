@@ -12,7 +12,6 @@ A browser extension for Chrome, Edge and Firefox. Independent project by [ePlus.
 
 - **Checkout Generator (primary):** configure workspace, seats, actual billing country and currency, then generate and copy or open the returned checkout link. Available directly in the popup.
 - **Open official offer page:** alternative route to the promotion on ChatGPT. Eligibility and pricing are decided by ChatGPT.
-- **Promotion banner:** optional top or floating banner on chatgpt.com, with dismissal and visibility settings.
 - **Modern popup:** light/dark mode, active-tab status, version and support links.
 - **Update Center:** stable release checks on ChatGPT page load (15-minute cache), every six hours, manual checking and links to GitHub Releases.
 - **Cross-browser packaging:** Chrome/Edge ZIP and Firefox packages, with optional signed self-distributed Firefox updates.
@@ -47,15 +46,11 @@ Output directories: `.output/chrome-mv3`, `.output/firefox-mv3`. ZIP packages ar
 
 BeUI popup (Offer / Settings): uses locally vendored MIT-licensed BeUI Button and AnimatedBadge components with React, Motion and Tailwind CSS. The Offer screen shows the primary Generate action only; editable checkout defaults are in Settings and open automatically if required fields are missing. The toolbar badge and payment logic are unchanged. See public/beui-LICENSE.txt for upstream attribution.
 
-Two-view popup (Offer / Settings): eligibility details collapse by default, checkout fields share compact rows, price review appears only on a supported checkout page, and banner/update preferences live under Settings with an update indicator. Modern Minimal: a compact 400px popup with an explicit root width to prevent browser popup shrinkage, system-aware light/dark theme with a manual toggle, active ChatGPT tab status, seat stepper (2–100), editable country/currency suggestions and checkout actions. The tab indicator does not verify login or offer eligibility; those are checked when requesting checkout.
-
-## Promotion banner
-
-The extension displays a clearly branded ePlus.DEV promotion on chatgpt.com. Open Banner settings to enable/disable, select top-right or floating bottom-right placement, choose a dismissal duration (24 hours, 7 days, or until enabled), or show it again. Changes sync to open tabs locally. The banner only opens the official campaign page; it never checks credentials or performs checkout. Both positions are isolated fixed overlays outside the page layout; the default is floating bottom-right. No app-root padding, height, or overflow changes. Actual layout compatibility should be tested in each browser.
+Two-view popup (Offer / Settings): eligibility details collapse by default, checkout fields share compact rows, price review appears only on a supported checkout page, and checkout/update preferences live under Settings with an update indicator. Modern Minimal: a compact 384px popup with an explicit root width to prevent browser popup shrinkage, system-aware light/dark theme with a manual toggle, active ChatGPT tab status, seat stepper (2–100), editable country/currency suggestions and checkout actions. The tab indicator does not verify login or offer eligibility; those are checked when requesting checkout.
 
 ## Updates without a public store
 
-The Software updates section checks the latest stable GitHub Release on ChatGPT page load or popup open (shared 15-minute cache), plus a six-hour alarm while the browser is running (all automatic triggers share the same 15-minute throttle), with a manual check and opt-out. An available update is also linked in the promotion banner. No executable code is downloaded or run by the checker.
+The Software updates section checks the latest stable GitHub Release on ChatGPT page load or popup open (shared 15-minute cache), plus a six-hour alarm while the browser is running (all automatic triggers share the same 15-minute throttle), with a manual check and opt-out. No executable code is downloaded or run by the checker.
 
 - Chrome / Edge: download `chrome.zip` from the release, extract the contents into the same unpacked extension directory, then reload the extension. Standard unmanaged Chrome on Windows/macOS does not allow silent self-hosted installs.
 - Firefox: `firefox-unsigned.zip` is only for temporary testing. Install `firefox.xpi` when available; signed self-distributed versions use the separate `firefox-updates` release manifest for native Firefox updates. Browser update settings still apply.
@@ -78,7 +73,7 @@ The **Checkout Generator** is visible by default in the popup. Use **Open offici
 
 1. Sign in at https://chatgpt.com using your own account.
 2. Open the extension popup.
-3. Enter the workspace name, seat count, actual billing country and currency.
+3. Review or edit checkout defaults in Settings if needed.
 4. Click **Generate checkout link**. Copy or open the returned link privately.
 5. Review the official checkout price, taxes, eligibility, renewal price and terms before making any purchase.
 
@@ -92,7 +87,7 @@ On an existing checkout on chatgpt.com, open the popup to review the visible due
 
 ## Privacy and permissions
 
-Permissions: `activeTab`, `scripting`, `storage`, and `alarms`. GitHub API host access is used only for public release metadata, without account credentials. The content script is restricted to `https://chatgpt.com/*`; no broad host access. A user-initiated script runs on the active ChatGPT tab, accesses the current session in memory, and sends its token only to the same-origin checkout endpoint. Only the light/dark theme preference, banner settings and update metadata/preferences are stored locally; no tokens or checkout URLs are persisted. Country/currency preferences are stored only when the user opts in. No telemetry, remote scripts, broad host permissions, token logging, or automatic retries. Checkout URLs may be sensitive; do not post them publicly. Hosted checkout accepts exact HTTPS destinations on `pay.openai.com`, `checkout.stripe.com`, `chatgpt.com` and `openai.com`; credential-bearing URLs, non-default ports and unrelated hosts are rejected. The extension blocks unexpected destination hosts and offers a direct official promotional page as an alternative.
+Permissions: `activeTab`, `scripting`, `storage`, and `alarms`. GitHub API host access is used only for public release metadata, without account credentials. The content script is restricted to `https://chatgpt.com/*`; no broad host access. A user-initiated script runs on the active ChatGPT tab, accesses the current session in memory, and sends its token only to the same-origin checkout endpoint. Only the light/dark theme preference and update metadata/preferences are stored locally; no tokens or checkout URLs are persisted. Country/currency preferences are stored only when the user opts in. No telemetry, remote scripts, broad host permissions, token logging, or automatic retries. Checkout URLs may be sensitive; do not post them publicly. Hosted checkout accepts exact HTTPS destinations on `pay.openai.com`, `checkout.stripe.com`, `chatgpt.com` and `openai.com`; credential-bearing URLs, non-default ports and unrelated hosts are rejected. The extension blocks unexpected destination hosts and offers a direct official promotional page as an alternative.
 
 ## Tests
 

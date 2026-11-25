@@ -78,7 +78,7 @@ input:read-only{background:var(--soft)}
 .update-row span{color:var(--muted)}
 .update-row strong{text-align:right;max-width:55%;overflow-wrap:anywhere}
 #update-dot{color:var(--offer-text)}
-#status,#claim-status,#banner-status{font-size:11px;overflow-wrap:anywhere}
+#status,#claim-status{font-size:11px;overflow-wrap:anywhere}
 #status{margin:9px 0 0;padding:9px;background:var(--soft);border-radius:8px}
 #claim-status{margin:6px 0;color:var(--danger)}
 #result{margin-top:9px;border-top:1px solid var(--border);padding-top:10px}

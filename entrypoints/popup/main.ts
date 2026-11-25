@@ -8,8 +8,7 @@ import type { PriceReview } from '../../utils/checkout-price';
 import { CHECK_TAB_MESSAGE, isChatGPTUrl } from '../../utils/eligibility-badge';
 import type { EligibilityResult } from '../../utils/eligibility';
 import { currencyForCountry, BILLING_PREFERENCE_KEY, parseBillingPreference } from '../../utils/billing-locale';
-import { BANNER_KEY, OFFER_URL, EPLUS_URL, SUPPORT_URL, normalizeSettings } from '../../utils/banner-settings';
-import type { BannerSettings } from '../../utils/banner-settings';
+import { OFFER_URL, EPLUS_URL, SUPPORT_URL } from '../../utils/links';
 
 function element<T extends HTMLElement = HTMLElement>(id: string): T {
   const node = document.getElementById(id);
@@ -319,60 +318,6 @@ button('github').addEventListener('click', () => openUrl('https://github.com/hoa
 
 button('eplus').addEventListener('click', () => openUrl(EPLUS_URL));
 button('telegram').addEventListener('click', () => openUrl(SUPPORT_URL));
-const bannerEnabled = field('banner-enabled');
-const bannerPosition = element<HTMLSelectElement>('banner-position');
-const bannerDismiss = element<HTMLSelectElement>('banner-dismiss');
-const bannerReset = button('banner-reset');
-let bannerSettings = normalizeSettings(undefined);
-let saving = false;
-function renderBannerSettings() {
-  bannerEnabled.checked = bannerSettings.enabled;
-  bannerEnabled.disabled = saving;
-  bannerPosition.value = bannerSettings.position;
-  bannerDismiss.value = bannerSettings.dismiss;
-  bannerPosition.disabled = saving || !bannerSettings.enabled;
-  bannerDismiss.disabled = saving || !bannerSettings.enabled;
-  bannerReset.disabled = saving;
-}
-function bannerMessage(value: string) {
-  const node = element('banner-status');
-  node.textContent = value;
-  node.hidden = !value;
-}
-async function loadBannerSettings() {
-  saving = true;
-  renderBannerSettings();
-  try {
-    const data = await browser.storage.local.get(BANNER_KEY);
-    bannerSettings = normalizeSettings(data[BANNER_KEY]);
-  } catch { bannerMessage('Unable to load banner settings.'); }
-  finally { saving = false; renderBannerSettings(); }
-}
-async function saveBannerSettings(patch: Partial<BannerSettings>) {
-  if (saving) return;
-  saving = true;
-  renderBannerSettings();
-  try {
-    const latest = await browser.storage.local.get(BANNER_KEY);
-    const next = normalizeSettings({...normalizeSettings(latest[BANNER_KEY]), ...patch});
-    await browser.storage.local.set({[BANNER_KEY]: next});
-    bannerSettings = next;
-    bannerMessage('Saved. Changes apply to open ChatGPT tabs.');
-  } catch { bannerMessage('Unable to save banner settings.'); }
-  finally { saving = false; renderBannerSettings(); }
-}
-bannerEnabled.addEventListener('change', () => void saveBannerSettings({enabled:bannerEnabled.checked, ...(bannerEnabled.checked ? {hiddenUntil:0} : {})}));
-bannerPosition.addEventListener('change', () => void saveBannerSettings({position:bannerPosition.value === 'floating' ? 'floating' : 'top'}));
-bannerDismiss.addEventListener('change', () => void saveBannerSettings({dismiss:bannerDismiss.value === 'week' ? 'week' : bannerDismiss.value === 'forever' ? 'forever' : 'day'}));
-bannerReset.addEventListener('click', () => void saveBannerSettings({enabled:true,hiddenUntil:0}));
-browser.storage.onChanged.addListener((changes, area) => {
-  if (area === 'local' && changes[BANNER_KEY]) {
-    bannerSettings = normalizeSettings(changes[BANNER_KEY].newValue);
-    renderBannerSettings();
-  }
-});
-void loadBannerSettings();
-
 import { UPDATE_KEY, AUTO_KEY, CHECK_MESSAGE, AUTO_CHECK_MESSAGE, normalizeUpdate, isNewer, releasePage } from '../../utils/updates';
 import type { UpdateState } from '../../utils/updates';
 
