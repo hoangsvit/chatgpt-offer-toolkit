@@ -19,8 +19,6 @@ import { cn } from "./utils";
 
 export type InputClassNames = {
   root?: string;
-  /** Use native DOM value ownership for the extension form controller. */
-  nativeUncontrolled?: boolean;
   label?: string;
   field?: string;
   input?: string;
@@ -34,6 +32,8 @@ export interface InputProps extends Omit<
   InputHTMLAttributes<HTMLInputElement>,
   "value" | "defaultValue" | "onChange"
 > {
+  /** Use native DOM value ownership for the extension form controller. */
+  nativeUncontrolled?: boolean;
   label?: string;
   value?: string;
   defaultValue?: string;
