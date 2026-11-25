@@ -104,3 +104,7 @@ The checkout endpoint and campaign identifier are undocumented and may change or
 ## Popup visual regression
 
 Chrome validation runs the built extension in Chromium with a non-ChatGPT tab, checks the theme toggle and settings controls, and uploads actual light/dark/settings screenshots as a separate artifact. It does not create a checkout or access account data.
+
+### PR build downloads
+
+For same-repository pull requests, the validation workflow maintains one bot comment. At the start of a new build it removes old download links; after tests and both builds succeed it links the current run's Chrome/Edge, Firefox and popup screenshot artifacts. Failed builds do not publish download links. Fork and Dependabot PRs retain read-only validation and use the Actions artifacts page instead. Artifact downloads may require GitHub login and expire under the repository's retention policy.
