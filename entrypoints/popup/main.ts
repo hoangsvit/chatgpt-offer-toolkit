@@ -4,7 +4,7 @@ import type { CheckoutConfig, CheckoutResult } from '../../utils/checkout';
 import './style.css';
 import { reviewCheckoutPrice } from '../../utils/checkout-price';
 import type { PriceReview } from '../../utils/checkout-price';
-import { CHECK_TAB_MESSAGE } from '../../utils/eligibility-badge';
+import { CHECK_TAB_MESSAGE, isChatGPTUrl } from '../../utils/eligibility-badge';
 import type { EligibilityResult } from '../../utils/eligibility';
 import { currencyForCountry, BILLING_PREFERENCE_KEY, parseBillingPreference } from '../../utils/billing-locale';
 import { BANNER_KEY, OFFER_URL, EPLUS_URL, SUPPORT_URL, normalizeSettings } from '../../utils/banner-settings';
@@ -187,9 +187,9 @@ async function runPriceReview() {
   try {
     const [tab] = await browser.tabs.query({active:true,currentWindow:true});
     const url = tab?.url ? new URL(tab.url) : null;
-    if (tab?.id == null || !url || !(url.origin === 'https://pay.openai.com' || url.origin === 'https://checkout.stripe.com' || (url.origin === 'https://chatgpt.com' && /^\/(checkout|payments\/checkout)(\/|$)/.test(url.pathname)))) {
+    if (tab?.id == null || !url || !(url.origin === 'https://chatgpt.com' && /^\/(checkout|payments\/checkout)(\/|$)/.test(url.pathname))) {
       state.textContent = 'Price unknown';
-      reason.textContent = 'Open the official checkout, then open this popup to review its displayed due-today amount.';
+      reason.textContent = 'Open a checkout on chatgpt.com. External payment pages are not read by this extension.';
       return;
     }
     const [response] = await browser.scripting.executeScript({target:{tabId:tab.id},func:reviewCheckoutPrice});
@@ -359,7 +359,8 @@ async function loadUpdates() {
     const s = await browser.storage.local.get([UPDATE_KEY,AUTO_KEY]);
     updateState = normalizeUpdate(s[UPDATE_KEY]); updateAuto = s[AUTO_KEY] !== false;
     field('update-auto').disabled = false;
-    if(updateAuto) updateState=normalizeUpdate(await browser.runtime.sendMessage(AUTO_CHECK_MESSAGE));
+    const [tab] = await browser.tabs.query({active:true,currentWindow:true});
+    if(updateAuto && isChatGPTUrl(tab?.url)) updateState=normalizeUpdate(await browser.runtime.sendMessage(AUTO_CHECK_MESSAGE));
     if(isNewer(updateState.latest,currentVersion)) element<HTMLDetailsElement>('update-center').open = true;
   } catch { updateState.error = 'Unable to load update settings.'; }
   renderUpdate();
