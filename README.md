@@ -8,6 +8,8 @@ A browser extension for Chrome, Edge and Firefox. Independent project by [ePlus.
 
 ## Features
 
+- **Eligibility Checker (read-only):** manually checks the assigned Business campaign and coupon status for the default personal workspace. Coupon eligibility is distinct from a zero-cost checkout.
+
 - **Checkout Generator (primary):** configure workspace, seats, actual billing country and currency, then generate and copy or open the returned checkout link. Available directly in the popup.
 - **Open official offer page:** alternative route to the promotion on ChatGPT. Eligibility and pricing are decided by ChatGPT.
 - **Promotion banner:** optional top or floating banner on chatgpt.com, with dismissal and visibility settings.
@@ -57,6 +59,16 @@ The popup Software updates section checks the latest stable GitHub Release every
 - Firefox: `firefox-unsigned.zip` is only for temporary testing. Install `firefox.xpi` when available; signed self-distributed versions use the separate `firefox-updates` release manifest for native Firefox updates. Browser update settings still apply.
 
 To publish a version, update package.json, merge the change and push a matching `vX.Y.Z` tag. The Release workflow tests, builds and publishes browser ZIPs and SHA256SUMS.txt. For signing, configure repository Actions secrets `AMO_JWT_ISSUER` and `AMO_JWT_SECRET`. Signing is an optional separate job; no unsigned XPI is advertised as a native update. The signed XPI and update manifest are published only after successful signing. Mozilla may require source review or reject signing; see [self-distribution](https://extensionworkshop.com/documentation/publish/self-distribution/). The dedicated prerelease tag firefox-updates is not the latest stable release.
+
+## Eligibility Checker
+
+Open ChatGPT in your personal workspace, then click **Check eligibility** in the popup. The checker reads the current account's campaign assignment and, only if the specific campaign is already assigned, validates that coupon through observed internal ChatGPT GET endpoints. It does not create checkout sessions, redeem promotions, change account state, test alternative countries or alter eligibility. Results are not persisted; session credentials remain in the ChatGPT tab and are sent only to ChatGPT.
+
+- **Coupon eligible:** the server explicitly reports eligible and all redemption flags false. No price, seat coverage, or subscription activation is verified.
+- **Not eligible / Already redeemed:** explicit negative server response.
+- **Unknown:** missing campaign, ambiguous personal workspace, HTTP error or unexpected data. A missing assignment alone is not treated as a definitive denial.
+
+Use the official checkout to verify 5 Standard seats, 0 Premium seats, monthly billing, a one-month discount, total due today and renewal amount. The private endpoints are not supported public APIs and may change. No account identifiers, tokens or raw HAR data are included in diagnostics or tests.
 
 ## Use
 

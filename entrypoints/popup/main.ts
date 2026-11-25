@@ -2,6 +2,8 @@ import { browser } from 'wxt/browser';
 import { validateConfig, validCheckoutUrl, requestCheckout } from '../../utils/checkout';
 import type { CheckoutConfig, CheckoutResult } from '../../utils/checkout';
 import './style.css';
+import { checkOfferEligibility } from '../../utils/eligibility';
+import type { EligibilityResult } from '../../utils/eligibility';
 import { suggestBilling, currencyForCountry } from '../../utils/billing-locale';
 import { BANNER_KEY, OFFER_URL, EPLUS_URL, SUPPORT_URL, normalizeSettings } from '../../utils/banner-settings';
 import type { BannerSettings } from '../../utils/banner-settings';
@@ -39,6 +41,8 @@ countryField.addEventListener('input', () => {
 let currentUrl: string | null = null;
 let busy = false;
 let tabReady = false;
+let eligibilityBusy = false;
+const eligibilityButton = button('eligibility-check');
 
 element('version').textContent = 'v' + browser.runtime.getManifest().version;
 const media = window.matchMedia('(prefers-color-scheme: dark)');
@@ -100,17 +104,47 @@ function renderConnection(ready: boolean) {
   tabReady = ready;
   element('connection').dataset.state = ready ? 'ready' : 'unavailable';
   element('connection-text').textContent = ready ? 'ChatGPT tab ready · sign-in checked on request' : 'Open chatgpt.com to generate a checkout link';
-  generate.disabled = busy || !tabReady;
+  generate.disabled = busy || !tabReady || eligibilityBusy;
+  eligibilityButton.disabled = busy || !tabReady || eligibilityBusy;
 }
 async function checkConnection() {
   try { renderConnection((await getActiveChatGPTTab()) !== null); }
   catch { renderConnection(false); }
 }
 void checkConnection();
+function renderEligibility(value: EligibilityResult | undefined) {
+  const state = element('eligibility-state');
+  const labels = {eligible:'Coupon eligible',not_eligible:'Not eligible',unknown:'Unknown',redeemed:'Already redeemed'};
+  state.dataset.state = value?.state ?? 'unknown';
+  state.textContent = value ? labels[value.state] : 'Unknown';
+  element('eligibility-plan').textContent = value?.plan ?? '—';
+  element('eligibility-campaign').textContent = value?.campaign === 'assigned' ? 'Assigned' : value?.campaign === 'not_listed' ? 'Not listed' : 'Unknown';
+  element('eligibility-reason').textContent = value?.reason ?? 'No verified response. Review the official offer page.';
+}
+eligibilityButton.addEventListener('click', async () => {
+  if (busy || eligibilityBusy) return;
+  eligibilityBusy = true;
+  eligibilityButton.disabled = true;
+  generate.disabled = true;
+  eligibilityButton.textContent = 'Checking…';
+  renderEligibility({state:'unknown',plan:null,campaign:'unknown',reason:'Checking your current personal workspace…'});
+  try {
+    const tabId = await getActiveChatGPTTab();
+    renderConnection(tabId !== null);
+    if (tabId === null) return renderEligibility(undefined);
+    const [response] = await browser.scripting.executeScript({target:{tabId},func:checkOfferEligibility});
+    renderEligibility(response?.result as EligibilityResult | undefined);
+  } catch { renderEligibility(undefined); }
+  finally {
+    eligibilityBusy = false;
+    eligibilityButton.textContent = 'Check eligibility';
+    renderConnection(tabReady);
+  }
+});
 
 element<HTMLFormElement>('settings').addEventListener('submit', async event => {
   event.preventDefault();
-  if (busy) return;
+  if (busy || eligibilityBusy) return;
   resetResult();
   let config: CheckoutConfig;
   try {
@@ -118,6 +152,7 @@ element<HTMLFormElement>('settings').addEventListener('submit', async event => {
   } catch (error) { status(error instanceof Error ? error.message : 'Invalid settings.'); return; }
   busy = true;
   generate.disabled = true;
+  eligibilityButton.disabled = true;
   element('generate-label').textContent = 'Generating…';
   const controls = ['workspace','seats','country','currency','minus','plus'];
   for (const id of controls) element<HTMLInputElement | HTMLButtonElement>(id).disabled = true;
@@ -138,6 +173,7 @@ element<HTMLFormElement>('settings').addEventListener('submit', async event => {
   finally {
     busy = false;
     generate.disabled = !tabReady;
+    eligibilityButton.disabled = !tabReady;
     element('generate-label').textContent = 'Generate checkout link';
     for (const id of controls) element<HTMLInputElement | HTMLButtonElement>(id).disabled = false;
     syncSeats();

@@ -10,6 +10,13 @@
 <div class="connection" id="connection" data-state="loading" role="status"><span class="dot"></span><span id="connection-text">Checking active tab…</span></div>
 <main>
 <section class="offer" aria-label="Campaign information"><div class="offer-top"><span>BUSINESS PROMOTION</span><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="8" width="18" height="4" rx="1"/><path d="M5 12v9h14v-9M12 8v13M12 8H7.5A2.5 2.5 0 1 1 10 5.5L12 8Zm0 0h4.5A2.5 2.5 0 1 0 14 5.5L12 8Z"/></svg></div><h2>1 month free</h2><p>Subject to account eligibility</p></section>
+<details class="advanced eligibility-section" open><summary>Offer eligibility <span id="eligibility-state" data-state="unknown">Not checked</span></summary>
+<div class="update-row"><span>Default personal plan</span><strong id="eligibility-plan">—</strong></div>
+<div class="update-row"><span>Campaign assignment</span><strong id="eligibility-campaign">—</strong></div>
+<p id="eligibility-reason" class="hint" role="status" aria-live="polite">Check your signed-in account. No checkout is created.</p>
+<button id="eligibility-check" type="button" class="secondary" disabled>Check eligibility</button>
+<p class="hint eligibility-total"><strong>Price not verified.</strong> Confirm 5 Standard seats, 0 Premium seats, monthly billing, discount duration, total due today and renewal price on the official checkout.</p>
+</details>
 <section class="checkout-section" aria-labelledby="checkout-title"><h2 id="checkout-title">Checkout Generator</h2><p class="checkout-intro">Configure your workspace and generate a checkout link using your current ChatGPT session.</p>
 <form id="settings">
   <label for="workspace">Workspace name</label><input id="workspace" required maxlength="100" value="MyTeam" autocomplete="off">
