@@ -10,15 +10,17 @@ export default defineContentScript({
     if (window.top !== window) return;
     let pending: Promise<EligibilityResult> | null = null;
     let latest: EligibilityResult | null = null;
-    let checkedAt = 0;
     let stopped = false;
     function check(force = false): Promise<EligibilityResult> {
       if (pending) return pending;
-      if (!force && latest && Date.now()-checkedAt < 60000) return Promise.resolve(latest);
+      // Keep the result (including Unknown) for this document. Only explicit refresh starts another check.
+      if (!force && latest) return Promise.resolve(latest);
       pending = (async () => {
         await browser.runtime.sendMessage({type:ELIGIBILITY_PENDING_MESSAGE}).catch(()=>{});
-        const result = await checkOfferEligibility();
-        latest = result; checkedAt = Date.now();
+        const result: EligibilityResult = await checkOfferEligibility().catch(()=>({
+          state:'unknown',plan:null,campaign:'unknown',reason:'Eligibility check failed. Use Check again to retry.'
+        }));
+        latest = result;
         if (!stopped) await browser.runtime.sendMessage({type:ELIGIBILITY_RESULT_MESSAGE,result}).catch(()=>{});
         return result;
       })().finally(()=>{pending=null;});
@@ -30,16 +32,11 @@ export default defineContentScript({
       return true;
     };
     browser.runtime.onMessage.addListener(listener);
-    // Once on document load. Refresh on return to a visible tab after the short cache expires.
-    const onVisible = () => { if (document.visibilityState === 'visible' && !stopped) void check().catch(()=>{}); };
-    document.addEventListener('visibilitychange',onVisible);
-    window.addEventListener('pageshow',onVisible);
+    // One automatic check per document; tab focus, pageshow and SPA UI changes do not trigger requests.
     void check().catch(()=>{});
     ctx.onInvalidated(()=>{
       stopped=true; latest=null;
       browser.runtime.onMessage.removeListener(listener);
-      document.removeEventListener('visibilitychange',onVisible);
-      window.removeEventListener('pageshow',onVisible);
     });
   },
 });
