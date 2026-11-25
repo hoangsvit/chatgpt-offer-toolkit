@@ -195,3 +195,56 @@ browser.storage.onChanged.addListener((changes, area) => {
   }
 });
 void loadBannerSettings();
+
+import { UPDATE_KEY, AUTO_KEY, CHECK_MESSAGE, normalizeUpdate, isNewer, releasePage } from '../../utils/updates';
+import type { UpdateState } from '../../utils/updates';
+
+const currentVersion = browser.runtime.getManifest().version;
+let updateState: UpdateState = normalizeUpdate(undefined);
+let checkingUpdate = false;
+let updateAuto = true;
+element('update-current').textContent = 'v' + currentVersion;
+element('update-note').textContent = import.meta.env.FIREFOX
+  ? 'Firefox can install updates automatically for signed self-distributed builds. Temporary builds must be reloaded manually.'
+  : 'Download the new ZIP, extract into the existing extension directory, then reload in the browser.';
+function renderUpdate() {
+  const newer = isNewer(updateState.latest,currentVersion);
+  element('update-latest').textContent = updateState.latest ? 'v'+updateState.latest : '—';
+  element('update-dot').hidden = !newer;
+  button('update-download').hidden = !newer;
+  button('update-check').disabled = checkingUpdate;
+  field('update-auto').checked = updateAuto;
+  element('update-state').textContent = checkingUpdate ? 'Checking GitHub Releases…' :
+    updateState.error ?? (newer ? 'Update available.' : updateState.latest ? 'You are up to date.' : updateState.checkedAt ? 'No stable release yet.' : 'Not checked yet.') +
+    (updateState.checkedAt ? ' · '+new Date(updateState.checkedAt).toLocaleString() : '');
+}
+async function loadUpdates() {
+  try {
+    const s = await browser.storage.local.get([UPDATE_KEY,AUTO_KEY]);
+    updateState = normalizeUpdate(s[UPDATE_KEY]); updateAuto = s[AUTO_KEY] !== false;
+    field('update-auto').disabled = false;
+    if(isNewer(updateState.latest,currentVersion)) element<HTMLDetailsElement>('update-center').open = true;
+  } catch { updateState.error = 'Unable to load update settings.'; }
+  renderUpdate();
+}
+button('update-check').addEventListener('click',async()=>{
+  if(checkingUpdate) return;
+  checkingUpdate=true;renderUpdate();
+  try { updateState=normalizeUpdate(await browser.runtime.sendMessage(CHECK_MESSAGE)); }
+  catch {updateState={...updateState,error:'Unable to check for updates.'};}
+  finally {checkingUpdate=false;renderUpdate();}
+});
+field('update-auto').addEventListener('change',async()=>{
+  const control = field('update-auto'); const wanted=control.checked; control.disabled=true;
+  try {await browser.storage.local.set({[AUTO_KEY]:wanted});updateAuto=wanted;}
+  catch {updateState.error='Unable to save automatic check setting.';}
+  finally {control.disabled=false;renderUpdate();}
+});
+button('update-download').addEventListener('click',()=>openUrl(releasePage(updateState.latest)));
+browser.storage.onChanged.addListener((changes,area)=>{
+  if(area!=='local')return;
+  if(changes[UPDATE_KEY])updateState=normalizeUpdate(changes[UPDATE_KEY].newValue);
+  if(changes[AUTO_KEY])updateAuto=changes[AUTO_KEY].newValue!==false;
+  if(changes[UPDATE_KEY]||changes[AUTO_KEY])renderUpdate();
+});
+void loadUpdates();
