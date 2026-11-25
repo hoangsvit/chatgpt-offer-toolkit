@@ -1,6 +1,6 @@
 {
   "name": "chatgpt-offer-toolkit",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "private": true,
   "type": "module",
   "description": "Cross-browser ChatGPT offer toolkit by ePlus.DEV",
