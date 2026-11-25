@@ -1,22 +1,24 @@
 name: Validate and package extensions
 on:
   push:
+    branches: [main]
   pull_request:
+  workflow_dispatch:
 permissions:
   contents: read
 concurrency:
-  group: validate-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
+  group: validate-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 jobs:
-  preview_start:
-    if: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository && github.actor != 'dependabot[bot]' }}
+  ci:
+    name: Type Check, Test & Build
     runs-on: ubuntu-24.04
     permissions:
       contents: read
       pull-requests: write
-      actions: read
     steps:
       - name: Hide stale downloads and show building status
+        if: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository && github.actor != 'dependabot[bot]' }}
         env:
           GH_TOKEN: ${{ github.token }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
@@ -25,7 +27,7 @@ jobs:
         run: |
           node --input-type=module <<'NODE'
           import { execFileSync } from 'node:child_process';
-          const {GITHUB_REPOSITORY:repo,GITHUB_RUN_ID:run,GITHUB_RUN_ATTEMPT:attempt,PR_NUMBER:pr,PR_HEAD:head,PREVIEW_PHASE:phase,TEST_RESULT:test,BUILD_RESULT:build}=process.env;
+          const {GITHUB_REPOSITORY:repo,GITHUB_RUN_ID:run,GITHUB_RUN_ATTEMPT:attempt,PR_NUMBER:pr,PR_HEAD:head,PREVIEW_PHASE:phase,TEST_RESULT:test,BUILD_RESULT:build,JOB_RESULT:job,CHROME_ARTIFACT:chrome,FIREFOX_ARTIFACT:firefox,SCREENSHOT_ARTIFACT:screenshot}=process.env;
           if (!/^\d+$/.test(pr)||!/^\d+$/.test(run)||!/^\d+$/.test(attempt)||!/^\w+\/[\w.-]+$/.test(repo)||! /^[a-f0-9]{40}$/.test(head)) throw Error('Invalid PR metadata');
           const api=(...args)=>JSON.parse(execFileSync('gh',['api',...args],{encoding:'utf8'}));
           const endpoint='repos/'+repo;
@@ -40,19 +42,16 @@ jobs:
           let lines=['### Extension build preview','','Commit: `'+head.slice(0,7)+'`'];
           if(phase==='start'){
            lines.push('','⏳ **Building and testing…**','','Downloads will appear here only after all checks pass.');
-          }else if(test==='success'&&build==='success'){
-           const artifacts=api(endpoint+'/actions/runs/'+run+'/artifacts?per_page=100','--paginate','--slurp').flatMap(p=>p.artifacts).filter(a=>!a.expired);
-           const names=['extension-chrome','extension-firefox'];
-           const selected=names.map(name=>artifacts.find(a=>a.name===name));
-           if(selected.every(Boolean)){
+          }else if(job==='success'&&test==='success'&&build==='success'){
+           const selected=[chrome,firefox];
+           if(selected.every(id=>typeof id==='string'&&/^\d+$/.test(id))){
             lines.push('','✅ **Build and tests passed**','','| Package | Download |','| --- | --- |');
-            for(const [i,label] of ['Chrome / Edge','Firefox (unsigned)'].entries())lines.push('| '+label+' | [Download ZIP]('+runUrl+'/artifacts/'+selected[i].id+') |');
-            const screenshots=artifacts.find(a=>a.name==='popup-screenshots');
-            if(screenshots)lines.push('| Popup screenshots | [Download ZIP]('+runUrl+'/artifacts/'+screenshots.id+') |');
-            lines.push('','GitHub login may be required. Extract the extension package before loading it. Artifacts expire according to repository retention settings.');
+            for(const [i,label] of ['Chrome / Edge','Firefox (unsigned)'].entries())lines.push('| '+label+' | [Download ZIP]('+runUrl+'/artifacts/'+selected[i]+') |');
+            if(typeof screenshot==='string'&&/^\d+$/.test(screenshot))lines.push('| Popup screenshots | [Download ZIP]('+runUrl+'/artifacts/'+screenshot+') |');
+            lines.push('','GitHub login may be required. Extract the downloaded ZIP once, then load the directory containing manifest.json. Artifacts expire according to repository retention settings.');
            }else lines.push('','⚠️ **Build finished, but required artifacts are missing.**','','Downloads withheld.');
           }else{
-           lines.push('','❌ **Build did not pass**','','Tests: `'+test+'` · Build: `'+build+'`','','Downloads withheld until a successful build.');
+           lines.push('','❌ **Build did not pass**','','Tests: `'+(test||'skipped')+'` · Build: `'+(build||'skipped')+'` · Job: `'+job+'`','','Downloads withheld until a successful build.');
           }
           lines.push('','[View build log]('+runUrl+')','',marker,'<!-- preview-run:'+run+':'+attempt+' -->');
           const body=lines.join('\n');
@@ -60,79 +59,81 @@ jobs:
           if(existing)api(endpoint+'/issues/comments/'+existing.id,'-X','PATCH','-f','body='+body);
           else api(endpoint+'/issues/'+pr+'/comments','-X','POST','-f','body='+body);
           NODE
-  test:
-    needs: preview_start
-    if: ${{ !cancelled() }}
-    runs-on: ubuntu-24.04
-    steps:
       - uses: actions/checkout@v7.0.1
+        with:
+          persist-credentials: false
       - uses: actions/setup-node@v7.1.0
         with:
           node-version-file: '.nvmrc'
-          check-latest: true
-          package-manager-cache: false
-      - run: npm install --no-audit --no-fund
-      - run: npm run typecheck
-      - run: npm test
-  build:
-    needs: test
-    if: ${{ !cancelled() && needs.test.result == 'success' }}
-    runs-on: ubuntu-24.04
-    strategy:
-      fail-fast: false
-      matrix:
-        browser: [chrome, firefox]
-    steps:
-      - uses: actions/checkout@v7.0.1
-      - uses: actions/setup-node@v7.1.0
-        with:
-          node-version-file: '.nvmrc'
-          check-latest: true
-          package-manager-cache: false
-      - run: npm install --no-audit --no-fund
-      - run: npx wxt build -b ${{ matrix.browser }} --mv3
-      - run: node scripts/check-manifest.mjs ${{ matrix.browser }}
-      - if: matrix.browser == 'chrome' && vars.RUN_POPUP_PLAYWRIGHT == 'true'
+          check-latest: false
+          cache: npm
+          cache-dependency-path: package.json
+      - name: Install dependencies once
+        run: npm install --no-audit --no-fund
+      - name: Typecheck and unit tests
+        id: tests
+        run: npm run typecheck && npm test
+      - name: Build and validate both browsers
+        id: build
+        run: |
+          set -euo pipefail
+          npx --no-install wxt build -b chrome --mv3
+          node scripts/check-manifest.mjs chrome
+          npx --no-install wxt build -b firefox --mv3
+          node scripts/check-manifest.mjs firefox
+      - name: Install Chromium (optional)
+        if: vars.RUN_POPUP_PLAYWRIGHT == 'true'
         run: npx playwright install --with-deps chromium
-      - if: matrix.browser == 'chrome' && vars.RUN_POPUP_PLAYWRIGHT == 'true'
+      - name: Test popup (optional)
+        if: vars.RUN_POPUP_PLAYWRIGHT == 'true'
         run: npm run test:popup
-      - if: matrix.browser == 'chrome' && vars.RUN_POPUP_PLAYWRIGHT == 'true' && always()
+      - name: Upload popup screenshots (optional)
+        id: screenshots
+        if: ${{ always() && vars.RUN_POPUP_PLAYWRIGHT == 'true' }}
         uses: actions/upload-artifact@v7.0.2
         with:
           name: popup-screenshots
           path: artifacts/popup/*.png
           if-no-files-found: ignore
-      - run: npx wxt zip -b ${{ matrix.browser }} --mv3
-      - uses: actions/upload-artifact@v7.0.2
+          retention-days: 7
+          overwrite: true
+      - name: Upload Chrome and Edge package
+        id: chrome
+        uses: actions/upload-artifact@v7.0.2
         with:
-          name: extension-${{ matrix.browser }}
-          path: |
-            .output/*.zip
-            .output/${{ matrix.browser }}-mv3/**
+          name: extension-chrome
+          path: .output/chrome-mv3/
           include-hidden-files: true
           if-no-files-found: error
-
-  preview_finish:
-    if: ${{ always() && github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository && github.actor != 'dependabot[bot]' }}
-    needs: [preview_start, test, build]
-    runs-on: ubuntu-24.04
-    permissions:
-      contents: read
-      pull-requests: write
-      actions: read
-    steps:
+          retention-days: 7
+          overwrite: true
+      - name: Upload Firefox package
+        id: firefox
+        uses: actions/upload-artifact@v7.0.2
+        with:
+          name: extension-firefox
+          path: .output/firefox-mv3/
+          include-hidden-files: true
+          if-no-files-found: error
+          retention-days: 7
+          overwrite: true
       - name: Publish validated build downloads
+        if: ${{ always() && github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository && github.actor != 'dependabot[bot]' }}
         env:
           GH_TOKEN: ${{ github.token }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
           PR_HEAD: ${{ github.event.pull_request.head.sha }}
           PREVIEW_PHASE: finish
-          TEST_RESULT: ${{ needs.test.result }}
-          BUILD_RESULT: ${{ needs.build.result }}
+          TEST_RESULT: ${{ steps.tests.outcome }}
+          BUILD_RESULT: ${{ steps.build.outcome }}
+          JOB_RESULT: ${{ job.status }}
+          CHROME_ARTIFACT: ${{ steps.chrome.outputs.artifact-id }}
+          FIREFOX_ARTIFACT: ${{ steps.firefox.outputs.artifact-id }}
+          SCREENSHOT_ARTIFACT: ${{ steps.screenshots.outputs.artifact-id }}
         run: |
           node --input-type=module <<'NODE'
           import { execFileSync } from 'node:child_process';
-          const {GITHUB_REPOSITORY:repo,GITHUB_RUN_ID:run,GITHUB_RUN_ATTEMPT:attempt,PR_NUMBER:pr,PR_HEAD:head,PREVIEW_PHASE:phase,TEST_RESULT:test,BUILD_RESULT:build}=process.env;
+          const {GITHUB_REPOSITORY:repo,GITHUB_RUN_ID:run,GITHUB_RUN_ATTEMPT:attempt,PR_NUMBER:pr,PR_HEAD:head,PREVIEW_PHASE:phase,TEST_RESULT:test,BUILD_RESULT:build,JOB_RESULT:job,CHROME_ARTIFACT:chrome,FIREFOX_ARTIFACT:firefox,SCREENSHOT_ARTIFACT:screenshot}=process.env;
           if (!/^\d+$/.test(pr)||!/^\d+$/.test(run)||!/^\d+$/.test(attempt)||!/^\w+\/[\w.-]+$/.test(repo)||! /^[a-f0-9]{40}$/.test(head)) throw Error('Invalid PR metadata');
           const api=(...args)=>JSON.parse(execFileSync('gh',['api',...args],{encoding:'utf8'}));
           const endpoint='repos/'+repo;
@@ -147,19 +148,16 @@ jobs:
           let lines=['### Extension build preview','','Commit: `'+head.slice(0,7)+'`'];
           if(phase==='start'){
            lines.push('','⏳ **Building and testing…**','','Downloads will appear here only after all checks pass.');
-          }else if(test==='success'&&build==='success'){
-           const artifacts=api(endpoint+'/actions/runs/'+run+'/artifacts?per_page=100','--paginate','--slurp').flatMap(p=>p.artifacts).filter(a=>!a.expired);
-           const names=['extension-chrome','extension-firefox'];
-           const selected=names.map(name=>artifacts.find(a=>a.name===name));
-           if(selected.every(Boolean)){
+          }else if(job==='success'&&test==='success'&&build==='success'){
+           const selected=[chrome,firefox];
+           if(selected.every(id=>typeof id==='string'&&/^\d+$/.test(id))){
             lines.push('','✅ **Build and tests passed**','','| Package | Download |','| --- | --- |');
-            for(const [i,label] of ['Chrome / Edge','Firefox (unsigned)'].entries())lines.push('| '+label+' | [Download ZIP]('+runUrl+'/artifacts/'+selected[i].id+') |');
-            const screenshots=artifacts.find(a=>a.name==='popup-screenshots');
-            if(screenshots)lines.push('| Popup screenshots | [Download ZIP]('+runUrl+'/artifacts/'+screenshots.id+') |');
-            lines.push('','GitHub login may be required. Extract the extension package before loading it. Artifacts expire according to repository retention settings.');
+            for(const [i,label] of ['Chrome / Edge','Firefox (unsigned)'].entries())lines.push('| '+label+' | [Download ZIP]('+runUrl+'/artifacts/'+selected[i]+') |');
+            if(typeof screenshot==='string'&&/^\d+$/.test(screenshot))lines.push('| Popup screenshots | [Download ZIP]('+runUrl+'/artifacts/'+screenshot+') |');
+            lines.push('','GitHub login may be required. Extract the downloaded ZIP once, then load the directory containing manifest.json. Artifacts expire according to repository retention settings.');
            }else lines.push('','⚠️ **Build finished, but required artifacts are missing.**','','Downloads withheld.');
           }else{
-           lines.push('','❌ **Build did not pass**','','Tests: `'+test+'` · Build: `'+build+'`','','Downloads withheld until a successful build.');
+           lines.push('','❌ **Build did not pass**','','Tests: `'+(test||'skipped')+'` · Build: `'+(build||'skipped')+'` · Job: `'+job+'`','','Downloads withheld until a successful build.');
           }
           lines.push('','[View build log]('+runUrl+')','',marker,'<!-- preview-run:'+run+':'+attempt+' -->');
           const body=lines.join('\n');
