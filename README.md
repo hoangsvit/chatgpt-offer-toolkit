@@ -1,6 +1,22 @@
+<p align="center"><img src="public/icon.svg" alt="Offer Toolkit icon" width="88"></p>
+
 # ChatGPT Offer Toolkit
 
-An unofficial Chrome / Microsoft Edge / Firefox extension for reviewing a ChatGPT Business promotional checkout without pasting JavaScript into DevTools.
+Explore ChatGPT Business offers, open official claim pages, generate checkout links, and check for updates. Built by ePlus.DEV.
+
+A browser extension for Chrome, Edge and Firefox. Independent project by [ePlus.DEV](https://eplus.dev); not affiliated with OpenAI.
+
+## Features
+
+- **Claim offer:** opens the official ChatGPT Business promotion page. Eligibility and pricing are decided by ChatGPT.
+- **Advanced checkout:** configure workspace, seats, actual billing country and currency, then copy or open a checkout link.
+- **Promotion banner:** optional top or floating banner on chatgpt.com, with dismissal and visibility settings.
+- **Modern popup:** light/dark mode, active-tab status, version and support links.
+- **Update Center:** stable release checks every six hours, manual checking and links to GitHub Releases.
+- **Cross-browser packaging:** Chrome/Edge ZIP and Firefox packages, with optional signed self-distributed Firefox updates.
+- **Privacy:** no persistent session tokens, no telemetry, no automatic subscription or payment.
+
+The extension is an offer navigation and checkout helper, not an eligibility bypass or a source of guaranteed free subscriptions.
 
 ## Install
 
@@ -11,7 +27,7 @@ Download the browser-specific ZIP artifact from a successful [GitHub Actions run
 
 ## Develop and build
 
-Requires Node.js 22.12+; Node.js 26 LTS is recommended and used by CI (see `.nvmrc`). WXT 0.21.5 generates separate Manifest V3 builds.
+Requires Node.js 22.12+; Node.js 26 LTS is recommended and used by CI (see `.nvmrc`). WXT 0.21.5 generates separate Manifest V3 builds. The ePlus ticket icon is generated automatically in PNG sizes 16, 32, 48, 96 and 128 from the local geometric design before development, build and packaging.
 
 ```sh
 npm install

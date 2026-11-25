@@ -3,7 +3,10 @@ import { defineConfig } from 'wxt';
 export default defineConfig({
   manifest: ({ browser }) => ({
     name: 'ChatGPT Offer Toolkit',
-    description: 'An independent ePlus.DEV helper for reviewing ChatGPT Business promotions.',
+    description: 'Explore ChatGPT Business offers, open official claim pages, generate checkout links, and check for updates. Built by ePlus.DEV.',
+    short_name: 'Offer Toolkit',
+    icons: {16: 'icon/16.png', 32: 'icon/32.png', 48: 'icon/48.png', 96: 'icon/96.png', 128: 'icon/128.png'},
+    action: {default_title: 'ChatGPT Offer Toolkit', default_icon: {16: 'icon/16.png', 32: 'icon/32.png', 48: 'icon/48.png'}},
     permissions: ['activeTab', 'scripting', 'storage', 'alarms'],
     host_permissions: ['https://api.github.com/*'],
     ...(browser === 'firefox' ? {

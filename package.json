@@ -1,24 +1,25 @@
 {
   "name": "chatgpt-offer-toolkit",
-  "version": "1.4.1",
+  "version": "1.4.2",
   "private": true,
   "type": "module",
-  "description": "Cross-browser ChatGPT offer toolkit by ePlus.DEV",
+  "description": "Explore ChatGPT Business offers, open official claim pages, generate checkout links, and check for updates. Built by ePlus.DEV.",
   "engines": {
     "node": ">=22.12.0"
   },
   "scripts": {
-    "dev": "wxt -b chrome --mv3",
-    "dev:firefox": "wxt -b firefox --mv3",
-    "build": "wxt build -b chrome --mv3",
-    "build:firefox": "wxt build -b firefox --mv3",
+    "dev": "npm run icons && wxt -b chrome --mv3",
+    "dev:firefox": "npm run icons && wxt -b firefox --mv3",
+    "build": "npm run icons && wxt build -b chrome --mv3",
+    "build:firefox": "npm run icons && wxt build -b firefox --mv3",
     "build:all": "npm run build && npm run build:firefox",
-    "zip": "wxt zip -b chrome --mv3",
-    "zip:firefox": "wxt zip -b firefox --mv3",
+    "zip": "npm run icons && wxt zip -b chrome --mv3",
+    "zip:firefox": "npm run icons && wxt zip -b firefox --mv3",
     "zip:all": "npm run zip && npm run zip:firefox",
-    "postinstall": "wxt prepare",
+    "postinstall": "npm run icons && wxt prepare",
     "typecheck": "tsc --noEmit",
-    "test": "node --test tests/*.test.cjs"
+    "test": "node --test tests/*.test.cjs",
+    "icons": "node scripts/generate-icons.mjs"
   },
   "devDependencies": {
     "wxt": "0.21.5",
