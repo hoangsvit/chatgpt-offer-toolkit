@@ -3,8 +3,8 @@ import { defineConfig } from 'wxt';
 export default defineConfig({
   manifest: ({ browser }) => ({
     name: 'ChatGPT Offer Toolkit',
-    description: 'Unofficial helper for reviewing ChatGPT Business promotional checkout.',
-    permissions: ['activeTab', 'scripting'],
+    description: 'An independent ePlus.DEV helper for reviewing ChatGPT Business promotions.',
+    permissions: ['activeTab', 'scripting', 'storage'],
     ...(browser === 'firefox' ? {
       browser_specific_settings: {
         gecko: { id: 'chatgpt-offer-toolkit@eplus.dev', strict_min_version: '128.0' },
