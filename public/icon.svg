@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <title>Offer Toolkit — ePlus.DEV</title>
+  <rect x="4" y="4" width="120" height="120" rx="28" fill="#146d4b"/>
+  <path d="M24 37 H104 V53 A11 11 0 0 0 104 75 V91 H24 V75 A11 11 0 0 0 24 53 Z" fill="#fff"/>
+  <circle cx="50" cy="51" r="6" fill="#146d4b"/>
+  <path d="M49 79 L79 49" stroke="#146d4b" stroke-width="8" stroke-linecap="round"/>
+  <circle cx="78" cy="78" r="6" fill="#146d4b"/>
+</svg>
