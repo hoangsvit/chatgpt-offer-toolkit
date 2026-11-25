@@ -63,3 +63,21 @@ test("unrecognized HTTP 400 or malformed body remains a generic failure",async()
   const result=await c.requestCheckout(config);assert.equal(result.code,undefined);assert.match(result.error,/HTTP 400/);assert.equal(calls,2);assert.ok(!result.error.includes("private"));
  }
 });
+
+test("server total preserves explicit zero and positive values without retry or private fields",async()=>{
+ for(const minorUnits of [0,3569500]){
+  let calls=0;
+  const c=load({fetch:async()=>++calls===1?{ok:true,json:async()=>({accessToken:"mock-token"})}:{ok:true,json:async()=>({url:"https://pay.openai.com/c/pay/test",status:"open",client_secret:"synthetic-private",checkout_state:{currency:"vnd",email:"synthetic-private",total:{total:{minorUnitsAmount:minorUnits}}}})}});
+  const result=await c.requestCheckout({...config,currency:"VND"});
+  assert.equal(result.total.currency,"VND");assert.equal(result.total.minorUnits,minorUnits);assert.equal(calls,2);
+  assert.ok(!JSON.stringify(result).includes("synthetic-private"));
+ }
+});
+test("missing or untrustworthy server totals are not treated as zero",async()=>{
+ for(const [status,currency,value] of [["open","vnd",undefined],["open","vnd",null],["open","vnd","0"],["open","vnd",-1],["open","vnd",0.1],["open","usd",0],["complete","vnd",0]]){
+  let calls=0;
+  const c=load({fetch:async()=>++calls===1?{ok:true,json:async()=>({accessToken:"mock-token"})}:{ok:true,json:async()=>({url:"https://pay.openai.com/c/pay/test",status,checkout_state:{currency,total:{total:{minorUnitsAmount:value}}}})}});
+  const result=await c.requestCheckout({...config,currency:"VND"});
+  assert.equal(result.total,undefined);assert.ok(result.url);assert.equal(calls,2);
+ }
+});

@@ -4,11 +4,12 @@ function harness(check){
  let listener,definition,invalidated;const messages=[];let count=0;
  const win={};win.top=win;
  const browser={runtime:{id:'extension-test',sendMessage:async message=>{messages.push(message);},onMessage:{addListener:fn=>{listener=fn;},removeListener:()=>{listener=undefined;}}}};
- const modules={'wxt/utils/define-content-script':{defineContentScript:x=>{definition=x;return x;}},'wxt/browser':{browser},'../utils/eligibility':{checkOfferEligibility:()=>{count++;return check();}},'../utils/eligibility-badge':{CHECK_TAB_MESSAGE:'check',ELIGIBILITY_RESULT_MESSAGE:'result',ELIGIBILITY_PENDING_MESSAGE:'pending'}};
+ const modules={'wxt/utils/define-content-script':{defineContentScript:x=>{definition=x;return x;}},'wxt/browser':{browser},'../utils/eligibility':{checkOfferEligibility:()=>{count++;return check();}},'../utils/eligibility-badge':{BADGE_MESSAGE:'badge',CHECK_TAB_MESSAGE:'check',ELIGIBILITY_RESULT_MESSAGE:'result',ELIGIBILITY_PENDING_MESSAGE:'pending'}};
  vm.runInNewContext(source,{exports:{},window:win,require:name=>{assert.ok(modules[name],name);return modules[name];}});
  definition.main({onInvalidated:fn=>{invalidated=fn;}});
  const request=(force=false)=>new Promise(resolve=>{assert.equal(listener({type:'check',force},{id:'extension-test'},resolve),true);});
- return {request,messages,count:()=>count,dispose:()=>invalidated()};
+ const snapshot=()=>{let value;assert.equal(listener({type:'badge'},{id:'extension-test'},v=>{value=v;}),false);return value;};
+ return {request,snapshot,messages,count:()=>count,dispose:()=>invalidated()};
 }
 const eligible={state:'eligible',plan:'plus',campaign:'assigned',reason:'synthetic'};
 test('automatic load and overlapping popup requests share one check; repeated opens reuse result',{timeout:5000},async()=>{
@@ -32,4 +33,16 @@ test('unknown results remain cached and only explicit retry starts a second requ
 test('explicit refresh is coalesced and fresh documents get their own check',async()=>{
  const a=harness(async()=>eligible);await a.request();await Promise.all([a.request(true),a.request(true)]);
  assert.equal(a.count(),2);const b=harness(async()=>eligible);await b.request();assert.equal(b.count(),1);a.dispose();b.dispose();
+});
+
+test('active-tab badge snapshot does not start or repeat eligibility requests',{timeout:5000},async()=>{
+ let finish,signalStarted;
+ const started=new Promise(resolve=>{signalStarted=resolve;});
+ const h=harness(()=>new Promise(resolve=>{finish=resolve;signalStarted();}));
+ await started;
+ assert.equal(h.snapshot().pending,true);assert.equal(h.count(),1);
+ const result=h.request();finish(eligible);await result;
+ assert.equal(h.snapshot().pending,false);assert.equal(h.snapshot().result.state,'eligible');
+ for(let i=0;i<5;i++)assert.equal(h.snapshot().result.state,'eligible');
+ assert.equal(h.count(),1);h.dispose();
 });

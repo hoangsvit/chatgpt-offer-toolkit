@@ -2,7 +2,9 @@ import { browser } from 'wxt/browser';
 import { validateConfig, validCheckoutUrl, requestCheckout } from '../../utils/checkout';
 import type { CheckoutConfig, CheckoutResult } from '../../utils/checkout';
 import './style.css';
-import { CHECK_TAB_MESSAGE } from '../../utils/eligibility-badge';
+import { reviewCheckoutPrice } from '../../utils/checkout-price';
+import type { PriceReview } from '../../utils/checkout-price';
+import { CHECK_TAB_MESSAGE, isChatGPTUrl } from '../../utils/eligibility-badge';
 import type { EligibilityResult } from '../../utils/eligibility';
 import { currencyForCountry, BILLING_PREFERENCE_KEY, parseBillingPreference } from '../../utils/billing-locale';
 import { BANNER_KEY, OFFER_URL, EPLUS_URL, SUPPORT_URL, normalizeSettings } from '../../utils/banner-settings';
@@ -16,6 +18,15 @@ function element<T extends HTMLElement = HTMLElement>(id: string): T {
 const field = (id: string) => element<HTMLInputElement>(id);
 const button = (id: string) => element<HTMLButtonElement>(id);
 const generate = button('generate');
+function showView(view:'offer'|'settings') {
+  const isOffer=view==='offer';
+  element('offer-view').hidden=!isOffer;
+  element('settings-view').hidden=isOffer;
+  button('view-offer').setAttribute('aria-pressed',String(isOffer));
+  button('view-settings').setAttribute('aria-pressed',String(!isOffer));
+}
+button('view-offer').addEventListener('click',()=>showView('offer'));
+button('view-settings').addEventListener('click',()=>showView('settings'));
 const seats = field('seats');
 const countryField = field('country');
 const currencyField = field('currency');
@@ -173,6 +184,44 @@ eligibilityButton.addEventListener('click', () => void runEligibilityCheck(true)
 // Reuse the current tab's automatic eligibility check; no checkout.
 void runEligibilityCheck();
 
+let priceBusy = false;
+async function runPriceReview() {
+  if (priceBusy) return;
+  priceBusy = true;
+  button('price-check').disabled = true;
+  const state = element('price-state');
+  const amount = element('price-amount');
+  const reason = element('price-reason');
+  state.textContent = 'Checking…'; state.dataset.state = 'unknown'; amount.textContent = '—';
+  try {
+    const [tab] = await browser.tabs.query({active:true,currentWindow:true});
+    const url = tab?.url ? new URL(tab.url) : null;
+    if (tab?.id == null || !url || !(url.origin === 'https://chatgpt.com' && /^\/(checkout|payments\/checkout)(\/|$)/.test(url.pathname))) {
+      element('price-panel').hidden = true;
+      state.textContent = 'Price unknown';
+      reason.textContent = 'Open a checkout on chatgpt.com. External payment pages are not read by this extension.';
+      return;
+    }
+    const panel=element<HTMLDetailsElement>('price-panel');
+    panel.hidden=false;
+    panel.open=true;
+    const [response] = await browser.scripting.executeScript({target:{tabId:tab.id},func:reviewCheckoutPrice});
+    const result = response?.result as PriceReview | undefined;
+    state.textContent = result?.state === 'zero' ? 'Zero due today' : result?.state === 'paid' ? 'Paid checkout' : 'Price unknown';
+    state.dataset.state = result?.state === 'zero' ? 'eligible' : result?.state === 'paid' ? 'not_eligible' : 'unknown';
+    amount.textContent = result?.amount ?? '—';
+    reason.textContent = result?.reason ?? 'No readable price. Review the official checkout manually.';
+  } catch {
+    state.textContent = 'Price unknown';
+    reason.textContent = 'Unable to read this checkout. Review the official total manually.';
+  } finally {
+    priceBusy = false;
+    button('price-check').disabled = false;
+  }
+}
+button('price-check').addEventListener('click', () => void runPriceReview());
+void runPriceReview();
+
 element<HTMLFormElement>('settings').addEventListener('submit', async event => {
   event.preventDefault();
   if (busy || eligibilityBusy) return;
@@ -210,7 +259,17 @@ element<HTMLFormElement>('settings').addEventListener('submit', async event => {
     }
     field('link').value = currentUrl;
     element('result').hidden = false;
-    status('Link generated. This does not confirm a free offer. Review the official checkout.');
+    if (result.total) {
+      const {currency,minorUnits} = result.total;
+      const format = new Intl.NumberFormat(undefined,{style:'currency',currency});
+      const digits = format.resolvedOptions().maximumFractionDigits ?? 2;
+      const displayed = format.format(minorUnits / 10 ** digits);
+      status(minorUnits === 0
+        ? 'Server-reported current total: '+displayed+'. Review the official checkout, renewal price and terms; activation is not verified.'
+        : 'Paid checkout — server-reported current total: '+displayed+'. Review the official checkout before subscribing.');
+    } else {
+      status('Link generated. Server total unavailable. Review the official checkout; a free offer is not verified.');
+    }
   } catch { status('Unable to access the ChatGPT tab. Reopen the extension and try again.'); }
   finally {
     busy = false;
@@ -311,6 +370,7 @@ function renderUpdate() {
   const newer = isNewer(updateState.latest,currentVersion);
   element('update-latest').textContent = updateState.latest ? 'v'+updateState.latest : '—';
   element('update-dot').hidden = !newer;
+  element('nav-update-dot').hidden = !newer;
   button('update-download').hidden = !newer;
   button('update-check').disabled = checkingUpdate;
   field('update-auto').checked = updateAuto;
@@ -323,7 +383,8 @@ async function loadUpdates() {
     const s = await browser.storage.local.get([UPDATE_KEY,AUTO_KEY]);
     updateState = normalizeUpdate(s[UPDATE_KEY]); updateAuto = s[AUTO_KEY] !== false;
     field('update-auto').disabled = false;
-    if(updateAuto) updateState=normalizeUpdate(await browser.runtime.sendMessage(AUTO_CHECK_MESSAGE));
+    const [tab] = await browser.tabs.query({active:true,currentWindow:true});
+    if(updateAuto && isChatGPTUrl(tab?.url)) updateState=normalizeUpdate(await browser.runtime.sendMessage(AUTO_CHECK_MESSAGE));
     if(isNewer(updateState.latest,currentVersion)) element<HTMLDetailsElement>('update-center').open = true;
   } catch { updateState.error = 'Unable to load update settings.'; }
   renderUpdate();
