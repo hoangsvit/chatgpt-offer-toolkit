@@ -1,6 +1,6 @@
 import { defineBackground } from 'wxt/utils/define-background';
 import { browser } from 'wxt/browser';
-import { RELEASE_API, UPDATE_KEY, AUTO_KEY, CHECK_MESSAGE, ALARM_NAME, normalizeUpdate, releaseVersion } from '../utils/updates';
+import { RELEASE_API, UPDATE_KEY, AUTO_KEY, CHECK_MESSAGE, AUTO_CHECK_MESSAGE, ALARM_NAME, normalizeUpdate, releaseVersion, shouldAutoCheck } from '../utils/updates';
 import type { UpdateState } from '../utils/updates';
 import { badgeFor, isChatGPTUrl, ELIGIBILITY_PENDING_MESSAGE, ELIGIBILITY_RESULT_MESSAGE } from '../utils/eligibility-badge';
 
@@ -35,6 +35,22 @@ export default defineBackground(() => {
     if(!await browser.alarms.get(ALARM_NAME)) await browser.alarms.create(ALARM_NAME,{periodInMinutes:360});
     if(Date.now()-normalizeUpdate(data[UPDATE_KEY]).checkedAt >= 21600000) await check();
   }
+  let autoPending: Promise<UpdateState> | null = null;
+  function checkIfDue(): Promise<UpdateState> {
+    if(autoPending) return autoPending;
+    autoPending=(async()=>{
+      const data=await browser.storage.local.get([AUTO_KEY,UPDATE_KEY]);
+      const previous=normalizeUpdate(data[UPDATE_KEY]);
+      return shouldAutoCheck(data[AUTO_KEY],previous.checkedAt) ? check() : previous;
+    })().finally(()=>{autoPending=null;});
+    return autoPending;
+  }
+  browser.runtime.onMessage.addListener((message,sender,sendResponse)=>{
+    if(message!==AUTO_CHECK_MESSAGE || sender.id!==browser.runtime.id) return false;
+    if(sender.tab && (sender.frameId!==0 || !isChatGPTUrl(sender.url))) return false;
+    void checkIfDue().then(sendResponse,()=>sendResponse({latest:null,checkedAt:Date.now(),error:'Unable to check for updates.'}));
+    return true;
+  });
   function run(task: Promise<unknown>) {void task.catch(()=>{});}
   browser.runtime.onInstalled.addListener(()=>run(configure()));
   browser.runtime.onStartup.addListener(()=>run(configure()));
