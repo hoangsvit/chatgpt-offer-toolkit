@@ -14,7 +14,7 @@ A browser extension for Chrome, Edge and Firefox. Independent project by [ePlus.
 - **Open official offer page:** alternative route to the promotion on ChatGPT. Eligibility and pricing are decided by ChatGPT.
 - **Promotion banner:** optional top or floating banner on chatgpt.com, with dismissal and visibility settings.
 - **Modern popup:** light/dark mode, active-tab status, version and support links.
-- **Update Center:** stable release checks every six hours, manual checking and links to GitHub Releases.
+- **Update Center:** stable release checks on ChatGPT page load (15-minute cache), every six hours, manual checking and links to GitHub Releases.
 - **Cross-browser packaging:** Chrome/Edge ZIP and Firefox packages, with optional signed self-distributed Firefox updates.
 - **Privacy:** no persistent session tokens, no telemetry, no automatic subscription or payment.
 
@@ -49,16 +49,16 @@ Modern Minimal: a compact 400px popup with an explicit root width to prevent bro
 
 ## Promotion banner
 
-The extension displays a clearly branded ePlus.DEV promotion on chatgpt.com. Open Banner settings to enable/disable, select top or floating placement, choose a dismissal duration (24 hours, 7 days, or until enabled), or show it again. Changes sync to open tabs locally. The banner only opens the official campaign page; it never checks credentials or performs checkout. The default top banner is inserted into page flow rather than fixed over the header. Actual layout compatibility should be tested in each browser.
+The extension displays a clearly branded ePlus.DEV promotion on chatgpt.com. Open Banner settings to enable/disable, select top-right or floating bottom-right placement, choose a dismissal duration (24 hours, 7 days, or until enabled), or show it again. Changes sync to open tabs locally. The banner only opens the official campaign page; it never checks credentials or performs checkout. Both positions are isolated fixed overlays outside the page layout; the default is floating bottom-right. No app-root padding, height, or overflow changes. Actual layout compatibility should be tested in each browser.
 
 ## Updates without a public store
 
-The popup Software updates section checks the latest stable GitHub Release every six hours (while the browser is running), with a manual check and an opt-out. An available update is also linked in the promotion banner. No executable code is downloaded or run by the checker.
+The Software updates section checks the latest stable GitHub Release on ChatGPT page load or popup open (shared 15-minute cache), plus every six hours while the browser is running, with a manual check and opt-out. An available update is also linked in the promotion banner. No executable code is downloaded or run by the checker.
 
 - Chrome / Edge: download `chrome.zip` from the release, extract the contents into the same unpacked extension directory, then reload the extension. Standard unmanaged Chrome on Windows/macOS does not allow silent self-hosted installs.
 - Firefox: `firefox-unsigned.zip` is only for temporary testing. Install `firefox.xpi` when available; signed self-distributed versions use the separate `firefox-updates` release manifest for native Firefox updates. Browser update settings still apply.
 
-To publish a version, update package.json, merge the change and push a matching `vX.Y.Z` tag. The Release workflow tests, builds and publishes browser ZIPs and SHA256SUMS.txt. For signing, configure repository Actions secrets `AMO_JWT_ISSUER` and `AMO_JWT_SECRET`. Signing is an optional separate job; no unsigned XPI is advertised as a native update. The signed XPI and update manifest are published only after successful signing. Mozilla may require source review or reject signing; see [self-distribution](https://extensionworkshop.com/documentation/publish/self-distribution/). The dedicated prerelease tag firefox-updates is not the latest stable release.
+To publish a version, bump package.json and merge into `main`. The Release workflow automatically tests, builds, creates the matching tag and publishes browser ZIPs and SHA256SUMS.txt only for a newer stable version. An unchanged or older version is skipped; a matching manual tag or workflow dispatch remains supported. No raw main source is installed. For signing, configure repository Actions secrets `AMO_JWT_ISSUER` and `AMO_JWT_SECRET`. Signing is an optional separate job; no unsigned XPI is advertised as a native update. The signed XPI and update manifest are published only after successful signing. Mozilla may require source review or reject signing; see [self-distribution](https://extensionworkshop.com/documentation/publish/self-distribution/). The dedicated prerelease tag firefox-updates is not the latest stable release.
 
 ## Eligibility Checker
 

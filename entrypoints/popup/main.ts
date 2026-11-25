@@ -266,7 +266,7 @@ browser.storage.onChanged.addListener((changes, area) => {
 });
 void loadBannerSettings();
 
-import { UPDATE_KEY, AUTO_KEY, CHECK_MESSAGE, normalizeUpdate, isNewer, releasePage } from '../../utils/updates';
+import { UPDATE_KEY, AUTO_KEY, CHECK_MESSAGE, AUTO_CHECK_MESSAGE, normalizeUpdate, isNewer, releasePage } from '../../utils/updates';
 import type { UpdateState } from '../../utils/updates';
 
 const currentVersion = browser.runtime.getManifest().version;
@@ -293,6 +293,7 @@ async function loadUpdates() {
     const s = await browser.storage.local.get([UPDATE_KEY,AUTO_KEY]);
     updateState = normalizeUpdate(s[UPDATE_KEY]); updateAuto = s[AUTO_KEY] !== false;
     field('update-auto').disabled = false;
+    if(updateAuto) updateState=normalizeUpdate(await browser.runtime.sendMessage(AUTO_CHECK_MESSAGE));
     if(isNewer(updateState.latest,currentVersion)) element<HTMLDetailsElement>('update-center').open = true;
   } catch { updateState.error = 'Unable to load update settings.'; }
   renderUpdate();

@@ -7,3 +7,5 @@ test('reject malformed or prerelease versions',()=>{for(const v of ['v1.4.1-beta
 test('stable public release only',()=>{assert.equal(u.releaseVersion({tag_name:'v1.4.0',draft:false,prerelease:false}),'1.4.0');assert.equal(u.releaseVersion({tag_name:'v1.4.0',draft:false,prerelease:true}),null);});
 test('links never use arbitrary API URLs',()=>{assert.equal(u.releasePage('https://evil.test'),u.RELEASES_URL);assert.equal(u.releasePage('1.4.0'),u.RELEASES_URL+'/tag/v1.4.0');});
 test('invalid cached metadata ignored',()=>{assert.equal(u.normalizeUpdate({latest:'bad',checkedAt:-1}).latest,null);assert.equal(u.normalizeUpdate({checkedAt:-1}).checkedAt,0);});
+
+test('page update checks are throttled and respect opt-out',()=>{const now=10000000;assert.equal(u.shouldAutoCheck(false,0,now),false);assert.equal(u.shouldAutoCheck(true,0,now),true);assert.equal(u.shouldAutoCheck(undefined,now-899999,now),false);assert.equal(u.shouldAutoCheck(true,now-900000,now),true);assert.equal(u.shouldAutoCheck(true,now+1,now),true);});

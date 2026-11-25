@@ -2,14 +2,14 @@ import { defineContentScript } from 'wxt/utils/define-content-script';
 import { browser } from 'wxt/browser';
 import { BANNER_KEY, OFFER_URL, EPLUS_URL, SUPPORT_URL, normalizeSettings, isVisible, dismissalDeadline } from '../utils/banner-settings';
 
-import { UPDATE_KEY, normalizeUpdate, isNewer, releasePage } from '../utils/updates';
+import { UPDATE_KEY, normalizeUpdate, isNewer, releasePage, AUTO_CHECK_MESSAGE } from '../utils/updates';
 
 const STYLE = `
-:host{all:initial;display:block;color-scheme:light;--bg:#eaf7ef;--text:#145d40;--muted:#39745a;--border:#c9e4d6;--accent:#146d4b;font:13px/1.4 system-ui,sans-serif}
+:host{all:initial;display:block;position:fixed;top:72px;right:16px;width:min(360px,calc(100vw - 32px));max-width:calc(100vw - 32px);box-sizing:border-box;z-index:10000;isolation:isolate;color-scheme:light;--bg:#eaf7ef;--text:#145d40;--muted:#39745a;--border:#c9e4d6;--accent:#146d4b;font:13px/1.4 system-ui,sans-serif}
 :host([data-dark]){color-scheme:dark;--bg:#203c30;--text:#c4f4d9;--muted:#a5cfb9;--border:#385d4b;--accent:#146d4b}
-*{box-sizing:border-box}.banner{display:flex;align-items:center;gap:12px;padding:9px 16px;background:var(--bg);border-bottom:1px solid var(--border);color:var(--text)}.gift{width:26px;height:26px;flex-shrink:0}.copy{flex:1;min-width:0}.title{display:block;font-weight:700;font-size:14px}.meta{display:flex;align-items:center;flex-wrap:wrap;gap:4px;font-size:11px;color:var(--muted)}a{color:inherit}a:hover{text-decoration:underline}.claim{display:inline-flex;align-items:center;justify-content:center;text-decoration:none;white-space:nowrap;background:var(--accent);color:#fff;border-radius:8px;padding:8px 12px;font-size:12px;font-weight:700}.close{border:0;background:transparent;color:var(--text);font:22px/1 system-ui;cursor:pointer;padding:6px;flex-shrink:0}.close:hover{opacity:.7}a:focus-visible,button:focus-visible{outline:2px solid currentColor;outline-offset:3px}
-:host([data-position="floating"]){position:fixed;right:16px;bottom:112px;width:min(300px,calc(100vw - 32px));z-index:10000}:host([data-position="floating"]) .banner{flex-wrap:wrap;border:1px solid var(--border);border-radius:14px;box-shadow:0 10px 35px #0002;padding:14px}:host([data-position="floating"]) .copy{flex-basis:70%}:host([data-position="floating"]) .claim{order:4;width:100%}
-@media(max-width:520px){.banner{flex-wrap:wrap;padding:8px 10px;gap:7px}.gift{width:22px;height:22px}.title{font-size:12px}.claim{font-size:11px;padding:7px 9px}.meta{font-size:10px}:host([data-position="floating"]){bottom:100px}}
+*{box-sizing:border-box}.banner{display:flex;align-items:center;gap:12px;padding:9px 16px;background:var(--bg);border:1px solid var(--border);border-radius:12px;box-shadow:0 4px 20px #0002;flex-wrap:wrap;color:var(--text)}.gift{width:26px;height:26px;flex-shrink:0}.copy{flex:1;min-width:0;overflow-wrap:anywhere}.title{display:block;font-weight:700;font-size:14px}.meta{display:flex;align-items:center;flex-wrap:wrap;gap:4px;font-size:11px;color:var(--muted)}a{color:inherit}a:hover{text-decoration:underline}.claim{display:inline-flex;align-items:center;justify-content:center;text-decoration:none;white-space:nowrap;background:var(--accent);color:#fff;border-radius:8px;padding:8px 12px;font-size:12px;font-weight:700}.close{border:0;background:transparent;color:var(--text);font:22px/1 system-ui;cursor:pointer;padding:6px;flex-shrink:0}.close:hover{opacity:.7}a:focus-visible,button:focus-visible{outline:2px solid currentColor;outline-offset:3px}
+:host([data-position="floating"]){top:auto;right:16px;bottom:112px;width:min(300px,calc(100vw - 32px));z-index:10000}:host([data-position="floating"]) .banner{flex-wrap:wrap;border:1px solid var(--border);border-radius:14px;box-shadow:0 10px 35px #0002;padding:14px}:host([data-position="floating"]) .copy{flex-basis:70%}:host([data-position="floating"]) .claim{order:4;width:100%}
+@media(max-width:520px){:host{top:64px;right:8px;width:min(300px,calc(100vw - 16px));max-width:calc(100vw - 16px)}:host([data-position="floating"]){top:auto;right:8px;width:min(300px,calc(100vw - 16px))}.banner{flex-wrap:wrap;padding:8px 10px;gap:7px}.gift{width:22px;height:22px}.title{font-size:12px}.claim{font-size:11px;padding:7px 9px}.meta{font-size:10px}:host([data-position="floating"]){bottom:100px}}
 `;
 const HOST_ID = 'eplus-offer-toolkit-banner';
 function makeLink(label: string, url: string, className = '') {
@@ -25,6 +25,9 @@ export default defineContentScript({
   matches: ['https://chatgpt.com/*'],
   runAt: 'document_idle',
   main(ctx) {
+    if (window.top !== window) return;
+    // Independent of banner visibility: only the background can decide whether an update check is due.
+    void browser.runtime.sendMessage(AUTO_CHECK_MESSAGE).catch(()=>{});
     let settings = normalizeSettings(undefined);
     let loaded = false;
     let update = normalizeUpdate(undefined);
@@ -89,7 +92,9 @@ export default defineContentScript({
       if (!host?.isConnected) {
         document.getElementById(HOST_ID)?.remove();
         host = build();
-        document.body.prepend(host);
+        // Both positions are fixed overlays. Never insert an in-flow element before the app root.
+        host.style.setProperty('position','fixed','important');
+        document.body.append(host);
       }
       host.dataset.position = settings.position;
       theme(); renderUpdate();
