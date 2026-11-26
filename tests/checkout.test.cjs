@@ -21,7 +21,7 @@ function mockPlus(coupon=checkedPlus,changes={}) {
  const calls=[];
  const data=[
   {accessToken:"sample-token"},
-  {accounts:{default:{account:{structure:"personal",account_id:plusAccountId},eligible_promo_campaigns:{plus:{id:plusPromo}}}}}},
+  {accounts:{default:{account:{structure:"personal",account_id:plusAccountId},eligible_promo_campaigns:{plus:{id:plusPromo}}}}},
   coupon
  ];
  const api=load({fetch:async (path,options)=>{
