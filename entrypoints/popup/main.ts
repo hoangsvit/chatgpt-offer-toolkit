@@ -2,7 +2,7 @@ import { browser } from 'wxt/browser';
 import { validateConfig, validCheckoutUrl, requestCheckout } from '../../utils/checkout';
 import type { CheckoutConfig, CheckoutResult } from '../../utils/checkout';
 import './style.css';
-import { mountBeui, enhanceFormControls, syncBeuiSwitches } from './beui/islands';
+import { mountBeui, enhanceFormControls, syncBeuiSwitches, syncBillingSelects } from './beui/islands';
 import { reviewCheckoutPrice } from '../../utils/checkout-price';
 import type { PriceReview } from '../../utils/checkout-price';
 import { CHECK_POPUP_MESSAGE, isChatGPTUrl } from '../../utils/eligibility-badge';
@@ -35,7 +35,11 @@ mountBeui(() => {
   if(!form.checkValidity()) {
     showView('settings');
     element<HTMLDetailsElement>('checkout-preferences').open=true;
-    form.reportValidity();
+    const invalid = form.querySelector<HTMLInputElement>('input:invalid');
+    if (invalid?.id === 'country' || invalid?.id === 'currency') {
+      billingHint.textContent = 'Select your billing country and currency before continuing.';
+      invalid.nextElementSibling?.querySelector('button')?.focus();
+    } else form.reportValidity();
     return;
   }
   form.requestSubmit();
@@ -56,6 +60,7 @@ async function loadBillingPreference() {
     if (savedBilling) {
       countryField.value = savedBilling.country;
       currencyField.value = savedBilling.currency;
+      syncBillingSelects();
       rememberBilling.checked = true;
       billingHint.textContent = 'Saved billing preference. Confirm it still matches your actual billing details.';
     } else {
@@ -79,6 +84,7 @@ currencyField.addEventListener('input', () => { billingEdited = true; });
 countryField.addEventListener('input', () => {
   billingEdited = true;
   currencyField.value = currencyForCountry(countryField.value) ?? '';
+  syncBillingSelects();
   billingHint.textContent = 'Currency is a local suggestion. Verify the currency supported by ChatGPT.';
 });
 let currentUrl: string | null = null;
@@ -135,7 +141,6 @@ function renderEligibility(value: EligibilityResult | undefined) {
   state.textContent = value?.state === 'unknown' && value.campaign === 'not_listed'
     ? 'Offer not listed' : value ? labels[value.state] : 'Unknown';
   element('eligibility-plan').textContent = value?.plan ? value.plan.charAt(0).toUpperCase() + value.plan.slice(1) : '—';
-  element('eligibility-campaign').textContent = value?.campaign === 'assigned' ? 'Assigned' : value?.campaign === 'not_listed' ? 'Not listed' : 'Unknown';
   element('eligibility-reason').textContent = value?.reason ?? 'No verified response. Review the official offer page.';
 }
 async function runEligibilityCheck(force = false) {
@@ -161,6 +166,7 @@ async function runEligibilityCheck(force = false) {
       if (!billingEdited && !savedBilling) {
         countryField.value = detected;
         currencyField.value = currencyForCountry(detected) ?? '';
+        syncBillingSelects();
         billingHint.textContent = 'Suggested from ChatGPT session: '+detected+'. Confirm actual billing country and supported currency.';
         resetResult();
       } else if (countryField.value.trim().toUpperCase() !== detected) {

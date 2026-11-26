@@ -21,11 +21,10 @@
     <button id="eligibility-check" type="button" disabled hidden>Check eligibility</button>
   </div>
   <details class="account-details">
-    <summary>Details</summary>
-    <div class="update-row"><span>Campaign assignment</span><strong id="eligibility-campaign">—</strong></div>
+    <summary><span class="account-chevron" aria-hidden="true"></span>Details</summary>
     <p id="eligibility-reason" class="hint" role="status" aria-live="polite">Checking your current personal workspace.</p>
+    <p class="account-note">Final price confirmed at checkout.</p>
   </details>
-  <p class="account-note">Final price confirmed at checkout.</p>
 </section>
 <details class="advanced eligibility-section" id="price-panel" hidden><summary>Checkout price review <span id="price-state" data-state="unknown">Price unknown</span></summary>
 <div class="update-row"><span>Displayed due today</span><strong id="price-amount">—</strong></div>
@@ -47,8 +46,8 @@
   <div><label for="seats">Seats</label>
   <div class="stepper"><button id="minus" type="button" class="icon-button" aria-label="Decrease seats">−</button><input id="seats" type="number" min="2" max="100" step="1" required value="5" inputmode="numeric"><button id="plus" type="button" class="icon-button" aria-label="Increase seats">+</button></div></div></div>
   <div class="grid">
-    <div><label for="country">Billing country</label><input id="country" list="countries" required maxlength="2" pattern="[A-Za-z]{2}" placeholder="e.g. VN" autocomplete="off"><datalist id="countries"><option value="VN" label="Vietnam"></option><option value="US" label="United States"></option><option value="SG" label="Singapore"></option><option value="JP" label="Japan"></option><option value="GB" label="United Kingdom"></option><option value="DE" label="Germany"></option><option value="FR" label="France"></option><option value="AU" label="Australia"></option><option value="CA" label="Canada"></option><option value="IN" label="India"></option></datalist></div>
-    <div><label for="currency">Currency</label><input id="currency" list="currencies" required maxlength="3" pattern="[A-Za-z]{3}" placeholder="e.g. VND" autocomplete="off"><datalist id="currencies"><option value="USD"></option><option value="VND"></option><option value="SGD"></option><option value="JPY"></option><option value="GBP"></option><option value="EUR"></option><option value="AUD"></option><option value="CAD"></option><option value="INR"></option></datalist></div>
+    <div><label id="country-label" for="country">Billing country</label><input id="country" required maxlength="2" pattern="[A-Za-z]{2}" placeholder="e.g. VN" autocomplete="off"></div>
+    <div><label id="currency-label" for="currency">Currency</label><input id="currency" required maxlength="3" pattern="[A-Za-z]{3}" placeholder="e.g. VND" autocomplete="off"></div>
   </div>
   <p id="billing-suggestion" class="hint" role="status" aria-live="polite"></p>
   <div class="toggle-row"><span>Remember billing after link succeeds</span><input id="remember-billing" type="checkbox"></div>

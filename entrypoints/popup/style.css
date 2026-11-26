@@ -117,11 +117,15 @@ footer{margin-top:10px}.privacy{margin-top:15px}
 .account-label strong{font-weight:600;color:var(--text)}
 #beui-eligibility{min-width:0;flex-shrink:0}
 #beui-refresh{flex:none;display:flex;align-items:center}
-.account-details{margin-top:8px}
-.account-details summary{color:var(--muted-foreground);font-size:11px;cursor:pointer;width:max-content;max-width:100%;padding:3px 0}
-.account-details[open] summary{margin-bottom:8px}
-.account-details .hint{margin:6px 0;line-height:1.5}
-.account-note{color:var(--muted-foreground);font-size:10px;line-height:1.4;margin-top:4px}
+.account-details{margin-top:8px;border-top:1px solid var(--border)}
+.account-details summary{display:flex;align-items:center;gap:7px;min-height:28px;color:var(--muted-foreground);font-size:11px;cursor:pointer;list-style:none}
+.account-details summary::-webkit-details-marker{display:none}
+.account-details summary:hover{color:var(--text)}
+.account-details summary:focus-visible{outline:2px solid var(--ring);outline-offset:2px;border-radius:4px}
+.account-chevron{width:6px;height:6px;border-inline-end:1px solid;border-block-end:1px solid;transform:rotate(-45deg)}
+.account-details[open] .account-chevron{transform:translateY(-1px) rotate(45deg)}
+.account-details .hint{margin:3px 0 6px;line-height:1.5}
+.account-note{color:var(--muted-foreground);font-size:10px;line-height:1.4;margin:0}
 @media(prefers-reduced-motion:reduce){#beui-refresh .animate-spin{animation:none}}
 
 #beui-theme{display:flex;flex:none}
