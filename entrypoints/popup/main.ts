@@ -119,7 +119,6 @@ let tabReady = false;
 let eligibilityBusy = false;
 const eligibleTabIds: Record<OfferPlan,number|null> = {business:null,personal:null};
 const eligibilityButton = button('eligibility-check');
-const plusEligibilityButton = button('plus-eligibility-check');
 
 element('version').textContent = 'v' + browser.runtime.getManifest().version;
 function status(message: string) {
@@ -176,7 +175,6 @@ function renderConnection(ready: boolean) {
       ? translate('Checking…') : hint.hidden ? translate('Create a checkout link with your current settings.')
         : translate('Checkout is available once ChatGPT confirms coupon eligibility.');
   eligibilityButton.disabled = busy || !tabReady || eligibilityBusy;
-  plusEligibilityButton.disabled = eligibilityButton.disabled;
 }
 function renderCampaign(state:HTMLElement, reason:HTMLElement, value:CampaignEligibility | undefined, message?:string) {
   const labels = {eligible:'Coupon eligible',not_eligible:'Not eligible',unknown:'Unknown',redeemed:'Already redeemed'};
@@ -188,7 +186,6 @@ function renderCampaign(state:HTMLElement, reason:HTMLElement, value:CampaignEli
 function renderEligibility(value: EligibilityResult | undefined, message?:string) {
   const plan = value?.plan ? value.plan.charAt(0).toUpperCase() + value.plan.slice(1) : '—';
   element('eligibility-plan').textContent = plan;
-  element('plus-current-plan').textContent = plan;
   renderCampaign(element('eligibility-state'),element('eligibility-reason'),value,message);
   const sharedReason = value?.campaign === 'unknown' ? value : undefined;
   renderCampaign(element('plus-eligibility-state'),element('plus-eligibility-reason'),value?.plus ?? sharedReason,message);
@@ -200,11 +197,9 @@ async function runEligibilityCheck(force = false) {
   resetResult();
   accountLabel = undefined;
   eligibilityButton.disabled = true;
-  plusEligibilityButton.disabled = true;
   generate.disabled = true;
   generate.dataset.tooltip = translate('Checking…');
   eligibilityButton.textContent = translate('Checking…');
-  plusEligibilityButton.textContent = eligibilityButton.textContent;
   renderEligibility({state:'unknown',plan:null,campaign:'unknown',reason:'Checking your current personal workspace.'},'Checking…');
   try {
     const tabId = await getActiveChatGPTTab();
@@ -234,12 +229,10 @@ async function runEligibilityCheck(force = false) {
   finally {
     eligibilityBusy = false;
     eligibilityButton.textContent = translate('Check again');
-    plusEligibilityButton.textContent = eligibilityButton.textContent;
     renderConnection(tabReady);
   }
 }
 eligibilityButton.addEventListener('click', () => void runEligibilityCheck(true));
-plusEligibilityButton.addEventListener('click', () => void runEligibilityCheck(true));
 // Reuse the current tab's automatic eligibility check; no checkout.
 void runEligibilityCheck();
 
@@ -297,7 +290,6 @@ element<HTMLFormElement>('settings').addEventListener('submit', async event => {
   generate.disabled = true;
   generate.dataset.tooltip = translate('Generating…');
   eligibilityButton.disabled = true;
-  plusEligibilityButton.disabled = true;
   element('generate-label').textContent = translate('Generating…');
   const controls = ['workspace','seats','country','currency','minus','plus','remember-billing','plan-business','plan-personal'];
   for (const id of controls) element<HTMLInputElement | HTMLButtonElement>(id).disabled = true;
