@@ -6,6 +6,7 @@ import { useTheme } from "./extension-theme";
 import { type ComponentPropsWithoutRef, useEffect, useState } from "react";
 import { ActionSwapIcon } from "./action-swap";
 import { cn } from "./utils";
+import { Tooltip } from "./tooltip";
 
 export type ThemeVariant = "rectangle" | "circle" | "circle-blur" | "blinds";
 
@@ -113,11 +114,12 @@ export function ThemeToggle({
 }: ThemeToggleProps) {
   const t = { ...themeToggleMessages, ...labels };
   const { isDark, mounted, toggle } = useThemeToggle({ variant, start });
+  const label = t[mounted && isDark ? "switchToLight" : "switchToDark"];
 
   return (
-    <button
+    <Tooltip content={label} side="bottom"><button
       type="button"
-      aria-label={t[mounted && isDark ? "switchToLight" : "switchToDark"]}
+      aria-label={label}
       onClick={toggle}
       className={cn("flex items-center justify-center", className)}
       {...rest}
@@ -137,6 +139,6 @@ export function ThemeToggle({
       ) : (
         <span className={iconClassName} aria-hidden="true" />
       )}
-    </button>
+    </button></Tooltip>
   );
 }

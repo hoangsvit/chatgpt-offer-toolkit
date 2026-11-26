@@ -9,6 +9,7 @@ import { ThemeToggle } from './theme-toggle';
 import { initTheme } from './extension-theme';
 import { AnimatedBadge, type AnimatedBadgeStatus } from './animated-badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './select';
+import { Tooltip } from './tooltip';
 
 const BILLING_SYNC_EVENT = 'offer-toolkit-billing-sync';
 export function syncBillingSelects() { document.dispatchEvent(new Event(BILLING_SYNC_EVENT)); }
@@ -97,11 +98,11 @@ function RefreshEligibility() {
     setValue(read());
     return ()=>observer.disconnect();
   },[]);
-  return <Button variant="ghost" size="icon" disabled={value.disabled}
-    aria-label="Check eligibility again" title="Check eligibility again"
+  return <Tooltip content="Check eligibility again" side="bottom"><Button variant="ghost" size="icon" disabled={value.disabled}
+    aria-label="Check eligibility again"
     onClick={()=>{if(!native.disabled)native.click()}}>
     <RefreshCw size={15} aria-hidden="true" className={value.checking?'animate-spin':undefined}/>
-  </Button>;
+  </Button></Tooltip>;
 }
 export function mountBeui(submit:()=>void) {
   initTheme();
@@ -139,12 +140,14 @@ function NativeAction({native,id,host}:{native:HTMLButtonElement;id:keyof typeof
     sync();return ()=>obs.disconnect();
   },[]);
   const onlyIcon=spec.size==='icon';
-  return <Button variant={spec.variant} size={spec.size} className={onlyIcon?'relative size-8 rounded-lg':id==='official'?'h-7 gap-1 px-1 text-primary':id==='github'||id==='telegram'||id==='eplus'?'h-7 gap-1 px-1 text-[10px]':'w-full rounded-lg'} disabled={state.disabled}
-    aria-label={native.getAttribute('aria-label')||state.label} aria-controls={native.getAttribute('aria-controls')||undefined} aria-pressed={state.pressed===null?undefined:state.pressed==='true'} title={native.title||undefined}
+  const label=native.getAttribute('aria-label')||state.label;
+  const action=<Button variant={spec.variant} size={spec.size} className={onlyIcon?'relative size-8 rounded-lg':id==='official'?'h-7 gap-1 px-1 text-primary':id==='github'||id==='telegram'||id==='eplus'?'h-7 gap-1 px-1 text-[10px]':'w-full rounded-lg'} disabled={state.disabled}
+    aria-label={label} aria-controls={native.getAttribute('aria-controls')||undefined} aria-pressed={state.pressed===null?undefined:state.pressed==='true'} title={onlyIcon?undefined:native.title||undefined}
     onClick={()=>{if(!native.disabled&&!native.hidden)native.click()}}>
     {!onlyIcon&&<span>{state.label}</span>}<Icon size={onlyIcon?17:13} aria-hidden="true"/>
     {state.dot&&<span className="absolute right-0 top-0 size-2 rounded-full bg-primary" aria-label="Update available"/>}
   </Button>;
+  return onlyIcon ? <Tooltip content={label} side="bottom">{action}</Tooltip> : action;
 }
 const SWITCH_EVENT='offer-toolkit-switch-sync';
 export function syncBeuiSwitches(){document.dispatchEvent(new Event(SWITCH_EVENT));}

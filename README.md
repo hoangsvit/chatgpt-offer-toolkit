@@ -24,7 +24,7 @@ For a PR preview, download the successful run's browser artifact from [GitHub Ac
 2. Open the extension. **Connected to ChatGPT** displays your name, or your email if a name is unavailable, when the session provides it.
 3. Review **Account eligibility**. Expand **Details** for the reason or press the refresh icon to check again.
 4. Enter your workspace, seat count, actual billing country, and currency in **Settings**. Country and currency use BeUI Select. Selecting a country suggests its local currency, which you can override.
-5. Select **Generate checkout link** or visit **Official offer**. Confirm the discount, amount due today, taxes, and renewal terms on the official checkout before paying.
+5. Once ChatGPT confirms coupon eligibility, select **Generate checkout link**. You can also visit **Official offer** from any eligibility state. Confirm the discount, amount due today, taxes, and renewal terms on the official checkout before paying.
 
 The starting defaults are `MyTeam`, five seats, and monthly billing. The signed-in session may suggest a country, and the extension preserves manually selected or saved billing preferences. Enable **Remember billing after link succeeds** to save the selected country and currency locally after successful link generation. Turning it off or receiving a recognized billing-country mismatch clears the saved preference.
 

@@ -5,3 +5,5 @@ ThemeToggle, ActionSwap and theme.css are from the same upstream commit. ThemeTo
 Input and Switch from the same pinned upstream revision. Input adds nativeUncontrolled for the existing native form controller; Switch is unchanged apart from its import path. ThemeToggle's view-transition CSS is extracted to a bundled local stylesheet and uses an immediate fallback if the browser transition is unavailable. All visible actions use the vendored Button.
 
 Select and its keyboard hooks come from the [BeUI Select registry](https://beui.dev/r/select.json). The extension uses local imports, connects the trigger to the field label, and raises the open menu above adjacent controls.
+
+Tooltip and its positioning and gesture helpers come from the [BeUI Tooltip registry](https://beui.dev/r/tooltip.json) with local import paths.

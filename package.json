@@ -33,6 +33,7 @@
     "playwright": "1.56.1"
   },
   "dependencies": {
+    "@floating-ui/dom": "1.8.0",
     "react": "19.1.1",
     "react-dom": "19.1.1",
     "motion": "12.23.12",

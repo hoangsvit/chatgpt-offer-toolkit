@@ -91,6 +91,7 @@ let currentUrl: string | null = null;
 let busy = false;
 let tabReady = false;
 let eligibilityBusy = false;
+let eligibleTabId: number | null = null;
 const eligibilityButton = button('eligibility-check');
 
 element('version').textContent = 'v' + browser.runtime.getManifest().version;
@@ -130,11 +131,15 @@ async function getActiveChatGPTTab() {
 let accountLabel: string | undefined;
 function renderConnection(ready: boolean) {
   tabReady = ready;
-  if (!ready) accountLabel = undefined;
+  if (!ready) {
+    accountLabel = undefined;
+    eligibleTabId = null;
+  }
   element('connection').dataset.state = ready ? 'ready' : 'unavailable';
   const connected = accountLabel ? 'Connected to ChatGPT · ' + accountLabel : 'Connected to ChatGPT';
   element('connection-text').textContent = ready ? connected : 'Open chatgpt.com to generate a checkout link';
-  generate.disabled = busy || !tabReady || eligibilityBusy;
+  generate.disabled = busy || !tabReady || eligibilityBusy || eligibleTabId === null;
+  element('checkout-eligibility-hint').hidden = !tabReady || busy || eligibilityBusy || eligibleTabId !== null;
   eligibilityButton.disabled = busy || !tabReady || eligibilityBusy;
 }
 function renderEligibility(value: EligibilityResult | undefined) {
@@ -149,6 +154,8 @@ function renderEligibility(value: EligibilityResult | undefined) {
 async function runEligibilityCheck(force = false) {
   if (busy || eligibilityBusy) return;
   eligibilityBusy = true;
+  eligibleTabId = null;
+  resetResult();
   accountLabel = undefined;
   eligibilityButton.disabled = true;
   generate.disabled = true;
@@ -164,6 +171,7 @@ async function runEligibilityCheck(force = false) {
       return;
     }
     const result = await browser.runtime.sendMessage({type:CHECK_POPUP_MESSAGE,tabId,force}) as EligibilityResult | undefined;
+    if (result?.state === 'eligible' && result.campaign === 'assigned') eligibleTabId = tabId;
     accountLabel = result?.accountLabel;
     renderEligibility(result);
     const detected = result?.detectedCountry;
@@ -229,7 +237,7 @@ void runPriceReview();
 
 element<HTMLFormElement>('settings').addEventListener('submit', async event => {
   event.preventDefault();
-  if (busy || eligibilityBusy) return;
+  if (busy || eligibilityBusy || eligibleTabId === null) return;
   showView('offer');
   resetResult();
   let config: CheckoutConfig;
@@ -247,6 +255,11 @@ element<HTMLFormElement>('settings').addEventListener('submit', async event => {
     const tabId = await getActiveChatGPTTab();
     renderConnection(tabId !== null);
     if (tabId === null) { status('Open chatgpt.com, sign in, and reopen the extension.'); return; }
+    if (tabId !== eligibleTabId) {
+      eligibleTabId = null;
+      status('Check offer eligibility in the current ChatGPT tab before generating checkout.');
+      return;
+    }
     const [response] = await browser.scripting.executeScript({target:{tabId},func:requestCheckout,args:[config]});
     const result = response?.result as CheckoutResult | undefined;
     if (!result?.url) {
@@ -293,8 +306,7 @@ element<HTMLFormElement>('settings').addEventListener('submit', async event => {
   } catch { status('Unable to access the ChatGPT tab. Reopen the extension and try again.'); }
   finally {
     busy = false;
-    generate.disabled = !tabReady;
-    eligibilityButton.disabled = !tabReady;
+    renderConnection(tabReady);
     element('generate-label').textContent = 'Generate checkout link';
     for (const id of controls) element<HTMLInputElement | HTMLButtonElement>(id).disabled = false;
     syncSeats();

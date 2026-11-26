@@ -78,7 +78,7 @@ jobs:
             fi
           fi
           gh release create "$RELEASE_TAG" dist/chrome.zip dist/firefox-unsigned.zip dist/SHA256SUMS.txt \
-            "${tag_options[@]}" --notes-file .github/release-notes.md --generate-notes --latest
+            "${tag_options[@]}" --notes "$(cat .github/release-notes.md)" --generate-notes --latest
   sign-firefox:
     needs: release
     if: needs.release.outputs.publish == 'true'
