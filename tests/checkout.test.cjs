@@ -3,15 +3,60 @@ const assert = require("node:assert/strict");
 const vm = require("node:vm");
 const fs = require("node:fs");
 const ts = require("typescript");
+const { webcrypto } = require("node:crypto");
 const source = ts.transpileModule(fs.readFileSync("utils/checkout.ts","utf8"), {
   compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 }
 }).outputText;
 function load({origin="https://chatgpt.com",fetch=async()=>{throw Error("unexpected request")}}={}){
-  const ctx=vm.createContext({URL,location:{origin},fetch,exports:{}});
+  const ctx=vm.createContext({URL,crypto:webcrypto,location:{origin},fetch,exports:{}});
   vm.runInContext(source,ctx);
   return ctx.exports;
 }
 const config={workspace:"MyTeam",seats:5,country:"VN",currency:"USD"};
+const plusConfig={plan:"plus",country:"VN",currency:"VND",appearance:"light"};
+const plusPromo="plus-synthetic";
+const plusAccountId="00000000-0000-4000-8000-000000000001";
+const checkedPlus={coupon:plusPromo,state:"eligible",redemption:{redeemed:false,redeemed_by_user:false,redeemed_by_workspace:false}};
+function mockPlus(coupon=checkedPlus,changes={}) {
+ const calls=[];
+ const data=[
+  {accessToken:"sample-token"},
+  {accounts:{default:{account:{structure:"personal",account_id:plusAccountId},eligible_promo_campaigns:{plus:{id:plusPromo}}}}},
+  coupon,
+  {checkout_ui_mode:"custom",plan_name:"chatgptplusplan",processor_entity:"openai_llc",checkout_session_id:"oaics_"+"a".repeat(32),promo_campaign:{promo_campaign_id:plusPromo},url:null,...changes}
+ ];
+ const api=load({fetch:async (path,options)=>{
+  const body=data[calls.length];calls.push({path,options});return {ok:true,json:async()=>body};
+ }});
+ return {api,calls};
+}
+test("Plus builds a new checkout URL from a verified account campaign and session",async()=>{
+ const {api,calls}=mockPlus();
+ assert.equal(api.validateConfig(plusConfig).currency,"VND");
+ const result=await api.requestCheckout(plusConfig);
+ const url=new URL(result.url);
+ assert.equal(url.origin,"https://chatgpt.com");
+ assert.equal(url.pathname,"/checkout/openai_llc/oaics_"+"a".repeat(32));
+ assert.equal(url.searchParams.get("promo_campaign"),plusPromo);
+ assert.equal(url.searchParams.get("source"),"chatgpt_web_merged");
+ assert.equal(calls.length,4);
+ assert.equal(calls[2].options.headers["ChatGPT-Account-Id"],plusAccountId);
+ const payload=JSON.parse(calls[3].options.body);
+ assert.equal(payload.plan_name,"chatgptplusplan");
+ assert.equal(payload.checkout_ui_mode,"custom");
+ assert.equal(payload.team_plan_data,undefined);
+ assert.match(payload.purchase_attempt_id,/^[0-9a-f-]{36}$/);
+});
+test("Plus refuses checkout when the coupon is unconfirmed or the response changed",async()=>{
+ const denied=mockPlus({...checkedPlus,state:"not_eligible"});
+ assert.match((await denied.api.requestCheckout(plusConfig)).error,/verify the Plus offer/);
+ assert.equal(denied.calls.length,3);
+ for(const change of [{promo_campaign:null},{processor_entity:"//evil.example"},{checkout_session_id:"bad/session"}]){
+  const {api,calls}=mockPlus(checkedPlus,change);
+  assert.equal((await api.requestCheckout(plusConfig)).url,undefined);
+  assert.equal(calls.length,4);
+ }
+});
 test("config validation",()=>{
  const c=load(); assert.equal(c.validateConfig(config).seats,5);
  for(const seats of [1,101,2.5]) assert.throws(()=>c.validateConfig({...config,seats}));

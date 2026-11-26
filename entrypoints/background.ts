@@ -88,7 +88,7 @@ export default defineBackground(() => {
   const checkingBadge = {text:'…',color:'#64736b',title:'Checking offer eligibility'};
   function paintEligibility(tabId: number, result: unknown, checking = false) {
     const {text,color,title} = checking ? checkingBadge : badgeFor(result);
-    paint(tabId,text,color,title);
+    paint(tabId,text,color,'Business · '+title);
   }
   async function defaultBadge() {
     await browser.action.setBadgeBackgroundColor({color:offBadge.color});

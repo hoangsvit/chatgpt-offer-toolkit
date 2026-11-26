@@ -1,4 +1,28 @@
 {
+  "personal": {
+    "message": "个人"
+  },
+  "coupon_eligibility_required": {
+    "message": "需要确认优惠券资格。"
+  },
+  "choose_a_plan": {
+    "message": "选择套餐"
+  },
+  "for_individuals": {
+    "message": "适合个人"
+  },
+  "view_plus_on_chatgpt": {
+    "message": "在 ChatGPT 上查看 Plus"
+  },
+  "open_the_official_chatgpt_pricing_page": {
+    "message": "打开 ChatGPT 官方定价页面。"
+  },
+  "plus_offer_eligible_confirm_pricing_on_chatgpt": {
+    "message": "符合 Plus 优惠资格。请在 ChatGPT 上确认价格。"
+  },
+  "campaign_information_is_unavailable": {
+    "message": "活动信息不可用。"
+  },
   "create_a_checkout_link_with_your_current_settings": {
     "message": "使用当前设置创建结账链接。"
   },

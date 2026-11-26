@@ -1,4 +1,28 @@
 {
+  "personal": {
+    "message": "Cá nhân"
+  },
+  "coupon_eligibility_required": {
+    "message": "Cần xác nhận đủ điều kiện ưu đãi."
+  },
+  "choose_a_plan": {
+    "message": "Chọn gói"
+  },
+  "for_individuals": {
+    "message": "Dành cho cá nhân"
+  },
+  "view_plus_on_chatgpt": {
+    "message": "Xem Plus trên ChatGPT"
+  },
+  "open_the_official_chatgpt_pricing_page": {
+    "message": "Mở trang giá chính thức của ChatGPT."
+  },
+  "plus_offer_eligible_confirm_pricing_on_chatgpt": {
+    "message": "Đủ điều kiện nhận ưu đãi Plus. Xác nhận giá trên ChatGPT."
+  },
+  "campaign_information_is_unavailable": {
+    "message": "Chưa có thông tin chương trình ưu đãi."
+  },
   "create_a_checkout_link_with_your_current_settings": {
     "message": "Tạo liên kết thanh toán theo cài đặt hiện tại."
   },

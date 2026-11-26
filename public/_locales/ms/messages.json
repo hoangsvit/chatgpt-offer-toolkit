@@ -1,4 +1,28 @@
 {
+  "personal": {
+    "message": "Peribadi"
+  },
+  "coupon_eligibility_required": {
+    "message": "Kelayakan kupon diperlukan."
+  },
+  "choose_a_plan": {
+    "message": "Pilih pelan"
+  },
+  "for_individuals": {
+    "message": "Untuk individu"
+  },
+  "view_plus_on_chatgpt": {
+    "message": "Lihat Plus di ChatGPT"
+  },
+  "open_the_official_chatgpt_pricing_page": {
+    "message": "Buka halaman harga rasmi ChatGPT."
+  },
+  "plus_offer_eligible_confirm_pricing_on_chatgpt": {
+    "message": "Layak untuk tawaran Plus. Sahkan harga di ChatGPT."
+  },
+  "campaign_information_is_unavailable": {
+    "message": "Maklumat promosi tidak tersedia."
+  },
   "create_a_checkout_link_with_your_current_settings": {
     "message": "Cipta pautan pembayaran dengan tetapan semasa."
   },

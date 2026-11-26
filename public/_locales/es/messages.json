@@ -1,4 +1,28 @@
 {
+  "personal": {
+    "message": "Personal"
+  },
+  "coupon_eligibility_required": {
+    "message": "Se requiere un cupón válido."
+  },
+  "choose_a_plan": {
+    "message": "Elegir un plan"
+  },
+  "for_individuals": {
+    "message": "Para particulares"
+  },
+  "view_plus_on_chatgpt": {
+    "message": "Ver Plus en ChatGPT"
+  },
+  "open_the_official_chatgpt_pricing_page": {
+    "message": "Abre la página oficial de precios de ChatGPT."
+  },
+  "plus_offer_eligible_confirm_pricing_on_chatgpt": {
+    "message": "Oferta Plus disponible. Confirma el precio en ChatGPT."
+  },
+  "campaign_information_is_unavailable": {
+    "message": "La información de la promoción no está disponible."
+  },
   "create_a_checkout_link_with_your_current_settings": {
     "message": "Genera un enlace de pago con tus ajustes actuales."
   },

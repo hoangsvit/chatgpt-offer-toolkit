@@ -8,7 +8,7 @@
 [![Download Firefox test build](https://img.shields.io/github/v/release/hoangsvit/chatgpt-offer-toolkit?label=Download%20Firefox%20test&logo=firefoxbrowser&logoColor=white&color=E66000)](https://github.com/hoangsvit/chatgpt-offer-toolkit/releases/latest/download/firefox-unsigned.zip)
 
 
-A Chrome, Edge, and Firefox extension for checking ChatGPT Business offer eligibility and generating a checkout link when ChatGPT confirms the offer. Built by [ePlus.DEV](https://eplus.dev) as an independent project.
+A Chrome, Edge, and Firefox extension for checking ChatGPT Business and Plus offers and generating checkout links when eligible. Built by [ePlus.DEV](https://eplus.dev) as an independent project.
 
 The popup follows the browser language. It supports English, Vietnamese, Hindi, Indonesian, Malay, Spanish, Brazilian Portuguese, French, Japanese, and Simplified Chinese. Some detailed error messages use English.
 
@@ -27,11 +27,11 @@ Download the package for your browser from **Assets** on GitHub Releases.
 ## Use
 
 1. Sign in at [ChatGPT](https://chatgpt.com), open your personal workspace, and click the extension icon.
-2. Check **Account eligibility**. Expand **Details** to see the reason, or click refresh to check again.
-3. If eligible, review your workspace, seats, billing country, and currency in **Settings**, then click **Generate checkout link**.
+2. Choose **Personal** for ChatGPT Plus or **Business**, then check **Account eligibility**. Expand **Details** or click refresh to check again.
+3. When eligible, review your billing country and currency in **Settings**. **Business** also requires a workspace name and seat count. Then click **Generate checkout link**. For the official Plus flow, choose **View Plus on ChatGPT**.
 4. Review the amount due today and the renewal terms on the official checkout before paying. **Official offer** is available directly from the popup.
 
-The toolbar badge shows **OK** when ChatGPT confirms eligibility, **NO** when it rejects the offer or the offer is absent, and **USED** when it was redeemed. Open **Details** in the popup to see the exact result.
+The toolbar badge shows the Business offer result. **OK** means eligible, **NO** means rejected or absent, and **USED** means redeemed. The popup shows a separate result for each plan.
 
 ## Update
 
