@@ -85,10 +85,10 @@ export default defineBackground(() => {
     void next.finally(()=>{if(queues.get(tabId)===next)queues.delete(tabId);}).catch(()=>{});
   }
   const offBadge = {text:'OFF',color:'#64736b',title:'Inactive — only works on chatgpt.com'};
-  const checkingBadge = {text:'…',color:'#64736b',title:'Checking offer eligibility'};
+  const checkingBadge = {text:'…',color:'#64736b',title:'Checking Personal (Plus) and Business offers'};
   function paintEligibility(tabId: number, result: unknown, checking = false) {
     const {text,color,title} = checking ? checkingBadge : badgeFor(result);
-    paint(tabId,text,color,'Business · '+title);
+    paint(tabId,text,color,title);
   }
   async function defaultBadge() {
     await browser.action.setBadgeBackgroundColor({color:offBadge.color});
