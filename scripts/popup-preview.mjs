@@ -17,6 +17,15 @@ try{
  await page.goto(`chrome-extension://${id}/${manifest.action.default_popup}`);
  await page.getByRole('button',{name:'Switch to dark mode',exact:true}).waitFor();
  await page.getByRole('button',{name:'Official offer',exact:true}).waitFor();
+ const summary=page.getByRole('region',{name:'Account eligibility',exact:true});
+ await summary.locator('#beui-eligibility > *').waitFor();
+ await summary.locator('#beui-plus-eligibility > *').waitFor();
+ assert.equal(await summary.locator('#beui-eligibility').isVisible(),true);
+ assert.equal(await summary.locator('#beui-plus-eligibility').isVisible(),true);
+ await page.locator('#plan-personal').click();
+ assert.equal(await summary.locator('#beui-eligibility').isVisible(),true);
+ assert.equal(await summary.locator('#beui-plus-eligibility').isVisible(),true);
+ await page.locator('#plan-business').click();
  await page.screenshot({path:'artifacts/popup/offer-light.png',fullPage:true});
  assert.equal(await page.locator('html').evaluate(el=>el.classList.contains('dark')),false);
  await page.getByRole('button',{name:'Switch to dark mode',exact:true}).click();
