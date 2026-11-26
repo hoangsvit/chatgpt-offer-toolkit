@@ -1,7 +1,8 @@
 const test=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs');
 const html=fs.readFileSync('entrypoints/popup/index.html','utf8'),main=fs.readFileSync('entrypoints/popup/main.ts','utf8');
 test('popup keeps unique IDs for all direct runtime element lookups',()=>{
- const ids=[...html.matchAll(/\bid="([^"]+)"/g)].map(m=>m[1]);
+ const markup=html+fs.readFileSync('entrypoints/popup/beui/settings-cards.tsx','utf8');
+ const ids=[...markup.matchAll(/\bid="([^"]+)"/g)].map(m=>m[1]);
  assert.equal(new Set(ids).size,ids.length);
  for(const m of main.matchAll(/(?:element(?:<[^>]+>)?|field|button)\('([^']+)'\)/g))assert.ok(ids.includes(m[1]),m[1]);
 });

@@ -1,6 +1,7 @@
 import type { EligibilityResult } from './eligibility';
 export const BADGE_MESSAGE = 'offer-eligibility-badge-v1';
 export const CHECK_TAB_MESSAGE = 'offer-eligibility-check-tab-v1';
+export const CHECK_POPUP_MESSAGE = 'offer-eligibility-check-popup-v1';
 export const ELIGIBILITY_RESULT_MESSAGE = 'offer-eligibility-result-v1';
 export const ELIGIBILITY_PENDING_MESSAGE = 'offer-eligibility-pending-v1';
 export function isChatGPTUrl(value: unknown): boolean {
@@ -14,6 +15,6 @@ export function badgeFor(value: unknown): {text:string;color:string;title:string
   if (state === 'not_eligible') return {text:'NO',color:'#b43b35',title:'Coupon not eligible'};
   if (state === 'redeemed') return {text:'USED',color:'#64736b',title:'Coupon already redeemed'};
   if (state === 'unknown' && (value as Partial<EligibilityResult>).campaign === 'not_listed')
-    return {text:'N/A',color:'#64736b',title:'Offer not listed for this account — final eligibility not verified'};
+    return {text:'NO',color:'#64736b',title:'Offer not listed for this account — final eligibility not verified'};
   return {text:'?',color:'#64736b',title:'Offer eligibility unknown'};
 }

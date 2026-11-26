@@ -1,0 +1,293 @@
+{
+  "create_a_checkout_link_with_your_current_settings": {
+    "message": "Genera un enlace de pago con tus ajustes actuales."
+  },
+  "open_the_official_chatgpt_offer_page": {
+    "message": "Abre la página oficial de la oferta de ChatGPT."
+  },
+  "copy_the_checkout_link_to_your_clipboard": {
+    "message": "Copia el enlace de pago al portapapeles."
+  },
+  "open_the_checkout_link_in_a_new_tab": {
+    "message": "Abre el enlace de pago en una pestaña nueva."
+  },
+  "read_the_amount_due_today_on_the_current_checkout_page": {
+    "message": "Consulta el importe que vence hoy en la página de pago actual."
+  },
+  "check_github_for_a_newer_version": {
+    "message": "Busca una versión más reciente en GitHub."
+  },
+  "open_the_github_release_and_its_downloads": {
+    "message": "Abre la versión de GitHub y sus descargas."
+  },
+  "open_the_project_on_github": {
+    "message": "Abre el proyecto en GitHub."
+  },
+  "open_support_on_telegram": {
+    "message": "Abre el canal de soporte en Telegram."
+  },
+  "visit_eplus_dev": {
+    "message": "Visita ePlus.DEV."
+  },
+  "saved_billing_preference_confirm_it_still_matches_your_actual_billing_details": {
+    "message": "Datos de facturación guardados. Confirma que siguen siendo correctos."
+  },
+  "select_your_actual_billing_country_its_local_currency_will_be_suggested": {
+    "message": "Selecciona tu país de facturación para ver la moneda sugerida."
+  },
+  "no_verified_response_review_the_official_offer_page": {
+    "message": "No hay respuesta verificada. Consulta la página oficial de la oferta."
+  },
+  "open_chatgpt_com_and_reopen_this_popup_to_check_eligibility": {
+    "message": "Abre chatgpt.com y vuelve a abrir esta ventana para comprobar la elegibilidad."
+  },
+  "link_copied_keep_it_private": {
+    "message": "Enlace copiado. Mantenlo en privado."
+  },
+  "requesting_checkout_from_your_current_chatgpt_session": {
+    "message": "Solicitando un enlace de pago con tu sesión actual de ChatGPT…"
+  },
+  "download_the_new_zip_extract_into_the_existing_extension_directory_then_reload_in_the_browser": {
+    "message": "Descarga el ZIP nuevo, extráelo en la carpeta de la extensión y recárgala en el navegador."
+  },
+  "firefox_can_install_updates_automatically_for_signed_self_distributed_builds_temporary_builds_must_be_reloaded_manually": {
+    "message": "Firefox puede actualizar las versiones firmadas automáticamente. Recarga manualmente las versiones temporales."
+  },
+  "open_the_official_checkout_and_open_this_popup_only_the_displayed_due_today_total_is_reviewed": {
+    "message": "Abre el pago oficial y esta ventana. Solo se revisa el importe mostrado para hoy."
+  },
+  "a_zero_total_does_not_verify_renewal_terms_or_activation_always_review_the_official_checkout_before_subscribing": {
+    "message": "Un total de cero no confirma la renovación ni la activación. Revisa el pago oficial antes de suscribirte."
+  },
+  "locale_name": {
+    "message": "es"
+  },
+  "back_to_offer": {
+    "message": "Volver a la oferta"
+  },
+  "settings": {
+    "message": "Ajustes"
+  },
+  "update_available": {
+    "message": "Actualización disponible"
+  },
+  "checking_active_tab": {
+    "message": "Comprobando la pestaña activa…"
+  },
+  "campaign_information": {
+    "message": "Información de la promoción"
+  },
+  "official_offer": {
+    "message": "Oferta oficial"
+  },
+  "1_month_free": {
+    "message": "1 mes gratis"
+  },
+  "subject_to_account_eligibility": {
+    "message": "Sujeto a la elegibilidad de la cuenta"
+  },
+  "account_eligibility": {
+    "message": "Elegibilidad de la cuenta"
+  },
+  "personal_plan": {
+    "message": "Plan personal"
+  },
+  "not_checked": {
+    "message": "Sin comprobar"
+  },
+  "check_eligibility": {
+    "message": "Comprobar elegibilidad"
+  },
+  "check_eligibility_again": {
+    "message": "Volver a comprobar elegibilidad"
+  },
+  "check_again": {
+    "message": "Volver a comprobar"
+  },
+  "details": {
+    "message": "Detalles"
+  },
+  "checking_your_current_personal_workspace": {
+    "message": "Comprobando tu espacio de trabajo personal."
+  },
+  "final_price_confirmed_at_checkout": {
+    "message": "El precio final se confirma al pagar."
+  },
+  "checkout_price_review": {
+    "message": "Verificar precio del pago"
+  },
+  "price_unknown": {
+    "message": "Precio desconocido"
+  },
+  "displayed_due_today": {
+    "message": "Importe mostrado para hoy"
+  },
+  "check_checkout_price": {
+    "message": "Comprobar el precio"
+  },
+  "create_checkout": {
+    "message": "Crear enlace de pago"
+  },
+  "checkout_is_available_once_chatgpt_confirms_coupon_eligibility": {
+    "message": "Podrás crear el enlace cuando ChatGPT confirme que puedes usar el cupón."
+  },
+  "checkout_link": {
+    "message": "Enlace de pago"
+  },
+  "copy_link": {
+    "message": "Copiar enlace"
+  },
+  "open_checkout": {
+    "message": "Abrir pago"
+  },
+  "preferences": {
+    "message": "Preferencias"
+  },
+  "checkout_defaults": {
+    "message": "Valores de pago predeterminados"
+  },
+  "workspace": {
+    "message": "Espacio de trabajo"
+  },
+  "seats": {
+    "message": "Puestos"
+  },
+  "decrease_seats": {
+    "message": "Reducir puestos"
+  },
+  "increase_seats": {
+    "message": "Aumentar puestos"
+  },
+  "billing_country": {
+    "message": "País de facturación"
+  },
+  "currency": {
+    "message": "Moneda"
+  },
+  "select_country": {
+    "message": "Seleccionar país"
+  },
+  "select_currency": {
+    "message": "Seleccionar moneda"
+  },
+  "remember_billing_after_link_succeeds": {
+    "message": "Guardar datos de facturación al crear el enlace"
+  },
+  "confirm_actual_billing_details_before_continuing": {
+    "message": "Confirma tus datos de facturación antes de continuar."
+  },
+  "generate_checkout_link": {
+    "message": "Generar enlace de pago"
+  },
+  "generating": {
+    "message": "Generando…"
+  },
+  "software_updates": {
+    "message": "Actualizaciones"
+  },
+  "new": {
+    "message": "Nueva"
+  },
+  "current_version": {
+    "message": "Versión actual"
+  },
+  "latest_version": {
+    "message": "Última versión"
+  },
+  "loading": {
+    "message": "Cargando…"
+  },
+  "view_release_download": {
+    "message": "Ver versión / descargar"
+  },
+  "automatically_check_on_chatgpt_15_min_cache": {
+    "message": "Buscar actualizaciones en ChatGPT (caché de 15 min)"
+  },
+  "automatically_check_for_updates": {
+    "message": "Buscar actualizaciones automáticamente"
+  },
+  "check_for_updates": {
+    "message": "Buscar actualizaciones"
+  },
+  "no_stored_tokens": {
+    "message": "Sin tokens almacenados"
+  },
+  "privacy_first": {
+    "message": "Privacidad ante todo"
+  },
+  "telegram_support": {
+    "message": "Soporte en Telegram"
+  },
+  "connected_to_chatgpt": {
+    "message": "Conectado a ChatGPT"
+  },
+  "open_chatgpt_com_to_generate_a_checkout_link": {
+    "message": "Abre chatgpt.com para generar un enlace de pago"
+  },
+  "coupon_eligible": {
+    "message": "Cupón disponible"
+  },
+  "not_eligible": {
+    "message": "No elegible"
+  },
+  "already_redeemed": {
+    "message": "Ya canjeado"
+  },
+  "offer_not_listed": {
+    "message": "Oferta no disponible"
+  },
+  "unknown": {
+    "message": "Desconocido"
+  },
+  "checking": {
+    "message": "Comprobando…"
+  },
+  "switch_to_light_mode": {
+    "message": "Cambiar al modo claro"
+  },
+  "switch_to_dark_mode": {
+    "message": "Cambiar al modo oscuro"
+  },
+  "zero_due_today": {
+    "message": "Nada que pagar hoy"
+  },
+  "paid_checkout": {
+    "message": "Pago con cargo"
+  },
+  "checking_github_releases": {
+    "message": "Buscando versiones en GitHub…"
+  },
+  "you_are_up_to_date": {
+    "message": "Tienes la última versión."
+  },
+  "no_stable_release_yet": {
+    "message": "Aún no hay una versión estable."
+  },
+  "not_checked_yet": {
+    "message": "Aún no se ha comprobado."
+  },
+  "select_your_billing_country_and_currency_before_continuing": {
+    "message": "Selecciona el país y la moneda de facturación antes de continuar."
+  },
+  "currency_is_a_local_suggestion_verify_the_currency_supported_by_chatgpt": {
+    "message": "La moneda es una sugerencia. Confirma qué moneda admite ChatGPT."
+  },
+  "sign_in_to_chatgpt_first": {
+    "message": "Primero inicia sesión en ChatGPT."
+  },
+  "the_server_reports_that_this_account_is_not_eligible": {
+    "message": "ChatGPT indica que la cuenta no es elegible."
+  },
+  "the_server_reports_that_the_promotion_was_already_redeemed": {
+    "message": "ChatGPT indica que la promoción ya se canjeó."
+  },
+  "this_campaign_is_not_listed_for_the_default_personal_workspace_review_the_official_offer_page_for_a_definitive_result": {
+    "message": "La promoción no aparece en el espacio personal predeterminado. Consulta la oferta oficial para confirmarlo."
+  },
+  "coupon_eligible_and_not_redeemed_seat_coverage_total_and_activation_are_not_verified": {
+    "message": "Cupón elegible y sin canjear. Falta confirmar los puestos cubiertos, el importe y la activación."
+  },
+  "extension_description": {
+    "message": "Consulta ofertas y genera enlaces de pago de ChatGPT Business. Creado por ePlus.DEV."
+  }
+}

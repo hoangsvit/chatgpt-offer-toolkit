@@ -8,25 +8,81 @@ import { Button } from './button';
 import { ThemeToggle } from './theme-toggle';
 import { initTheme } from './extension-theme';
 import { AnimatedBadge, type AnimatedBadgeStatus } from './animated-badge';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './select';
+import { Tooltip } from './tooltip';
+import { translate, uiLocale } from '../i18n';
+
+const BILLING_SYNC_EVENT = 'offer-toolkit-billing-sync';
+export function syncBillingSelects() { document.dispatchEvent(new Event(BILLING_SYNC_EVENT)); }
+
+function billingOptions(id: 'country' | 'currency') {
+  if (id === 'currency') return Intl.supportedValuesOf('currency').map(code => ({ code, label: code }));
+  const displayNames = new Intl.DisplayNames([uiLocale], { type: 'region', fallback: 'none' });
+  const options = [];
+  for (const first of 'ABCDEFGHIJKLMNOPQRSTUVWXYZ') {
+    for (const second of 'ABCDEFGHIJKLMNOPQRSTUVWXYZ') {
+      const code = first + second;
+      const name = displayNames.of(code);
+      if (name && !['EU','EZ','UN','ZZ','XX'].includes(code)) options.push({ code, label: `${name} (${code})` });
+    }
+  }
+  return options.sort((a,b) => a.label.localeCompare(b.label,uiLocale));
+}
+
+function BillingSelect({native,id}:{native:HTMLInputElement;id:'country'|'currency'}) {
+  const [options] = useState(() => billingOptions(id));
+  const read = () => ({value:native.value,disabled:native.disabled});
+  const [state,setState] = useState(read);
+  useEffect(() => {
+    const sync = () => setState(read());
+    const observer = new MutationObserver(sync);
+    observer.observe(native,{attributes:true,attributeFilter:['disabled']});
+    native.addEventListener('input',sync);
+    document.addEventListener(BILLING_SYNC_EVENT,sync);
+    sync();
+    return () => {
+      observer.disconnect();
+      native.removeEventListener('input',sync);
+      document.removeEventListener(BILLING_SYNC_EVENT,sync);
+    };
+  },[native]);
+  const selected = options.find(option => option.code === state.value);
+  return <Select value={state.value} disabled={state.disabled} onValueChange={value => {
+    native.value = value;
+    native.dispatchEvent(new Event('input',{bubbles:true}));
+  }}>
+    <SelectTrigger labelId={`${id}-label`} className="h-9 px-2.5 text-xs">
+      <SelectValue className="truncate" placeholder={translate(id === 'country' ? 'Select country' : 'Select currency')}/>
+    </SelectTrigger>
+    <SelectContent>
+      {state.value && !selected && <SelectItem value={state.value}>{state.value}</SelectItem>}
+      {options.map(({code,label}) => <SelectItem key={code} value={code} className="text-xs">{label}</SelectItem>)}
+    </SelectContent>
+  </Select>;
+}
 
 function Generate({submit}:{submit:()=>void}) {
   const native=document.getElementById('generate') as HTMLButtonElement;
   const label=document.getElementById('generate-label')!;
-  const read=()=>({disabled:native.disabled,label:label.textContent||'Generate checkout'});
+  const read=()=>({
+    disabled:native.disabled,
+    label:label.textContent||translate('Generate checkout link'),
+    tooltip:native.dataset.tooltip||translate('Create a checkout link with your current settings.'),
+  });
   const [value,setValue]=useState(read);
   useEffect(()=>{
     const observer=new MutationObserver(()=>setValue(read()));
-    observer.observe(native,{attributes:true,attributeFilter:['disabled'],childList:true,subtree:true,characterData:true});
+    observer.observe(native,{attributes:true,attributeFilter:['disabled','data-tooltip'],childList:true,subtree:true,characterData:true});
     setValue(read());
     return ()=>observer.disconnect();
   },[]);
-  return <Button className="w-full rounded-xl justify-between px-4" size="lg" disabled={value.disabled} onClick={()=>{if(!native.disabled)submit()}} pressScale={0.98}>
+  return <Tooltip content={value.tooltip}><Button className="w-full rounded-xl justify-between px-4" size="lg" disabled={value.disabled} onClick={()=>{if(!native.disabled)submit()}} pressScale={0.98}>
     <Link2 size={17} aria-hidden="true"/><span className="flex-1">{value.label}</span><ArrowRight size={17} aria-hidden="true"/>
-  </Button>;
+  </Button></Tooltip>;
 }
 function EligibilityBadge() {
   const node=document.getElementById('eligibility-state')!;
-  const read=()=>({text:node.textContent||'Unknown',state:node.dataset.state});
+  const read=()=>({text:node.textContent||translate('Unknown'),state:node.dataset.state});
   const [value,setValue]=useState(read);
   useEffect(()=>{
     const observer=new MutationObserver(()=>setValue(read()));
@@ -34,12 +90,12 @@ function EligibilityBadge() {
     setValue(read());
     return ()=>observer.disconnect();
   },[]);
-  const status:AnimatedBadgeStatus=value.text==='Checking…'?'loading':value.state==='eligible'?'success':value.state==='not_eligible'?'danger':value.state==='redeemed'?'warning':'neutral';
+  const status:AnimatedBadgeStatus=value.text===translate('Checking…')?'loading':value.state==='eligible'?'success':value.state==='not_eligible'?'danger':value.state==='redeemed'?'warning':'neutral';
   return <AnimatedBadge status={status} size="sm" pulse={false} aria-hidden="true">{value.text}</AnimatedBadge>;
 }
 function RefreshEligibility() {
   const native=document.getElementById('eligibility-check') as HTMLButtonElement;
-  const read=()=>({disabled:native.disabled,checking:native.textContent==='Checking…'});
+  const read=()=>({disabled:native.disabled,checking:native.textContent===translate('Checking…')});
   const [value,setValue]=useState(read);
   useEffect(()=>{
     const observer=new MutationObserver(()=>setValue(read()));
@@ -47,11 +103,12 @@ function RefreshEligibility() {
     setValue(read());
     return ()=>observer.disconnect();
   },[]);
-  return <Button variant="ghost" size="icon" disabled={value.disabled}
-    aria-label="Check eligibility again" title="Check eligibility again"
+  const label=translate('Check eligibility again');
+  return <Tooltip content={label} side="bottom"><Button variant="ghost" size="icon" disabled={value.disabled}
+    aria-label={label}
     onClick={()=>{if(!native.disabled)native.click()}}>
     <RefreshCw size={15} aria-hidden="true" className={value.checking?'animate-spin':undefined}/>
-  </Button>;
+  </Button></Tooltip>;
 }
 export function mountBeui(submit:()=>void) {
   initTheme();
@@ -65,17 +122,17 @@ export function mountBeui(submit:()=>void) {
 const buttonSpecs = {
   'view-offer': {icon:ArrowLeft, variant:'ghost', size:'icon'},
   'view-settings': {icon:Settings2, variant:'outline', size:'icon'},
-  'official': {icon:ArrowUpRight, variant:'ghost', size:'sm'},
+  'official': {icon:ArrowUpRight, variant:'ghost', size:'sm', tooltip:'Open the official ChatGPT offer page.'},
   'minus': {icon:Minus, variant:'outline', size:'icon'},
   'plus': {icon:Plus, variant:'outline', size:'icon'},
-  'copy': {icon:Copy, variant:'outline', size:'md'},
-  'open': {icon:ExternalLink, variant:'primary', size:'md'},
-  'price-check': {icon:RefreshCw, variant:'outline', size:'md'},
-  'update-check': {icon:RefreshCw, variant:'outline', size:'md'},
-  'update-download': {icon:Download, variant:'primary', size:'md'},
-  'github': {icon:ArrowUpRight, variant:'ghost', size:'sm'},
-  'telegram': {icon:ArrowUpRight, variant:'ghost', size:'sm'},
-  'eplus': {icon:ArrowUpRight, variant:'ghost', size:'sm'},
+  'copy': {icon:Copy, variant:'outline', size:'md', tooltip:'Copy the checkout link to your clipboard.'},
+  'open': {icon:ExternalLink, variant:'primary', size:'md', tooltip:'Open the checkout link in a new tab.'},
+  'price-check': {icon:RefreshCw, variant:'outline', size:'md', tooltip:'Read the amount due today on the current checkout page.'},
+  'update-check': {icon:RefreshCw, variant:'outline', size:'md', tooltip:'Check GitHub for a newer version.'},
+  'update-download': {icon:Download, variant:'primary', size:'md', tooltip:'Open the GitHub release and its downloads.'},
+  'github': {icon:ArrowUpRight, variant:'ghost', size:'sm', tooltip:'Open the project on GitHub.'},
+  'telegram': {icon:ArrowUpRight, variant:'ghost', size:'sm', tooltip:'Open support on Telegram.'},
+  'eplus': {icon:ArrowUpRight, variant:'ghost', size:'sm', tooltip:'Visit ePlus.DEV.'},
 } as const;
 function NativeAction({native,id,host}:{native:HTMLButtonElement;id:keyof typeof buttonSpecs;host:HTMLElement}){
   const spec=buttonSpecs[id];
@@ -89,12 +146,15 @@ function NativeAction({native,id,host}:{native:HTMLButtonElement;id:keyof typeof
     sync();return ()=>obs.disconnect();
   },[]);
   const onlyIcon=spec.size==='icon';
-  return <Button variant={spec.variant} size={spec.size} className={onlyIcon?'relative size-8 rounded-lg':id==='official'?'h-7 gap-1 px-1 text-primary':id==='github'||id==='telegram'||id==='eplus'?'h-7 gap-1 px-1 text-[10px]':'w-full rounded-lg'} disabled={state.disabled}
-    aria-label={native.getAttribute('aria-label')||state.label} aria-controls={native.getAttribute('aria-controls')||undefined} aria-pressed={state.pressed===null?undefined:state.pressed==='true'} title={native.title||undefined}
+  const label=native.getAttribute('aria-label')||state.label;
+  const action=<Button variant={spec.variant} size={spec.size} className={onlyIcon?'relative size-8 rounded-lg':id==='official'?'h-7 gap-1 px-1 text-primary':id==='github'||id==='telegram'||id==='eplus'?'h-7 gap-1 px-1 text-[10px]':'w-full rounded-lg'} disabled={state.disabled}
+    aria-label={label} aria-controls={native.getAttribute('aria-controls')||undefined} aria-pressed={state.pressed===null?undefined:state.pressed==='true'}
     onClick={()=>{if(!native.disabled&&!native.hidden)native.click()}}>
     {!onlyIcon&&<span>{state.label}</span>}<Icon size={onlyIcon?17:13} aria-hidden="true"/>
-    {state.dot&&<span className="absolute right-0 top-0 size-2 rounded-full bg-primary" aria-label="Update available"/>}
+    {state.dot&&<span className="absolute right-0 top-0 size-2 rounded-full bg-primary" aria-label={translate('Update available')}/>}
   </Button>;
+  const content='tooltip' in spec ? translate(spec.tooltip) : label;
+  return <Tooltip content={content} side={onlyIcon || id==='official' ? 'bottom' : 'top'}>{action}</Tooltip>;
 }
 const SWITCH_EVENT='offer-toolkit-switch-sync';
 export function syncBeuiSwitches(){document.dispatchEvent(new Event(SWITCH_EVENT));}
@@ -111,11 +171,19 @@ function NativeSwitch({native,label}:{native:HTMLInputElement;label:string}){
 }
 export function enhanceFormControls(){
   // Actual beUI inputs retain native form validation, IDs and DOM value ownership.
-  for(const id of ['workspace','seats','country','currency','link']){
+  for(const id of ['workspace','seats','link']){
     const native=document.getElementById(id) as HTMLInputElement;
     const props={id,type:native.type,defaultValue:native.value,required:native.required,readOnly:native.readOnly,disabled:native.disabled,maxLength:native.maxLength>=0?native.maxLength:undefined,min:native.min||undefined,max:native.max||undefined,step:native.step||undefined,pattern:native.pattern||undefined,list:native.getAttribute('list')||undefined,placeholder:native.placeholder,autoComplete:native.autocomplete||undefined,inputMode:(native.inputMode||undefined) as React.InputHTMLAttributes<HTMLInputElement>['inputMode']};
     const host=document.createElement('div');host.className='beui-field';native.replaceWith(host);
     flushSync(()=>createRoot(host).render(<Input nativeUncontrolled {...props} classNames={{field:'h-9 rounded-lg',input:'text-xs'}}/>));
+  }
+  for(const id of ['country','currency'] as const){
+    const native=document.getElementById(id) as HTMLInputElement;
+    const host=document.createElement('div');
+    native.after(host);
+    native.classList.add('beui-native');
+    native.addEventListener('invalid',event=>event.preventDefault());
+    flushSync(()=>createRoot(host).render(<BillingSelect native={native} id={id}/>));
   }
   for(const id of Object.keys(buttonSpecs) as (keyof typeof buttonSpecs)[]){
     const native=document.getElementById(id) as HTMLButtonElement;
@@ -125,6 +193,6 @@ export function enhanceFormControls(){
   for(const [id,label] of [['remember-billing','Remember billing after link succeeds'],['update-auto','Automatically check for updates']] as const){
     const native=document.getElementById(id) as HTMLInputElement;
     const host=document.createElement('span');native.after(host);native.classList.add('beui-native');
-    flushSync(()=>createRoot(host).render(<NativeSwitch native={native} label={label}/>));
+    flushSync(()=>createRoot(host).render(<NativeSwitch native={native} label={translate(label)}/>));
   }
 }

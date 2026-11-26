@@ -1,0 +1,293 @@
+{
+  "create_a_checkout_link_with_your_current_settings": {
+    "message": "Buat tautan pembayaran dengan pengaturan saat ini."
+  },
+  "open_the_official_chatgpt_offer_page": {
+    "message": "Buka halaman penawaran resmi ChatGPT."
+  },
+  "copy_the_checkout_link_to_your_clipboard": {
+    "message": "Salin tautan pembayaran ke papan klip."
+  },
+  "open_the_checkout_link_in_a_new_tab": {
+    "message": "Buka tautan pembayaran di tab baru."
+  },
+  "read_the_amount_due_today_on_the_current_checkout_page": {
+    "message": "Lihat jumlah yang harus dibayar hari ini di halaman pembayaran saat ini."
+  },
+  "check_github_for_a_newer_version": {
+    "message": "Periksa versi terbaru di GitHub."
+  },
+  "open_the_github_release_and_its_downloads": {
+    "message": "Buka rilis GitHub beserta unduhannya."
+  },
+  "open_the_project_on_github": {
+    "message": "Buka proyek di GitHub."
+  },
+  "open_support_on_telegram": {
+    "message": "Buka dukungan di Telegram."
+  },
+  "visit_eplus_dev": {
+    "message": "Kunjungi ePlus.DEV."
+  },
+  "saved_billing_preference_confirm_it_still_matches_your_actual_billing_details": {
+    "message": "Preferensi penagihan tersimpan. Pastikan detailnya masih benar."
+  },
+  "select_your_actual_billing_country_its_local_currency_will_be_suggested": {
+    "message": "Pilih negara penagihan yang sebenarnya untuk mendapatkan saran mata uang."
+  },
+  "no_verified_response_review_the_official_offer_page": {
+    "message": "Belum ada respons terverifikasi. Lihat halaman penawaran resmi."
+  },
+  "open_chatgpt_com_and_reopen_this_popup_to_check_eligibility": {
+    "message": "Buka chatgpt.com lalu buka kembali popup ini untuk memeriksa kelayakan."
+  },
+  "link_copied_keep_it_private": {
+    "message": "Tautan disalin. Jaga kerahasiaannya."
+  },
+  "requesting_checkout_from_your_current_chatgpt_session": {
+    "message": "Meminta tautan pembayaran dari sesi ChatGPT saat ini…"
+  },
+  "download_the_new_zip_extract_into_the_existing_extension_directory_then_reload_in_the_browser": {
+    "message": "Unduh ZIP baru, ekstrak ke folder ekstensi yang ada, lalu muat ulang di browser."
+  },
+  "firefox_can_install_updates_automatically_for_signed_self_distributed_builds_temporary_builds_must_be_reloaded_manually": {
+    "message": "Firefox dapat memperbarui versi bertanda tangan secara otomatis. Muat ulang versi sementara secara manual."
+  },
+  "open_the_official_checkout_and_open_this_popup_only_the_displayed_due_today_total_is_reviewed": {
+    "message": "Buka halaman pembayaran resmi dan popup ini. Hanya jumlah yang ditampilkan untuk hari ini yang diperiksa."
+  },
+  "a_zero_total_does_not_verify_renewal_terms_or_activation_always_review_the_official_checkout_before_subscribing": {
+    "message": "Jumlah nol tidak memastikan syarat perpanjangan atau aktivasi. Periksa pembayaran resmi sebelum berlangganan."
+  },
+  "locale_name": {
+    "message": "id"
+  },
+  "back_to_offer": {
+    "message": "Kembali ke penawaran"
+  },
+  "settings": {
+    "message": "Pengaturan"
+  },
+  "update_available": {
+    "message": "Pembaruan tersedia"
+  },
+  "checking_active_tab": {
+    "message": "Memeriksa tab aktif…"
+  },
+  "campaign_information": {
+    "message": "Informasi promosi"
+  },
+  "official_offer": {
+    "message": "Penawaran resmi"
+  },
+  "1_month_free": {
+    "message": "Gratis 1 bulan"
+  },
+  "subject_to_account_eligibility": {
+    "message": "Tergantung kelayakan akun"
+  },
+  "account_eligibility": {
+    "message": "Kelayakan akun"
+  },
+  "personal_plan": {
+    "message": "Paket pribadi"
+  },
+  "not_checked": {
+    "message": "Belum diperiksa"
+  },
+  "check_eligibility": {
+    "message": "Periksa kelayakan"
+  },
+  "check_eligibility_again": {
+    "message": "Periksa ulang kelayakan"
+  },
+  "check_again": {
+    "message": "Periksa lagi"
+  },
+  "details": {
+    "message": "Detail"
+  },
+  "checking_your_current_personal_workspace": {
+    "message": "Memeriksa ruang kerja pribadi Anda saat ini."
+  },
+  "final_price_confirmed_at_checkout": {
+    "message": "Harga akhir dikonfirmasi saat pembayaran."
+  },
+  "checkout_price_review": {
+    "message": "Tinjau harga pembayaran"
+  },
+  "price_unknown": {
+    "message": "Harga tidak diketahui"
+  },
+  "displayed_due_today": {
+    "message": "Jumlah yang ditampilkan untuk hari ini"
+  },
+  "check_checkout_price": {
+    "message": "Periksa harga pembayaran"
+  },
+  "create_checkout": {
+    "message": "Buat pembayaran"
+  },
+  "checkout_is_available_once_chatgpt_confirms_coupon_eligibility": {
+    "message": "Pembayaran tersedia setelah ChatGPT mengonfirmasi kelayakan kupon."
+  },
+  "checkout_link": {
+    "message": "Tautan pembayaran"
+  },
+  "copy_link": {
+    "message": "Salin tautan"
+  },
+  "open_checkout": {
+    "message": "Buka pembayaran"
+  },
+  "preferences": {
+    "message": "Preferensi"
+  },
+  "checkout_defaults": {
+    "message": "Pengaturan pembayaran default"
+  },
+  "workspace": {
+    "message": "Ruang kerja"
+  },
+  "seats": {
+    "message": "Kursi"
+  },
+  "decrease_seats": {
+    "message": "Kurangi kursi"
+  },
+  "increase_seats": {
+    "message": "Tambah kursi"
+  },
+  "billing_country": {
+    "message": "Negara penagihan"
+  },
+  "currency": {
+    "message": "Mata uang"
+  },
+  "select_country": {
+    "message": "Pilih negara"
+  },
+  "select_currency": {
+    "message": "Pilih mata uang"
+  },
+  "remember_billing_after_link_succeeds": {
+    "message": "Ingat penagihan setelah tautan dibuat"
+  },
+  "confirm_actual_billing_details_before_continuing": {
+    "message": "Pastikan detail penagihan benar sebelum melanjutkan."
+  },
+  "generate_checkout_link": {
+    "message": "Buat tautan pembayaran"
+  },
+  "generating": {
+    "message": "Sedang membuat…"
+  },
+  "software_updates": {
+    "message": "Pembaruan perangkat lunak"
+  },
+  "new": {
+    "message": "Baru"
+  },
+  "current_version": {
+    "message": "Versi saat ini"
+  },
+  "latest_version": {
+    "message": "Versi terbaru"
+  },
+  "loading": {
+    "message": "Memuat…"
+  },
+  "view_release_download": {
+    "message": "Lihat rilis / unduh"
+  },
+  "automatically_check_on_chatgpt_15_min_cache": {
+    "message": "Periksa otomatis di ChatGPT (cache 15 menit)"
+  },
+  "automatically_check_for_updates": {
+    "message": "Periksa pembaruan secara otomatis"
+  },
+  "check_for_updates": {
+    "message": "Periksa pembaruan"
+  },
+  "no_stored_tokens": {
+    "message": "Token tidak disimpan"
+  },
+  "privacy_first": {
+    "message": "Privasi diutamakan"
+  },
+  "telegram_support": {
+    "message": "Dukungan Telegram"
+  },
+  "connected_to_chatgpt": {
+    "message": "Terhubung ke ChatGPT"
+  },
+  "open_chatgpt_com_to_generate_a_checkout_link": {
+    "message": "Buka chatgpt.com untuk membuat tautan pembayaran"
+  },
+  "coupon_eligible": {
+    "message": "Memenuhi syarat kupon"
+  },
+  "not_eligible": {
+    "message": "Tidak memenuhi syarat"
+  },
+  "already_redeemed": {
+    "message": "Sudah ditukarkan"
+  },
+  "offer_not_listed": {
+    "message": "Penawaran tidak tercantum"
+  },
+  "unknown": {
+    "message": "Tidak diketahui"
+  },
+  "checking": {
+    "message": "Memeriksa…"
+  },
+  "switch_to_light_mode": {
+    "message": "Beralih ke mode terang"
+  },
+  "switch_to_dark_mode": {
+    "message": "Beralih ke mode gelap"
+  },
+  "zero_due_today": {
+    "message": "Tidak ada tagihan hari ini"
+  },
+  "paid_checkout": {
+    "message": "Pembayaran berbiaya"
+  },
+  "checking_github_releases": {
+    "message": "Memeriksa rilis GitHub…"
+  },
+  "you_are_up_to_date": {
+    "message": "Anda menggunakan versi terbaru."
+  },
+  "no_stable_release_yet": {
+    "message": "Belum ada rilis stabil."
+  },
+  "not_checked_yet": {
+    "message": "Belum diperiksa."
+  },
+  "select_your_billing_country_and_currency_before_continuing": {
+    "message": "Pilih negara penagihan dan mata uang sebelum melanjutkan."
+  },
+  "currency_is_a_local_suggestion_verify_the_currency_supported_by_chatgpt": {
+    "message": "Mata uang hanya saran. Pastikan mata uang yang didukung ChatGPT."
+  },
+  "sign_in_to_chatgpt_first": {
+    "message": "Masuk ke ChatGPT terlebih dahulu."
+  },
+  "the_server_reports_that_this_account_is_not_eligible": {
+    "message": "Server melaporkan bahwa akun ini tidak memenuhi syarat."
+  },
+  "the_server_reports_that_the_promotion_was_already_redeemed": {
+    "message": "Server melaporkan bahwa promosi sudah ditukarkan."
+  },
+  "this_campaign_is_not_listed_for_the_default_personal_workspace_review_the_official_offer_page_for_a_definitive_result": {
+    "message": "Promosi ini tidak tercantum di ruang kerja pribadi default. Lihat halaman penawaran resmi untuk memastikan."
+  },
+  "coupon_eligible_and_not_redeemed_seat_coverage_total_and_activation_are_not_verified": {
+    "message": "Kupon memenuhi syarat dan belum ditukarkan. Cakupan kursi, jumlah total, dan aktivasi belum dikonfirmasi."
+  },
+  "extension_description": {
+    "message": "Periksa penawaran ChatGPT Business dan buat tautan pembayaran. Dibuat oleh ePlus.DEV."
+  }
+}

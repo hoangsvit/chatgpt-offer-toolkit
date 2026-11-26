@@ -4,7 +4,8 @@ import tailwindcss from '@tailwindcss/vite';
 export default defineConfig({
   manifest: ({ browser }) => ({
     name: 'ChatGPT Offer Toolkit',
-    description: 'Generate ChatGPT Business promotional checkout links, visit the official offer page, and manage updates. Built by ePlus.DEV.',
+    default_locale: 'en',
+    description: '__MSG_extension_description__',
     short_name: 'Offer Toolkit',
     icons: {16: 'icon/16.png', 32: 'icon/32.png', 48: 'icon/48.png', 96: 'icon/96.png', 128: 'icon/128.png'},
     action: {default_title: 'ChatGPT Offer Toolkit', default_icon: {16: 'icon/16.png', 32: 'icon/32.png', 48: 'icon/48.png'}},

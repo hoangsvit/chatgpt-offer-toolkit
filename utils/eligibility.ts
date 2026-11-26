@@ -4,15 +4,22 @@ export interface EligibilityResult {
   campaign: 'assigned' | 'not_listed' | 'unknown';
   reason: string;
   detectedCountry?: string;
+  accountLabel?: string;
 }
-// Serialized into the current ChatGPT tab. All helpers must remain inside the function.
+// Also executed in the ChatGPT tab for isolated sessions. Keep helpers inside the function.
 // Read-only: no checkout, redemption, modification, or third-party requests.
-export async function checkOfferEligibility(): Promise<EligibilityResult> {
+export async function checkOfferEligibility(context: 'tab' | 'extension' = 'tab'): Promise<EligibilityResult> {
   let plan: string | null = null;
   let campaign: EligibilityResult['campaign'] = 'unknown';
   let detectedCountry: string | undefined;
-  const result = (state: EligibilityResult['state'], reason: string): EligibilityResult => ({state,plan,campaign,reason,...(detectedCountry ? {detectedCountry} : {})});
-  if (location.origin !== 'https://chatgpt.com') return result('unknown','Open the official ChatGPT site first.');
+  let accountLabel: string | undefined;
+  const result = (state: EligibilityResult['state'], reason: string): EligibilityResult => ({
+    state,plan,campaign,reason,...(detectedCountry ? {detectedCountry} : {}),...(accountLabel ? {accountLabel} : {}),
+  });
+  if (context === 'tab' && location.origin !== 'https://chatgpt.com') return result('unknown','Open the official ChatGPT site first.');
+  if (context === 'extension' && !['chrome-extension:', 'moz-extension:'].includes(location.protocol)) {
+    return result('unknown','The extension could not access the ChatGPT session.');
+  }
   const object = (value: unknown): Record<string,unknown> | null =>
     value !== null && typeof value === 'object' && !Array.isArray(value) ? value as Record<string,unknown> : null;
   const campaignId = 'team-1-month-free';
@@ -22,7 +29,8 @@ export async function checkOfferEligibility(): Promise<EligibilityResult> {
     const timer = setTimeout(() => controller.abort(), 15000);
     try {
       const response = await fetch('https://chatgpt.com' + path, {
-        ...options, credentials:'same-origin', cache:'no-store', redirect:'error', signal:controller.signal
+        ...options, credentials:context === 'extension' ? 'include' : 'same-origin',
+        cache:'no-store', redirect:'error', signal:controller.signal
       });
       if (!response.ok) return {status:response.status, body:null};
       stage += ' response';
@@ -34,6 +42,10 @@ export async function checkOfferEligibility(): Promise<EligibilityResult> {
     if (sessionResponse.status !== 200) return result('unknown','Session HTTP '+sessionResponse.status+'. Sign in on ChatGPT and retry.');
     const token = sessionResponse.body?.accessToken;
     if (typeof token !== 'string' || !token) return result('unknown','Sign in to ChatGPT first.');
+    const user = object(sessionResponse.body?.user);
+    const name = typeof user?.name === 'string' ? user.name.trim() : '';
+    const email = typeof user?.email === 'string' ? user.email.trim() : '';
+    accountLabel = (name || email).slice(0,254) || undefined;
     // Observed session context: a country hint, not a verified billing address.
     const country = object(sessionResponse.body?.statsigContext)?.country;
     if (typeof country === 'string' && /^[A-Z]{2}$/.test(country) && !['ZZ','EU','XX'].includes(country)) detectedCountry = country;

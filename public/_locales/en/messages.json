@@ -1,0 +1,293 @@
+{
+  "create_a_checkout_link_with_your_current_settings": {
+    "message": "Create a checkout link with your current settings."
+  },
+  "open_the_official_chatgpt_offer_page": {
+    "message": "Open the official ChatGPT offer page."
+  },
+  "copy_the_checkout_link_to_your_clipboard": {
+    "message": "Copy the checkout link to your clipboard."
+  },
+  "open_the_checkout_link_in_a_new_tab": {
+    "message": "Open the checkout link in a new tab."
+  },
+  "read_the_amount_due_today_on_the_current_checkout_page": {
+    "message": "Read the amount due today on the current checkout page."
+  },
+  "check_github_for_a_newer_version": {
+    "message": "Check GitHub for a newer version."
+  },
+  "open_the_github_release_and_its_downloads": {
+    "message": "Open the GitHub release and its downloads."
+  },
+  "open_the_project_on_github": {
+    "message": "Open the project on GitHub."
+  },
+  "open_support_on_telegram": {
+    "message": "Open support on Telegram."
+  },
+  "visit_eplus_dev": {
+    "message": "Visit ePlus.DEV."
+  },
+  "saved_billing_preference_confirm_it_still_matches_your_actual_billing_details": {
+    "message": "Saved billing preference. Confirm it still matches your actual billing details."
+  },
+  "select_your_actual_billing_country_its_local_currency_will_be_suggested": {
+    "message": "Select your actual billing country. Its local currency will be suggested."
+  },
+  "no_verified_response_review_the_official_offer_page": {
+    "message": "No verified response. Review the official offer page."
+  },
+  "open_chatgpt_com_and_reopen_this_popup_to_check_eligibility": {
+    "message": "Open chatgpt.com and reopen this popup to check eligibility."
+  },
+  "link_copied_keep_it_private": {
+    "message": "Link copied. Keep it private."
+  },
+  "requesting_checkout_from_your_current_chatgpt_session": {
+    "message": "Requesting checkout from your current ChatGPT session…"
+  },
+  "download_the_new_zip_extract_into_the_existing_extension_directory_then_reload_in_the_browser": {
+    "message": "Download the new ZIP, extract into the existing extension directory, then reload in the browser."
+  },
+  "firefox_can_install_updates_automatically_for_signed_self_distributed_builds_temporary_builds_must_be_reloaded_manually": {
+    "message": "Firefox can install updates automatically for signed self-distributed builds. Temporary builds must be reloaded manually."
+  },
+  "open_the_official_checkout_and_open_this_popup_only_the_displayed_due_today_total_is_reviewed": {
+    "message": "Open the official checkout and open this popup. Only the displayed due-today total is reviewed."
+  },
+  "a_zero_total_does_not_verify_renewal_terms_or_activation_always_review_the_official_checkout_before_subscribing": {
+    "message": "A zero total does not verify renewal terms or activation. Always review the official checkout before subscribing."
+  },
+  "locale_name": {
+    "message": "en"
+  },
+  "back_to_offer": {
+    "message": "Back to offer"
+  },
+  "settings": {
+    "message": "Settings"
+  },
+  "update_available": {
+    "message": "Update available"
+  },
+  "checking_active_tab": {
+    "message": "Checking active tab…"
+  },
+  "campaign_information": {
+    "message": "Campaign information"
+  },
+  "official_offer": {
+    "message": "Official offer"
+  },
+  "1_month_free": {
+    "message": "1 month free"
+  },
+  "subject_to_account_eligibility": {
+    "message": "Subject to account eligibility"
+  },
+  "account_eligibility": {
+    "message": "Account eligibility"
+  },
+  "personal_plan": {
+    "message": "Personal plan"
+  },
+  "not_checked": {
+    "message": "Not checked"
+  },
+  "check_eligibility": {
+    "message": "Check eligibility"
+  },
+  "check_eligibility_again": {
+    "message": "Check eligibility again"
+  },
+  "check_again": {
+    "message": "Check again"
+  },
+  "details": {
+    "message": "Details"
+  },
+  "checking_your_current_personal_workspace": {
+    "message": "Checking your current personal workspace."
+  },
+  "final_price_confirmed_at_checkout": {
+    "message": "Final price confirmed at checkout."
+  },
+  "checkout_price_review": {
+    "message": "Checkout price review"
+  },
+  "price_unknown": {
+    "message": "Price unknown"
+  },
+  "displayed_due_today": {
+    "message": "Displayed due today"
+  },
+  "check_checkout_price": {
+    "message": "Check checkout price"
+  },
+  "create_checkout": {
+    "message": "Create checkout"
+  },
+  "checkout_is_available_once_chatgpt_confirms_coupon_eligibility": {
+    "message": "Checkout is available once ChatGPT confirms coupon eligibility."
+  },
+  "checkout_link": {
+    "message": "Checkout link"
+  },
+  "copy_link": {
+    "message": "Copy link"
+  },
+  "open_checkout": {
+    "message": "Open checkout"
+  },
+  "preferences": {
+    "message": "Preferences"
+  },
+  "checkout_defaults": {
+    "message": "Checkout defaults"
+  },
+  "workspace": {
+    "message": "Workspace"
+  },
+  "seats": {
+    "message": "Seats"
+  },
+  "decrease_seats": {
+    "message": "Decrease seats"
+  },
+  "increase_seats": {
+    "message": "Increase seats"
+  },
+  "billing_country": {
+    "message": "Billing country"
+  },
+  "currency": {
+    "message": "Currency"
+  },
+  "select_country": {
+    "message": "Select country"
+  },
+  "select_currency": {
+    "message": "Select currency"
+  },
+  "remember_billing_after_link_succeeds": {
+    "message": "Remember billing after link succeeds"
+  },
+  "confirm_actual_billing_details_before_continuing": {
+    "message": "Confirm actual billing details before continuing."
+  },
+  "generate_checkout_link": {
+    "message": "Generate checkout link"
+  },
+  "generating": {
+    "message": "Generating…"
+  },
+  "software_updates": {
+    "message": "Software updates"
+  },
+  "new": {
+    "message": "New"
+  },
+  "current_version": {
+    "message": "Current version"
+  },
+  "latest_version": {
+    "message": "Latest version"
+  },
+  "loading": {
+    "message": "Loading…"
+  },
+  "view_release_download": {
+    "message": "View release / download"
+  },
+  "automatically_check_on_chatgpt_15_min_cache": {
+    "message": "Automatically check on ChatGPT (15 min cache)"
+  },
+  "automatically_check_for_updates": {
+    "message": "Automatically check for updates"
+  },
+  "check_for_updates": {
+    "message": "Check for updates"
+  },
+  "no_stored_tokens": {
+    "message": "No stored tokens"
+  },
+  "privacy_first": {
+    "message": "Privacy first"
+  },
+  "telegram_support": {
+    "message": "Telegram Support"
+  },
+  "connected_to_chatgpt": {
+    "message": "Connected to ChatGPT"
+  },
+  "open_chatgpt_com_to_generate_a_checkout_link": {
+    "message": "Open chatgpt.com to generate a checkout link"
+  },
+  "coupon_eligible": {
+    "message": "Coupon eligible"
+  },
+  "not_eligible": {
+    "message": "Not eligible"
+  },
+  "already_redeemed": {
+    "message": "Already redeemed"
+  },
+  "offer_not_listed": {
+    "message": "Offer not listed"
+  },
+  "unknown": {
+    "message": "Unknown"
+  },
+  "checking": {
+    "message": "Checking…"
+  },
+  "switch_to_light_mode": {
+    "message": "Switch to light mode"
+  },
+  "switch_to_dark_mode": {
+    "message": "Switch to dark mode"
+  },
+  "zero_due_today": {
+    "message": "Zero due today"
+  },
+  "paid_checkout": {
+    "message": "Paid checkout"
+  },
+  "checking_github_releases": {
+    "message": "Checking GitHub Releases…"
+  },
+  "you_are_up_to_date": {
+    "message": "You are up to date."
+  },
+  "no_stable_release_yet": {
+    "message": "No stable release yet."
+  },
+  "not_checked_yet": {
+    "message": "Not checked yet."
+  },
+  "select_your_billing_country_and_currency_before_continuing": {
+    "message": "Select your billing country and currency before continuing."
+  },
+  "currency_is_a_local_suggestion_verify_the_currency_supported_by_chatgpt": {
+    "message": "Currency is a local suggestion. Verify the currency supported by ChatGPT."
+  },
+  "sign_in_to_chatgpt_first": {
+    "message": "Sign in to ChatGPT first."
+  },
+  "the_server_reports_that_this_account_is_not_eligible": {
+    "message": "The server reports that this account is not eligible."
+  },
+  "the_server_reports_that_the_promotion_was_already_redeemed": {
+    "message": "The server reports that the promotion was already redeemed."
+  },
+  "this_campaign_is_not_listed_for_the_default_personal_workspace_review_the_official_offer_page_for_a_definitive_result": {
+    "message": "This campaign is not listed for the default personal workspace. Review the official offer page for a definitive result."
+  },
+  "coupon_eligible_and_not_redeemed_seat_coverage_total_and_activation_are_not_verified": {
+    "message": "Coupon eligible and not redeemed. Seat coverage, total and activation are not verified."
+  },
+  "extension_description": {
+    "message": "Generate ChatGPT Business promotional checkout links, visit the official offer page, and manage updates. Built by ePlus.DEV."
+  }
+}

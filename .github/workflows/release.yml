@@ -66,16 +66,19 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           RELEASE_TAG: ${{ steps.plan.outputs.tag }}
         run: |
+          tag_options=(--target "$GITHUB_SHA")
           if [[ "$GITHUB_REF" == refs/tags/* ]]; then
-            gh release create "$RELEASE_TAG" dist/chrome.zip dist/firefox-unsigned.zip dist/SHA256SUMS.txt --verify-tag --generate-notes --latest
+            tag_options=(--verify-tag)
           else
             existing=$(git ls-remote --tags origin "refs/tags/$RELEASE_TAG" "refs/tags/$RELEASE_TAG^{}")
             if [[ -n "$existing" ]]; then
               tag_sha=$(printf '%s\n' "$existing" | tail -1 | cut -f1)
               test "$tag_sha" = "$GITHUB_SHA"
+              tag_options=(--verify-tag)
             fi
-            gh release create "$RELEASE_TAG" dist/chrome.zip dist/firefox-unsigned.zip dist/SHA256SUMS.txt --target "$GITHUB_SHA" --generate-notes --latest
           fi
+          gh release create "$RELEASE_TAG" dist/chrome.zip dist/firefox-unsigned.zip dist/SHA256SUMS.txt \
+            "${tag_options[@]}" --notes "$(cat .github/release-notes.md)" --generate-notes --latest
   sign-firefox:
     needs: release
     if: needs.release.outputs.publish == 'true'
