@@ -7,7 +7,7 @@ const { webcrypto } = require("node:crypto");
 const source = ts.transpileModule(fs.readFileSync("utils/checkout.ts","utf8"), {
   compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 }
 }).outputText;
-function load({origin="https://chatgpt.com",fetch=async()=>{throw Error("unexpected request")}={}}){
+function load({origin="https://chatgpt.com",fetch=async()=>{throw Error("unexpected request")}}={}){
   const ctx=vm.createContext({URL,crypto:webcrypto,location:{origin},fetch,exports:{}});
   vm.runInContext(source,ctx);
   return ctx.exports;
