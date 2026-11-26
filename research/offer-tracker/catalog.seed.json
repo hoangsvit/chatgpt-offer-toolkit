@@ -1,0 +1,87 @@
+{
+  "schemaVersion": 1,
+  "asOf": "2026-11-26",
+  "note": "Research snapshot; null means unverified or unspecified. Restricted does not imply account eligibility.",
+  "offers": [
+    {
+      "id": "openworks-us",
+      "plan": "Business",
+      "benefitType": "free_trial",
+      "durationMonths": 3,
+      "countries": [
+        "US"
+      ],
+      "audience": "Eligible independently owned small businesses participating in the OpenWorks pilot",
+      "status": "restricted",
+      "source": "https://openai.com/openworks/",
+      "evidence": [
+        "https://help.openai.com/en/articles/20001724-how-to-apply-to-openworks-and-follow-up-on-your-application"
+      ],
+      "enrollmentStart": null,
+      "enrollmentEnd": null,
+      "renewal": "Verify program terms",
+      "checkedAt": "2026-11-26"
+    },
+    {
+      "id": "malta-ai-literacy",
+      "plan": "Plus",
+      "benefitType": "partner_benefit",
+      "durationMonths": null,
+      "countries": [
+        "MT"
+      ],
+      "audience": "Maltese citizens meeting program requirements",
+      "status": "needs_review",
+      "source": "https://openai.com/index/malta-chatgpt-plus-partnership/",
+      "enrollmentStart": null,
+      "enrollmentEnd": null,
+      "renewal": "Not verified",
+      "checkedAt": "2026-11-26"
+    },
+    {
+      "id": "revolut-uk-go-3m",
+      "plan": "Go",
+      "benefitType": "free_trial",
+      "durationMonths": 3,
+      "countries": [
+        "GB"
+      ],
+      "audience": "Eligible Revolut customers under UK promotion terms",
+      "status": "restricted",
+      "source": "https://www.revolut.com/legal/chatgpt-3-months-trial-offer/",
+      "enrollmentStart": "2026-07-30T00:00:00Z",
+      "enrollmentEnd": "2027-07-29T23:59:00Z",
+      "renewal": "Review partner and ChatGPT subscription terms before redeeming",
+      "checkedAt": "2026-11-26"
+    },
+    {
+      "id": "business-nov-2026-usage",
+      "plan": "Business",
+      "benefitType": "usage_bonus",
+      "durationMonths": null,
+      "countries": null,
+      "audience": "Eligible new workspaces with qualifying Standard or Premium seats",
+      "status": "restricted",
+      "source": "https://help.openai.com/en/articles/8980713-sign-up-for-chatgpt-business",
+      "enrollmentStart": "2026-11-23",
+      "enrollmentEnd": "2026-11-30",
+      "benefitEnd": "2026-12-31",
+      "renewal": "Not a subscription discount",
+      "checkedAt": "2026-11-26"
+    },
+    {
+      "id": "chatgpt-trial-invitations",
+      "plan": null,
+      "benefitType": "invite_program",
+      "durationMonths": null,
+      "countries": null,
+      "audience": "Eligible invitees under specific invitation terms",
+      "status": "needs_review",
+      "source": "https://help.openai.com/en/articles/8381046-chatgpt-promotional-subscriptionsfree-trial-invites-faq",
+      "enrollmentStart": null,
+      "enrollmentEnd": null,
+      "renewal": "Check the specific invitation",
+      "checkedAt": "2026-11-26"
+    }
+  ]
+}
