@@ -11,27 +11,41 @@
 <main>
 <div id="offer-view">
 <div class="connection" id="connection" data-state="loading" role="status"><span class="dot"></span><span id="connection-text">Checking active tab…</span></div>
+<section class="account-card" aria-label="Account eligibility">
+  <div class="account-top">
+    <div class="account-label"><span>Account eligibility</span><small>Personal plan · <strong id="eligibility-plan">—</strong></small></div>
+    <div id="beui-refresh"></div>
+    <button id="eligibility-check" type="button" disabled hidden>Check eligibility</button>
+  </div>
+  <div class="account-details account-results">
+    <div class="account-top">
+      <div class="account-label"><span>Personal · ChatGPT Plus</span></div>
+      <span id="plus-eligibility-state" class="sr-only" data-state="unknown" role="status">Not checked</span>
+      <span id="beui-plus-eligibility"></span>
+    </div>
+    <div class="account-top">
+      <div class="account-label"><span>Business</span></div>
+      <span id="eligibility-state" class="sr-only" data-state="unknown" role="status">Not checked</span>
+      <span id="beui-eligibility"></span>
+    </div>
+  </div>
+  <details class="account-details">
+    <summary><span class="account-chevron" aria-hidden="true"></span>Details</summary>
+    <p class="account-note"><strong>Personal</strong></p>
+    <p id="plus-eligibility-reason" class="hint" role="status" aria-live="polite">Checking your current personal workspace.</p>
+    <p class="account-note"><strong>Business</strong></p>
+    <p id="eligibility-reason" class="hint" role="status" aria-live="polite">Checking your current personal workspace.</p>
+    <p class="account-note">Final price confirmed at checkout.</p>
+    <div class="privacy"><svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-11V5l-8-3-8 3v6c0 7 8 11 8 11Z"/><path d="m9 12 2 2 4-4"/></svg><span>No stored tokens</span></div>
+  </details>
+</section>
 <div class="plan-picker" role="group" aria-label="Choose a plan">
   <button id="plan-personal" type="button" aria-pressed="false" aria-controls="plus-panel">Personal</button>
   <button id="plan-business" type="button" aria-pressed="true" aria-controls="business-panel">Business</button>
 </div>
 <div id="business-panel">
 <section class="offer" aria-label="Campaign information"><div class="offer-top"><span>CHATGPT BUSINESS</span><button id="official" type="button" class="offer-link">Official offer <span aria-hidden="true">↗</span></button></div><h2>1 month free</h2><p id="claim-status" role="status" aria-live="polite" hidden></p></section>
-<section class="account-card" aria-label="Account eligibility">
-  <div class="account-top">
-    <div class="account-label"><span>Account eligibility</span><small>Personal plan · <strong id="eligibility-plan">—</strong></small></div>
-    <span id="eligibility-state" class="sr-only" data-state="unknown" role="status">Not checked</span>
-    <span id="beui-eligibility"></span>
-    <div id="beui-refresh"></div>
-    <button id="eligibility-check" type="button" disabled hidden>Check eligibility</button>
-  </div>
-  <details class="account-details">
-    <summary><span class="account-chevron" aria-hidden="true"></span>Details</summary>
-    <p id="eligibility-reason" class="hint" role="status" aria-live="polite">Checking your current personal workspace.</p>
-    <p class="account-note">Final price confirmed at checkout.</p>
-    <div class="privacy"><svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-11V5l-8-3-8 3v6c0 7 8 11 8 11Z"/><path d="m9 12 2 2 4-4"/></svg><span>No stored tokens</span></div>
-  </details>
-</section>
+
 </div>
 
 <div id="plus-panel" hidden>
@@ -39,20 +53,7 @@
     <div class="offer-top"><span>For individuals</span><button id="plus-pricing" type="button" class="offer-link">View Plus on ChatGPT</button></div>
     <h2>ChatGPT Plus</h2>
   </section>
-  <section class="account-card" aria-label="Account eligibility">
-    <div class="account-top">
-      <div class="account-label"><span>Account eligibility</span><small>Personal plan · <strong id="plus-current-plan">—</strong></small></div>
-      <span id="plus-eligibility-state" class="sr-only" data-state="unknown" role="status">Not checked</span>
-      <span id="beui-plus-eligibility"></span>
-      <div id="beui-plus-refresh"></div>
-      <button id="plus-eligibility-check" type="button" disabled hidden>Check eligibility</button>
-    </div>
-    <details class="account-details">
-      <summary><span class="account-chevron" aria-hidden="true"></span>Details</summary>
-      <p id="plus-eligibility-reason" class="hint" role="status" aria-live="polite">Checking your current personal workspace.</p>
-      <p class="account-note">Final price confirmed at checkout.</p>
-    </details>
-  </section>
+  
 </div>
 <section class="checkout-section" aria-label="Create checkout"><h2 id="checkout-title" class="sr-only">Create checkout</h2>
 <div id="beui-generate"></div>
