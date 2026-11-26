@@ -21,13 +21,15 @@ const readMessages = locale => JSON.parse(readFileSync(directory + '_locales/' +
 const defaultMessages = readMessages('en');
 assert.ok(defaultMessages.extension_description.message.includes('ePlus.DEV'));
 const languages = readdirSync(directory + '_locales');
-for (const language of ['en','es','fr','ja','pt_BR','vi','zh_CN']) assert.ok(languages.includes(language));
+for (const language of ['en','es','fr','hi','id','ja','ms','pt_BR','vi','zh_CN']) assert.ok(languages.includes(language));
 for (const language of languages) {
   const messages = readMessages(language);
   assert.deepEqual(Object.keys(messages).sort(), Object.keys(defaultMessages).sort(), 'Missing translations in ' + language);
   assert.ok(Object.values(messages).every(({message}) => typeof message === 'string' && message.trim()));
   assert.ok(messages.extension_description.message.length <= 132);
 }
+assert.equal(readFileSync(directory + 'fonts/AlloVariable.woff2').subarray(0, 4).toString(), 'wOF2');
+assert.ok(existsSync(directory + 'fonts/Allo-OFL.txt'));
 for (const size of [16,32,48,96,128]) {
   const path = manifest.icons?.[String(size)];
   assert.ok(path, 'Missing extension icon '+size);

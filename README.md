@@ -8,7 +8,7 @@
 
 A Chrome, Edge, and Firefox extension for checking ChatGPT Business offer eligibility and generating a checkout link when ChatGPT confirms the offer. Built by [ePlus.DEV](https://eplus.dev) as an independent project.
 
-The popup follows the browser language. It supports English, Vietnamese, Spanish, Brazilian Portuguese, French, Japanese, and Simplified Chinese. Some detailed error messages use English.
+The popup follows the browser language. It supports English, Vietnamese, Hindi, Indonesian, Malay, Spanish, Brazilian Portuguese, French, Japanese, and Simplified Chinese. Some detailed error messages use English.
 
 [Release notes and all downloads](https://github.com/hoangsvit/chatgpt-offer-toolkit/releases/latest) · [Report an issue](https://github.com/hoangsvit/chatgpt-offer-toolkit/issues/new/choose) · [Contribute](CONTRIBUTING.md)
 

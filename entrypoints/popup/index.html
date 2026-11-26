@@ -43,7 +43,8 @@
 </div>
 <div id="settings-view" hidden>
 <h2 class="sr-only">Preferences</h2>
-<details class="advanced" id="checkout-preferences" open><summary>Checkout defaults</summary><form id="settings">
+<div id="settings-cards">
+<form id="settings">
   <div class="grid workspace-grid"><div><label for="workspace">Workspace</label><input id="workspace" required maxlength="100" value="MyTeam" autocomplete="off"></div>
   <div><label for="seats">Seats</label>
   <div class="stepper"><button id="minus" type="button" class="icon-button" aria-label="Decrease seats">−</button><input id="seats" type="number" min="2" max="100" step="1" required value="5" inputmode="numeric"><button id="plus" type="button" class="icon-button" aria-label="Increase seats">+</button></div></div></div>
@@ -54,8 +55,8 @@
   <p id="billing-suggestion" class="hint" role="status" aria-live="polite"></p>
   <div class="toggle-row"><span>Remember billing after link succeeds</span><input id="remember-billing" type="checkbox"></div>
   <button id="generate" type="submit" disabled hidden><span id="generate-label">Generate checkout link</span></button>
-</form></details>
-<details class="advanced update-settings" id="update-center"><summary>Software updates <span id="update-dot" hidden>· New</span></summary>
+</form>
+<div id="settings-update-content" hidden>
 <div class="update-versions">
 <div class="update-row"><span>Current version</span><strong id="update-current"></strong></div>
 <div class="update-row"><span>Latest version</span><strong id="update-latest">—</strong></div>
@@ -67,7 +68,8 @@
 <button id="update-download" type="button" class="primary" hidden>View release / download ↗</button>
 </div>
 <p class="hint update-note" id="update-note"></p>
-</details>
+</div>
+</div>
 </div>
 </main>
 <footer><button id="github" type="button" class="text-button">GitHub ↗</button><button id="telegram" type="button" class="text-button">Telegram Support ↗</button><button id="eplus" type="button" class="text-button">ePlus.DEV ↗</button></footer>

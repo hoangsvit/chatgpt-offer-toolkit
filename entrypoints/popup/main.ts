@@ -10,6 +10,7 @@ import type { EligibilityResult } from '../../utils/eligibility';
 import { currencyForCountry, BILLING_PREFERENCE_KEY, parseBillingPreference } from '../../utils/billing-locale';
 import { OFFER_URL, EPLUS_URL, SUPPORT_URL } from '../../utils/links';
 import { localizePopup, translate, uiLocale } from './i18n';
+import { mountSettingsCards, openCheckoutPreferences } from './beui/settings-cards';
 
 function element<T extends HTMLElement = HTMLElement>(id: string): T {
   const node = document.getElementById(id);
@@ -19,6 +20,7 @@ function element<T extends HTMLElement = HTMLElement>(id: string): T {
 const field = (id: string) => element<HTMLInputElement>(id);
 const button = (id: string) => element<HTMLButtonElement>(id);
 localizePopup();
+mountSettingsCards();
 enhanceFormControls();
 const generate = button('generate');
 function showView(view:'offer'|'settings') {
@@ -34,19 +36,11 @@ function showView(view:'offer'|'settings') {
 }
 button('view-offer').addEventListener('click',()=>showView('offer'));
 button('view-settings').addEventListener('click',()=>showView('settings'));
-const checkoutPreferences=element<HTMLDetailsElement>('checkout-preferences');
-const softwareUpdates=element<HTMLDetailsElement>('update-center');
-checkoutPreferences.addEventListener('toggle',()=>{
-  if (checkoutPreferences.open) softwareUpdates.open=false;
-});
-softwareUpdates.addEventListener('toggle',()=>{
-  if (softwareUpdates.open) checkoutPreferences.open=false;
-});
 mountBeui(() => {
   const form=element<HTMLFormElement>('settings');
   if(!form.checkValidity()) {
     showView('settings');
-    element<HTMLDetailsElement>('checkout-preferences').open=true;
+    openCheckoutPreferences();
     const invalid = form.querySelector<HTMLInputElement>('input:invalid');
     if (invalid?.id === 'country' || invalid?.id === 'currency') {
       billingHint.textContent = translate('Select your billing country and currency before continuing.');
@@ -286,7 +280,7 @@ element<HTMLFormElement>('settings').addEventListener('submit', async event => {
         forgetBilling();
         billingEdited = true;
         showView('settings');
-        element<HTMLDetailsElement>('checkout-preferences').open=true;
+        openCheckoutPreferences();
         billingHint.textContent = translate('Saved billing preference cleared. Correct the actual country and currency before trying again.');
       }
       status(result?.error || 'No checkout response received.');
