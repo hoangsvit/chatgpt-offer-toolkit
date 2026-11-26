@@ -1,10 +1,12 @@
-<p align="center"><img src="public/icon.svg" alt="Offer Toolkit icon" width="72"></p>
+
+<img width="1672" height="941" alt="Offer Toolkit Dark Mode Hero" src="https://github.com/user-attachments/assets/92f7359c-4706-4b7f-b7ec-6a92e51e31f4" />
 
 # ChatGPT Offer Toolkit
 
 [![Download for Chrome](https://img.shields.io/github/v/release/hoangsvit/chatgpt-offer-toolkit?label=Download%20Chrome&logo=googlechrome&logoColor=white&color=4285F4)](https://github.com/hoangsvit/chatgpt-offer-toolkit/releases/latest/download/chrome.zip)
 [![Download for Edge](https://img.shields.io/github/v/release/hoangsvit/chatgpt-offer-toolkit?label=Download%20Edge&color=0078D4)](https://github.com/hoangsvit/chatgpt-offer-toolkit/releases/latest/download/chrome.zip)
 [![Download Firefox test build](https://img.shields.io/github/v/release/hoangsvit/chatgpt-offer-toolkit?label=Download%20Firefox%20test&logo=firefoxbrowser&logoColor=white&color=E66000)](https://github.com/hoangsvit/chatgpt-offer-toolkit/releases/latest/download/firefox-unsigned.zip)
+
 
 A Chrome, Edge, and Firefox extension for checking ChatGPT Business offer eligibility and generating a checkout link when ChatGPT confirms the offer. Built by [ePlus.DEV](https://eplus.dev) as an independent project.
 
