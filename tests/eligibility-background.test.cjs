@@ -15,8 +15,8 @@ function load(file, modules = {}, globals = {}) {
 }
 
 const messages = load('utils/eligibility-badge.ts');
-const eligible = { state: 'eligible', plan: 'plus', campaign: 'assigned', reason: 'Synthetic eligibility' };
-const denied = { state: 'not_eligible', plan: 'plus', campaign: 'assigned', reason: 'Synthetic denial' };
+const eligible = { state: 'eligible', plan: 'business', campaign: 'assigned', reason: 'Synthetic eligibility' };
+const denied = { state: 'not_eligible', plan: 'business', campaign: 'assigned', reason: 'Synthetic denial' };
 const settle = () => new Promise(resolve => setImmediate(resolve));
 
 function harness({ check, page, tab = {}, firefox = false }) {
@@ -95,11 +95,11 @@ test('popup and badge share one fallback API request, cache it and refresh expli
   assert.equal(await b, eligible);
   h.activate();
   await settle();
-  assert.equal(h.badge(), 'OK');
+  assert.equal(h.badge(), 'B+');
   assert.equal(await h.popup(), eligible);
   assert.equal(await h.popup(true), denied);
   await settle();
-  assert.equal(h.badge(), 'NO');
+  assert.equal(h.badge(), '?');
   assert.deepEqual(h.calls, ['extension', 'extension']);
 });
 
@@ -107,7 +107,7 @@ test('popup reuses the page checker when it is available', async () => {
   const h = harness({ page: denied });
   assert.equal(await h.popup(), denied);
   await settle();
-  assert.equal(h.badge(), 'NO');
+  assert.equal(h.badge(), '?');
   assert.deepEqual(h.calls, []);
 });
 
@@ -116,7 +116,7 @@ test('fallback uses the tab session in private browsing and Firefox containers',
     const h = harness({ ...options, check: async () => eligible });
     assert.equal(await h.popup(), eligible);
     await settle();
-    assert.equal(h.badge(), 'OK');
+    assert.equal(h.badge(), 'B+');
     assert.deepEqual(h.calls, ['tab']);
   }
 });
@@ -134,4 +134,24 @@ test('a fallback result cannot replace the badge after navigation away', async (
   await settle();
   assert.equal(h.badge(), 'OFF');
   assert.deepEqual(h.calls, ['extension']);
+});
+
+test('background badge tracks both plan results when refreshed', async () => {
+  const personalEligible = { ...eligible, plan: 'plus' };
+  const personalDenied = { ...denied, plan: 'plus' };
+  const results = [
+    [{ ...eligible, plus: personalEligible }, '2/2'],
+    [{ ...denied, plus: personalEligible }, 'P+'],
+    [{ ...eligible, plus: personalDenied }, 'B+'],
+    [{ ...denied, plus: personalDenied }, 'NO'],
+    [denied, '?'],
+  ];
+  let index = 0;
+  const h = harness({ check: async () => results[index++][0] });
+  for (const [result, badge] of results) {
+    assert.equal(await h.popup(true), result);
+    await settle();
+    assert.equal(h.badge(), badge);
+  }
+  assert.deepEqual(h.calls, results.map(() => 'extension'));
 });
