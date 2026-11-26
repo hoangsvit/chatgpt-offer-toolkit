@@ -62,10 +62,17 @@ export function useListbox({
       !list.current?.contains(document.activeElement)
     )
       return;
+    const panel = list.current;
     const option = Array.from(
-      list.current?.querySelectorAll<HTMLElement>("[data-listbox-id]") ?? [],
+      panel?.querySelectorAll<HTMLElement>("[data-listbox-id]") ?? [],
     ).find((element) => element.dataset.listboxId === activeId);
-    option?.focus({ preventScroll: false });
+    if (!panel || !option) return;
+    option.focus({ preventScroll: true });
+    const row = option.getBoundingClientRect();
+    const top = panel.getBoundingClientRect().top + panel.clientTop;
+    const bottom = top + panel.clientHeight;
+    if (row.top < top) panel.scrollTop += row.top - top;
+    else if (row.bottom > bottom) panel.scrollTop += row.bottom - bottom;
   }, [open, activeId, list]);
 
   const onKeyDown = (event: KeyboardEvent) => {

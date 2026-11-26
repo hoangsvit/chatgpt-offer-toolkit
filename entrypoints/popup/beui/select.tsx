@@ -42,6 +42,7 @@ const UNFOLD_EXIT = { duration: 0.2, ease: EASE_OUT } as const;
 const RADIUS = 12;
 // How far the open panel sits from the trigger once it has pulled away.
 const GAP = 8;
+const MAX_MENU_HEIGHT = 224;
 // The surface starts as a thin lip flush against the trigger's edge.
 const LIP = 8;
 const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
@@ -151,7 +152,7 @@ export function Select({
       rootRef.current?.contains(document.activeElement) &&
       document.activeElement !== trigger
     )
-      trigger?.focus();
+      trigger?.focus({ preventScroll: true });
     setOpen(false);
   }, [baseId, setOpen]);
 
@@ -352,6 +353,7 @@ export function SelectContent({ className, children }: SelectContentProps) {
   const ctx = useSelectContext("SelectContent");
   const panelRef = useRef<HTMLDivElement>(null);
   const [height, setHeight] = useState(0);
+  const [availableHeight, setAvailableHeight] = useState(MAX_MENU_HEIGHT);
   const { open, progress, reduce, setPlacement } = ctx;
   const { activeId, onKeyDown } = useListbox({
     open,
@@ -385,17 +387,22 @@ export function SelectContent({ className, children }: SelectContentProps) {
     return () => observer.disconnect();
   }, [present]);
 
-  // On open, flip upward when there isn't room below and there's more above.
   useLayoutEffect(() => {
     if (!open) return;
     const trigger = document.getElementById(ctx.triggerId);
-    const node = panelRef.current;
-    if (!trigger || !node) return;
-    const rect = trigger.getBoundingClientRect();
-    const h = node.offsetHeight;
-    const below = window.innerHeight - rect.bottom;
-    const above = rect.top;
-    setPlacement(below < h + 16 && above > below ? "top" : "bottom");
+    if (!trigger) return;
+    const position = () => {
+      const { top, bottom } = trigger.getBoundingClientRect();
+      const padding = GAP + 8;
+      const below = window.innerHeight - bottom - padding;
+      const above = top - padding;
+      const flip = below < MAX_MENU_HEIGHT && above > below;
+      setPlacement(flip ? "top" : "bottom");
+      setAvailableHeight(Math.max(0, Math.min(MAX_MENU_HEIGHT, flip ? above : below)));
+    };
+    position();
+    window.addEventListener("resize", position);
+    return () => window.removeEventListener("resize", position);
   }, [open, ctx.triggerId, setPlacement]);
 
   const isTop = ctx.placement === "top";
@@ -447,7 +454,7 @@ export function SelectContent({ className, children }: SelectContentProps) {
       }}
       style={{
         visibility: present ? undefined : "hidden",
-        maxHeight: present ? undefined : 0,
+        maxHeight: present ? availableHeight : 0,
         borderWidth: present ? undefined : 0,
         y,
         clipPath,
@@ -460,7 +467,7 @@ export function SelectContent({ className, children }: SelectContentProps) {
       // flush against the trigger, then separates into its own rounded pill;
       // sits above or below depending on available space
       className={cn(
-        "absolute left-0 right-0 z-20 overflow-hidden border border-border bg-background shadow-lg",
+        "absolute left-0 right-0 z-20 overflow-x-hidden overflow-y-auto overscroll-contain border border-border bg-background shadow-lg",
         isTop ? "bottom-full" : "top-full",
         className,
       )}

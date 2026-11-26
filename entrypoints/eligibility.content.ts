@@ -27,7 +27,10 @@ export default defineContentScript({
         }));
         latest = result;
         checking = false;
-        if (!stopped) await browser.runtime.sendMessage({type:ELIGIBILITY_RESULT_MESSAGE,result}).catch(()=>{});
+        if (!stopped) {
+          const {state,campaign} = result;
+          await browser.runtime.sendMessage({type:ELIGIBILITY_RESULT_MESSAGE,result:{state,campaign}}).catch(()=>{});
+        }
         return result;
       })().finally(()=>{pending=null;checking=false;});
       return pending;
@@ -36,7 +39,7 @@ export default defineContentScript({
       if (sender.id !== browser.runtime.id) return false;
       if (message?.type === BADGE_MESSAGE) {
         // Active-tab sync is a cache-only read; never starts or awaits an API request.
-        sendResponse({pending:checking,result:latest});
+        sendResponse({pending:checking,result:latest && {state:latest.state,campaign:latest.campaign}});
         return false;
       }
       if (message?.type !== CHECK_TAB_MESSAGE) return false;

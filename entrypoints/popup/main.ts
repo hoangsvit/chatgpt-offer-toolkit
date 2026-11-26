@@ -127,10 +127,13 @@ async function getActiveChatGPTTab() {
   if (tab?.id == null || !tab.url || new URL(tab.url).origin !== 'https://chatgpt.com') return null;
   return tab.id;
 }
+let accountLabel: string | undefined;
 function renderConnection(ready: boolean) {
   tabReady = ready;
+  if (!ready) accountLabel = undefined;
   element('connection').dataset.state = ready ? 'ready' : 'unavailable';
-  element('connection-text').textContent = ready ? 'Connected to ChatGPT' : 'Open chatgpt.com to generate a checkout link';
+  const connected = accountLabel ? 'Connected to ChatGPT · ' + accountLabel : 'Connected to ChatGPT';
+  element('connection-text').textContent = ready ? connected : 'Open chatgpt.com to generate a checkout link';
   generate.disabled = busy || !tabReady || eligibilityBusy;
   eligibilityButton.disabled = busy || !tabReady || eligibilityBusy;
 }
@@ -146,6 +149,7 @@ function renderEligibility(value: EligibilityResult | undefined) {
 async function runEligibilityCheck(force = false) {
   if (busy || eligibilityBusy) return;
   eligibilityBusy = true;
+  accountLabel = undefined;
   eligibilityButton.disabled = true;
   generate.disabled = true;
   eligibilityButton.textContent = 'Checking…';
@@ -160,6 +164,7 @@ async function runEligibilityCheck(force = false) {
       return;
     }
     const result = await browser.runtime.sendMessage({type:CHECK_POPUP_MESSAGE,tabId,force}) as EligibilityResult | undefined;
+    accountLabel = result?.accountLabel;
     renderEligibility(result);
     const detected = result?.detectedCountry;
     if (typeof detected === 'string' && /^[A-Z]{2}$/.test(detected) && !['ZZ','EU','XX'].includes(detected)) {

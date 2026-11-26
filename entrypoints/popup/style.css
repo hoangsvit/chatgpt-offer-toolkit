@@ -39,6 +39,7 @@ svg{flex-shrink:0;vertical-align:middle}
 .nav-dot{width:7px;height:7px;border-radius:50%;background:var(--primary)}
 .connection{display:flex;align-items:center;gap:6px;color:var(--muted-foreground);font-size:11px;margin:0 0 10px}
 .dot{width:7px;height:7px;border-radius:50%;background:currentColor;flex:none}
+#connection-text{min-width:0;overflow-wrap:anywhere}
 .connection[data-state=ready]{color:var(--offer-text)}
 .connection[data-state=unavailable]{color:var(--warn)}
 .offer{padding:13px 14px;border-radius:12px;background:var(--offer);color:var(--offer-text);margin-bottom:9px}

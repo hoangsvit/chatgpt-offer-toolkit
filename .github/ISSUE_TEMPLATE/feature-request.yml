@@ -1,0 +1,21 @@
+name: Feature request
+description: Suggest a change to the extension.
+title: "[Feature]: "
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem would this solve?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: What would you like the extension to do?
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: Alternatives or additional context
+      description: Screenshots are welcome after removing account and checkout information.

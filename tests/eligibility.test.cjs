@@ -14,6 +14,13 @@ async function run(responses,origin='https://chatgpt.com',context='tab'){
  const result=await ctx.exports.checkOfferEligibility(context);return {result,calls};
 }
 const session={body:{accessToken:'synthetic-token'}};
+test('account label prefers the signed-in name and falls back to email',async()=>{
+ for(const [user,expected] of [[{name:' Example User ',email:'test@example.com'},'Example User'],[{name:' ',email:'test@example.com'},'test@example.com']]){
+  const {result}=await run([{body:{...session.body,user}},{status:403}]);
+  assert.equal(result.accountLabel,expected);
+ }
+ assert.equal((await run([{body:{user:{name:'Example User'}}}])).result.accountLabel,undefined);
+});
 test('extension fallback uses browser credentials and rejects ordinary web origins',async()=>{
  const {result,calls}=await run([session,{body:profile()},{body:coupon()}],'chrome-extension://test','extension');
  assert.equal(result.state,'eligible');
