@@ -1,4 +1,34 @@
 {
+  "create_a_checkout_link_with_your_current_settings": {
+    "message": "Créez un lien de paiement avec vos paramètres actuels."
+  },
+  "open_the_official_chatgpt_offer_page": {
+    "message": "Ouvrez la page officielle de l’offre ChatGPT."
+  },
+  "copy_the_checkout_link_to_your_clipboard": {
+    "message": "Copiez le lien de paiement dans le presse-papiers."
+  },
+  "open_the_checkout_link_in_a_new_tab": {
+    "message": "Ouvrez le lien de paiement dans un nouvel onglet."
+  },
+  "read_the_amount_due_today_on_the_current_checkout_page": {
+    "message": "Consultez le montant dû aujourd’hui sur la page de paiement actuelle."
+  },
+  "check_github_for_a_newer_version": {
+    "message": "Recherchez une version plus récente sur GitHub."
+  },
+  "open_the_github_release_and_its_downloads": {
+    "message": "Ouvrez la version GitHub et ses téléchargements."
+  },
+  "open_the_project_on_github": {
+    "message": "Ouvrez le projet sur GitHub."
+  },
+  "open_support_on_telegram": {
+    "message": "Ouvrez l’assistance sur Telegram."
+  },
+  "visit_eplus_dev": {
+    "message": "Visitez ePlus.DEV."
+  },
   "saved_billing_preference_confirm_it_still_matches_your_actual_billing_details": {
     "message": "Préférences de facturation enregistrées. Vérifiez qu’elles sont toujours exactes."
   },

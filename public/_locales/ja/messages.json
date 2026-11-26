@@ -1,4 +1,34 @@
 {
+  "create_a_checkout_link_with_your_current_settings": {
+    "message": "現在の設定で決済リンクを作成します。"
+  },
+  "open_the_official_chatgpt_offer_page": {
+    "message": "ChatGPTの公式特典ページを開きます。"
+  },
+  "copy_the_checkout_link_to_your_clipboard": {
+    "message": "決済リンクをクリップボードにコピーします。"
+  },
+  "open_the_checkout_link_in_a_new_tab": {
+    "message": "決済リンクを新しいタブで開きます。"
+  },
+  "read_the_amount_due_today_on_the_current_checkout_page": {
+    "message": "現在の決済画面で本日の支払額を確認します。"
+  },
+  "check_github_for_a_newer_version": {
+    "message": "GitHubで新しいバージョンを確認します。"
+  },
+  "open_the_github_release_and_its_downloads": {
+    "message": "GitHubのリリースとダウンロードを開きます。"
+  },
+  "open_the_project_on_github": {
+    "message": "GitHubでプロジェクトを開きます。"
+  },
+  "open_support_on_telegram": {
+    "message": "Telegramのサポートを開きます。"
+  },
+  "visit_eplus_dev": {
+    "message": "ePlus.DEVを開きます。"
+  },
   "saved_billing_preference_confirm_it_still_matches_your_actual_billing_details": {
     "message": "保存済みの請求情報が正しいことを確認してください。"
   },

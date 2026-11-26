@@ -153,7 +153,11 @@ function renderConnection(ready: boolean) {
     ? connected + (accountLabel ? ' · ' + accountLabel : '')
     : translate('Open chatgpt.com to generate a checkout link');
   generate.disabled = busy || !tabReady || eligibilityBusy || eligibleTabId === null;
-  element('checkout-eligibility-hint').hidden = !tabReady || busy || eligibilityBusy || eligibleTabId !== null;
+  const hint = element('checkout-eligibility-hint');
+  hint.hidden = !tabReady || busy || eligibilityBusy || eligibleTabId !== null;
+  generate.dataset.tooltip = busy ? translate('Generating…') : !tabReady
+    ? translate('Open chatgpt.com to generate a checkout link') : eligibilityBusy
+      ? translate('Checking…') : hint.hidden ? translate('Create a checkout link with your current settings.') : hint.textContent ?? '';
   eligibilityButton.disabled = busy || !tabReady || eligibilityBusy;
 }
 function renderEligibility(value: EligibilityResult | undefined) {
@@ -173,6 +177,7 @@ async function runEligibilityCheck(force = false) {
   accountLabel = undefined;
   eligibilityButton.disabled = true;
   generate.disabled = true;
+  generate.dataset.tooltip = translate('Checking…');
   eligibilityButton.textContent = translate('Checking…');
   renderEligibility({state:'unknown',plan:null,campaign:'unknown',reason:'Checking your current personal workspace…'});
   element('eligibility-state').textContent = translate('Checking…');
@@ -259,6 +264,7 @@ element<HTMLFormElement>('settings').addEventListener('submit', async event => {
   } catch (error) { status(error instanceof Error ? error.message : 'Invalid settings.'); return; }
   busy = true;
   generate.disabled = true;
+  generate.dataset.tooltip = translate('Generating…');
   eligibilityButton.disabled = true;
   element('generate-label').textContent = translate('Generating…');
   const controls = ['workspace','seats','country','currency','minus','plus','remember-billing'];
