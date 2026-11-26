@@ -24,13 +24,13 @@ export function badgeFor(value: unknown): {text:string;color:string;title:string
   const business = campaignStatus(value);
   const personal = campaignStatus(value && typeof value === 'object' ? (value as Partial<EligibilityResult>).plus : undefined);
   const labels: Record<CampaignStatus,string> = {
-    eligible:'Coupon eligible — final price not verified',
+    eligible:'Eligible',
     denied:'Not eligible',
-    redeemed:'Already redeemed',
-    absent:'Offer not listed — final eligibility not verified',
+    redeemed:'Redeemed',
+    absent:'Offer not listed',
     unknown:'Unknown',
   };
-  const title = 'Personal (Plus): '+labels[personal]+' | Business: '+labels[business];
+  const title = 'Plus: '+labels[personal]+' · Business: '+labels[business];
   const green = '#16845b', neutral = '#64736b';
   if (personal === 'eligible' && business === 'eligible') return {text:'2/2',color:green,title};
   if (personal === 'eligible') return {text:'P+',color:green,title};

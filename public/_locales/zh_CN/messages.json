@@ -1,4 +1,19 @@
 {
+  "check_now": {
+    "message": "立即检查"
+  },
+  "view_release": {
+    "message": "查看版本"
+  },
+  "last_checked": {
+    "message": "上次检查"
+  },
+  "skip_this_version": {
+    "message": "跳过此版本"
+  },
+  "unable_to_save_the_skipped_version": {
+    "message": "无法保存已跳过的版本。"
+  },
   "personal": {
     "message": "个人"
   },

@@ -1,4 +1,19 @@
 {
+  "check_now": {
+    "message": "今すぐ確認"
+  },
+  "view_release": {
+    "message": "リリースを見る"
+  },
+  "last_checked": {
+    "message": "最終確認"
+  },
+  "skip_this_version": {
+    "message": "このバージョンをスキップ"
+  },
+  "unable_to_save_the_skipped_version": {
+    "message": "スキップしたバージョンを保存できませんでした。"
+  },
   "personal": {
     "message": "個人"
   },

@@ -1,4 +1,19 @@
 {
+  "check_now": {
+    "message": "Kiểm tra ngay"
+  },
+  "view_release": {
+    "message": "Xem bản phát hành"
+  },
+  "last_checked": {
+    "message": "Lần kiểm tra gần nhất"
+  },
+  "skip_this_version": {
+    "message": "Bỏ qua phiên bản này"
+  },
+  "unable_to_save_the_skipped_version": {
+    "message": "Không lưu được phiên bản đã bỏ qua."
+  },
   "personal": {
     "message": "Cá nhân"
   },

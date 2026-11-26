@@ -2,6 +2,7 @@ export const RELEASES_URL = 'https://github.com/hoangsvit/chatgpt-offer-toolkit/
 export const RELEASE_API = 'https://api.github.com/repos/hoangsvit/chatgpt-offer-toolkit/releases/latest';
 export const UPDATE_KEY = 'offerToolkitUpdate';
 export const AUTO_KEY = 'offerToolkitAutoUpdate';
+export const SKIPPED_UPDATE_KEY = 'offerToolkitSkippedUpdate';
 export const AUTO_CHECK_MESSAGE = 'offer-toolkit:auto-check-updates';
 export const PAGE_CHECK_INTERVAL_MS = 15 * 60 * 1000;
 export function shouldAutoCheck(enabled: unknown, checkedAt: number, now = Date.now()): boolean {

@@ -397,36 +397,54 @@ button('github').addEventListener('click', () => openUrl('https://github.com/hoa
 
 button('eplus').addEventListener('click', () => openUrl(EPLUS_URL));
 button('telegram').addEventListener('click', () => openUrl(SUPPORT_URL));
-import { UPDATE_KEY, AUTO_KEY, CHECK_MESSAGE, AUTO_CHECK_MESSAGE, normalizeUpdate, isNewer, releasePage } from '../../utils/updates';
+import { UPDATE_KEY, AUTO_KEY, SKIPPED_UPDATE_KEY, CHECK_MESSAGE, AUTO_CHECK_MESSAGE, normalizeUpdate, isNewer, releasePage } from '../../utils/updates';
 import type { UpdateState } from '../../utils/updates';
 
 const currentVersion = browser.runtime.getManifest().version;
 let updateState: UpdateState = normalizeUpdate(undefined);
 let checkingUpdate = false;
 let updateAuto = true;
+let skippedVersion: string | null = null;
+let skippingVersion = false;
 element('update-current').textContent = 'v' + currentVersion;
 element('update-note').textContent = translate(import.meta.env.FIREFOX
   ? 'Firefox can install updates automatically for signed self-distributed builds. Temporary builds must be reloaded manually.'
   : 'Download the new ZIP, extract into the existing extension directory, then reload in the browser.');
 function renderUpdate() {
   const newer = isNewer(updateState.latest,currentVersion);
+  const notify = newer && updateState.latest !== skippedVersion;
   element('update-latest').textContent = updateState.latest ? 'v'+updateState.latest : '—';
-  element('update-dot').hidden = !newer;
-  element('nav-update-dot').hidden = !newer;
+  element('update-latest-card').dataset.newer = String(newer);
+  element('update-banner').hidden = !notify;
+  element('update-banner-version').textContent = notify ? 'v'+updateState.latest : '';
+  element('update-dot').hidden = !notify;
+  element('nav-update-dot').hidden = !notify;
   button('update-download').hidden = !newer;
+  element('update-note').hidden = !newer;
   button('update-check').disabled = checkingUpdate;
   field('update-auto').checked = updateAuto;
   syncBeuiSwitches();
   const message = checkingUpdate ? 'Checking GitHub Releases…' :
     updateState.error ?? (newer ? 'Update available' : updateState.latest ? 'You are up to date.' : updateState.checkedAt ? 'No stable release yet.' : 'Not checked yet.');
-  element('update-state').textContent = translate(message) +
-    (!checkingUpdate && updateState.checkedAt ? ' · '+new Date(updateState.checkedAt).toLocaleString(uiLocale) : '');
+  const state = element('update-state');
+  state.textContent = translate(message);
+  state.dataset.state = checkingUpdate ? 'checking' : updateState.error ? 'error' : newer ? 'available' : 'idle';
+  const timestamp = element<HTMLTimeElement>('update-checked-at');
+  const checkedAt = new Date(updateState.checkedAt);
+  timestamp.hidden = checkingUpdate || !updateState.checkedAt || !Number.isFinite(checkedAt.getTime());
+  if (!timestamp.hidden) {
+    timestamp.dateTime = checkedAt.toISOString();
+    timestamp.textContent = checkedAt.toLocaleString(uiLocale,{dateStyle:'short',timeStyle:'short'});
+    timestamp.title = translate('Last checked');
+  }
 }
 async function loadUpdates() {
   try {
-    const s = await browser.storage.local.get([UPDATE_KEY,AUTO_KEY]);
+    const s = await browser.storage.local.get([UPDATE_KEY,AUTO_KEY,SKIPPED_UPDATE_KEY]);
     updateState = normalizeUpdate(s[UPDATE_KEY]); updateAuto = s[AUTO_KEY] !== false;
+    skippedVersion = normalizeUpdate({latest:s[SKIPPED_UPDATE_KEY]}).latest;
     field('update-auto').disabled = false;
+    renderUpdate();
     const [tab] = await browser.tabs.query({active:true,currentWindow:true});
     if(updateAuto && isChatGPTUrl(tab?.url)) updateState=normalizeUpdate(await browser.runtime.sendMessage(AUTO_CHECK_MESSAGE));
   } catch { updateState.error = 'Unable to load update settings.'; }
@@ -446,10 +464,30 @@ field('update-auto').addEventListener('change',async()=>{
   finally {control.disabled=false;renderUpdate();}
 });
 button('update-download').addEventListener('click',()=>openUrl(releasePage(updateState.latest)));
+button('update-banner-download').addEventListener('click',()=>openUrl(releasePage(updateState.latest)));
+button('update-banner-skip').addEventListener('click',async()=>{
+  const version = updateState.latest;
+  if (skippingVersion || !version || !isNewer(version,currentVersion)) return;
+  const control = button('update-banner-skip');
+  const error = element('update-banner-error');
+  skippingVersion = control.disabled = true;
+  error.hidden = true;
+  try {
+    await browser.storage.local.set({[SKIPPED_UPDATE_KEY]:version});
+    skippedVersion = version;
+  } catch {
+    error.textContent = translate('Unable to save the skipped version.');
+    error.hidden = false;
+  } finally {
+    skippingVersion = control.disabled = false;
+    renderUpdate();
+  }
+});
 browser.storage.onChanged.addListener((changes,area)=>{
   if(area!=='local')return;
   if(changes[UPDATE_KEY])updateState=normalizeUpdate(changes[UPDATE_KEY].newValue);
   if(changes[AUTO_KEY])updateAuto=changes[AUTO_KEY].newValue!==false;
-  if(changes[UPDATE_KEY]||changes[AUTO_KEY])renderUpdate();
+  if(changes[SKIPPED_UPDATE_KEY])skippedVersion=normalizeUpdate({latest:changes[SKIPPED_UPDATE_KEY].newValue}).latest;
+  if(changes[UPDATE_KEY]||changes[AUTO_KEY]||changes[SKIPPED_UPDATE_KEY])renderUpdate();
 });
 void loadUpdates();

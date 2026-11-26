@@ -35,7 +35,7 @@ The toolbar badge summarizes both plans: **2/2** means both coupons are confirme
 
 ## Update
 
-Open **Settings → Software updates** to check for a new version. On Chrome or Edge, replace the files in the existing unpacked folder and click **Reload** on the extensions page. Signed Firefox builds can update through Firefox.
+The popup shows new releases and lets you download or skip the displayed version. Check for updates anytime in **Settings → Software updates**. On Chrome or Edge, replace the files in the existing unpacked folder and click **Reload** on the extensions page. Signed Firefox builds can update through Firefox.
 
 ## Project links
 

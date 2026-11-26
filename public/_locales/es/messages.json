@@ -1,4 +1,19 @@
 {
+  "check_now": {
+    "message": "Comprobar ahora"
+  },
+  "view_release": {
+    "message": "Ver versión"
+  },
+  "last_checked": {
+    "message": "Última comprobación"
+  },
+  "skip_this_version": {
+    "message": "Omitir esta versión"
+  },
+  "unable_to_save_the_skipped_version": {
+    "message": "No se pudo guardar la versión omitida."
+  },
   "personal": {
     "message": "Personal"
   },

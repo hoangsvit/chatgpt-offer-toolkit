@@ -1,4 +1,19 @@
 {
+  "check_now": {
+    "message": "अभी जाँचें"
+  },
+  "view_release": {
+    "message": "रिलीज़ देखें"
+  },
+  "last_checked": {
+    "message": "पिछली जाँच"
+  },
+  "skip_this_version": {
+    "message": "यह संस्करण छोड़ें"
+  },
+  "unable_to_save_the_skipped_version": {
+    "message": "छोड़ा गया संस्करण सहेजा नहीं जा सका।"
+  },
   "personal": {
     "message": "व्यक्तिगत"
   },

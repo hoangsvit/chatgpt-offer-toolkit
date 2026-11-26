@@ -1,4 +1,19 @@
 {
+  "check_now": {
+    "message": "Vérifier"
+  },
+  "view_release": {
+    "message": "Voir la version"
+  },
+  "last_checked": {
+    "message": "Dernière vérification"
+  },
+  "skip_this_version": {
+    "message": "Ignorer cette version"
+  },
+  "unable_to_save_the_skipped_version": {
+    "message": "Impossible d’enregistrer la version ignorée."
+  },
   "personal": {
     "message": "Personnel"
   },

@@ -1,4 +1,19 @@
 {
+  "check_now": {
+    "message": "Periksa sekarang"
+  },
+  "view_release": {
+    "message": "Lihat rilis"
+  },
+  "last_checked": {
+    "message": "Pemeriksaan terakhir"
+  },
+  "skip_this_version": {
+    "message": "Lewati versi ini"
+  },
+  "unable_to_save_the_skipped_version": {
+    "message": "Versi yang dilewati tidak dapat disimpan."
+  },
   "personal": {
     "message": "Pribadi"
   },

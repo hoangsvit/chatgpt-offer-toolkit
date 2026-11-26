@@ -10,6 +10,14 @@
 
 <main>
 <div id="offer-view">
+<section id="update-banner" class="update-banner" aria-label="Update available" hidden>
+  <div class="update-banner-row">
+    <p class="update-banner-version" role="status"><span>Update available</span> <strong id="update-banner-version"></strong></p>
+    <button id="update-banner-download" type="button" class="icon-button" aria-label="View release / download">↓</button>
+    <button id="update-banner-skip" type="button" class="icon-button" aria-label="Skip this version">×</button>
+  </div>
+  <p id="update-banner-error" class="hint" role="status" hidden></p>
+</section>
 <div class="connection" id="connection" data-state="loading" role="status"><span class="dot"></span><span id="connection-text">Checking active tab…</span></div>
 <section class="account-card" aria-label="Account eligibility">
   <div class="account-top">
@@ -84,17 +92,20 @@
   <button id="generate" type="submit" disabled hidden><span id="generate-label">Generate checkout link</span></button>
 </form>
 <div id="settings-update-content" hidden>
-<div class="update-versions">
-<div class="update-row"><span>Current version</span><strong id="update-current"></strong></div>
-<div class="update-row"><span>Latest version</span><strong id="update-latest">—</strong></div>
+<dl class="update-versions">
+  <div class="update-version"><dt>Current version</dt><dd id="update-current">—</dd></div>
+  <div class="update-version" id="update-latest-card"><dt>Latest version</dt><dd id="update-latest">—</dd></div>
+</dl>
+<div class="update-status-row">
+  <p id="update-state" role="status" aria-live="polite">Loading…</p>
+  <time id="update-checked-at" hidden></time>
 </div>
-<p class="hint" id="update-state" role="status" aria-live="polite">Loading…</p>
-<div class="toggle-row"><span>Automatically check on ChatGPT (15 min cache)</span><input id="update-auto" type="checkbox" checked disabled></div>
 <div class="update-actions">
-<button id="update-check" type="button" class="secondary">Check for updates</button>
-<button id="update-download" type="button" class="primary" hidden>View release / download ↗</button>
+  <button id="update-check" type="button" class="secondary">Check now</button>
+  <button id="update-download" type="button" class="primary" hidden>View release</button>
 </div>
-<p class="hint update-note" id="update-note"></p>
+<div class="toggle-row update-auto-row"><span>Automatically check for updates</span><input id="update-auto" type="checkbox" checked disabled></div>
+<p class="hint update-note" id="update-note" hidden></p>
 </div>
 </div>
 </div>

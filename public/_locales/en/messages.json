@@ -1,4 +1,19 @@
 {
+  "check_now": {
+    "message": "Check now"
+  },
+  "view_release": {
+    "message": "View release"
+  },
+  "last_checked": {
+    "message": "Last checked"
+  },
+  "skip_this_version": {
+    "message": "Skip this version"
+  },
+  "unable_to_save_the_skipped_version": {
+    "message": "Unable to save the skipped version."
+  },
   "personal": {
     "message": "Personal"
   },

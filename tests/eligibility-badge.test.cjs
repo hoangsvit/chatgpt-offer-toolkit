@@ -16,7 +16,7 @@ test('combined badge covers all 25 combinations independently',()=>{
    const expected=b==='eligible'&&p==='eligible'?'2/2':p==='eligible'?'P+':b==='eligible'?'B+':b==='unknown'||p==='unknown'?'?':b==='redeemed'&&p==='redeemed'?'USED':'NO';
    assert.equal(badge.text,expected,b+' / '+p);
    assert.equal(badge.color,expected==='2/2'||expected==='P+'||expected==='B+'?'#16845b':b==='denied'&&p==='denied'?'#b43b35':'#64736b');
-   assert.match(badge.title,/Personal \(Plus\):.*Business:/);
+   assert.match(badge.title,/^Plus: .+ · Business: .+$/);
    assert.ok(badge.text.length<=4);
  }
 });
@@ -24,8 +24,8 @@ test('missing or unconfirmed plan results never count as eligible',()=>{
  for(const value of [null,{},unknown,denied,{state:'eligible',campaign:'unknown'},{...denied,plus:{state:'eligible',campaign:'unknown'}}])assert.equal(badgeFor(value).text,'?');
  assert.equal(badgeFor(eligible).text,'B+');
  assert.equal(badgeFor({plus:eligible}).text,'P+');
- assert.match(badgeFor({...eligible,plus:unknown}).title,/Personal \(Plus\): Unknown.*Business: Coupon eligible — final price not verified/);
- assert.match(badgeFor({...absent,plus:redeemed}).title,/final eligibility not verified/);
+ assert.equal(badgeFor({...eligible,plus:unknown}).title,'Plus: Unknown · Business: Eligible');
+ assert.equal(badgeFor({...absent,plus:eligible}).title,'Plus: Eligible · Business: Offer not listed');
 });
 test('only exact HTTPS ChatGPT origin is accepted',()=>{
  assert.equal(isChatGPTUrl('https://chatgpt.com/c/test'),true);

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import { flushSync } from 'react-dom';
-import { ArrowRight, ArrowLeft, ArrowUpRight, Settings2, Link2, RefreshCw, Minus, Plus, Copy, ExternalLink, Download, UserRound, UsersRound } from 'lucide-react';
+import { ArrowRight, ArrowLeft, ArrowUpRight, Settings2, Link2, RefreshCw, Minus, Plus, Copy, ExternalLink, Download, UserRound, UsersRound, X } from 'lucide-react';
 import { Input } from './input';
 import { Switch } from './switch';
 import { Button } from './button';
@@ -139,6 +139,8 @@ const buttonSpecs = {
   'price-check': {icon:RefreshCw, variant:'outline', size:'md', tooltip:'Read the amount due today on the current checkout page.'},
   'update-check': {icon:RefreshCw, variant:'outline', size:'md', tooltip:'Check GitHub for a newer version.'},
   'update-download': {icon:Download, variant:'primary', size:'md', tooltip:'Open the GitHub release and its downloads.'},
+  'update-banner-download': {icon:Download, variant:'ghost', size:'icon', tooltip:'Open the GitHub release and its downloads.'},
+  'update-banner-skip': {icon:X, variant:'ghost', size:'icon'},
   'github': {icon:ArrowUpRight, variant:'ghost', size:'sm', tooltip:'Open the project on GitHub.'},
   'telegram': {icon:ArrowUpRight, variant:'ghost', size:'sm', tooltip:'Open support on Telegram.'},
   'eplus': {icon:ArrowUpRight, variant:'ghost', size:'sm', tooltip:'Visit ePlus.DEV.'},
