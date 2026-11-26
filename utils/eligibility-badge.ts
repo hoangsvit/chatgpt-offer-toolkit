@@ -1,6 +1,7 @@
 import type { EligibilityResult } from './eligibility';
 export const BADGE_MESSAGE = 'offer-eligibility-badge-v1';
 export const CHECK_TAB_MESSAGE = 'offer-eligibility-check-tab-v1';
+export const CHECK_POPUP_MESSAGE = 'offer-eligibility-check-popup-v1';
 export const ELIGIBILITY_RESULT_MESSAGE = 'offer-eligibility-result-v1';
 export const ELIGIBILITY_PENDING_MESSAGE = 'offer-eligibility-pending-v1';
 export function isChatGPTUrl(value: unknown): boolean {

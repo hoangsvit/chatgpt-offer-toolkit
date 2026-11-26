@@ -5,14 +5,17 @@ export interface EligibilityResult {
   reason: string;
   detectedCountry?: string;
 }
-// Serialized into the current ChatGPT tab. All helpers must remain inside the function.
+// Also executed in the ChatGPT tab for isolated sessions. Keep helpers inside the function.
 // Read-only: no checkout, redemption, modification, or third-party requests.
-export async function checkOfferEligibility(): Promise<EligibilityResult> {
+export async function checkOfferEligibility(context: 'tab' | 'extension' = 'tab'): Promise<EligibilityResult> {
   let plan: string | null = null;
   let campaign: EligibilityResult['campaign'] = 'unknown';
   let detectedCountry: string | undefined;
   const result = (state: EligibilityResult['state'], reason: string): EligibilityResult => ({state,plan,campaign,reason,...(detectedCountry ? {detectedCountry} : {})});
-  if (location.origin !== 'https://chatgpt.com') return result('unknown','Open the official ChatGPT site first.');
+  if (context === 'tab' && location.origin !== 'https://chatgpt.com') return result('unknown','Open the official ChatGPT site first.');
+  if (context === 'extension' && !['chrome-extension:', 'moz-extension:'].includes(location.protocol)) {
+    return result('unknown','The extension could not access the ChatGPT session.');
+  }
   const object = (value: unknown): Record<string,unknown> | null =>
     value !== null && typeof value === 'object' && !Array.isArray(value) ? value as Record<string,unknown> : null;
   const campaignId = 'team-1-month-free';
@@ -22,7 +25,8 @@ export async function checkOfferEligibility(): Promise<EligibilityResult> {
     const timer = setTimeout(() => controller.abort(), 15000);
     try {
       const response = await fetch('https://chatgpt.com' + path, {
-        ...options, credentials:'same-origin', cache:'no-store', redirect:'error', signal:controller.signal
+        ...options, credentials:context === 'extension' ? 'include' : 'same-origin',
+        cache:'no-store', redirect:'error', signal:controller.signal
       });
       if (!response.ok) return {status:response.status, body:null};
       stage += ' response';

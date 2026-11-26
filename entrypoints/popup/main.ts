@@ -5,7 +5,7 @@ import './style.css';
 import { mountBeui, enhanceFormControls, syncBeuiSwitches } from './beui/islands';
 import { reviewCheckoutPrice } from '../../utils/checkout-price';
 import type { PriceReview } from '../../utils/checkout-price';
-import { CHECK_TAB_MESSAGE, isChatGPTUrl } from '../../utils/eligibility-badge';
+import { CHECK_POPUP_MESSAGE, isChatGPTUrl } from '../../utils/eligibility-badge';
 import type { EligibilityResult } from '../../utils/eligibility';
 import { currencyForCountry, BILLING_PREFERENCE_KEY, parseBillingPreference } from '../../utils/billing-locale';
 import { OFFER_URL, EPLUS_URL, SUPPORT_URL } from '../../utils/links';
@@ -154,15 +154,7 @@ async function runEligibilityCheck(force = false) {
       element('eligibility-state').textContent = 'Not checked';
       return;
     }
-    // Reuse the page's in-flight check or document-scoped result.
-    let result: EligibilityResult | undefined;
-    try {
-      result = await browser.tabs.sendMessage(tabId,{type:CHECK_TAB_MESSAGE,force}) as EligibilityResult | undefined;
-    } catch {
-      // Do not inject a second checker after a messaging failure.
-      renderEligibility({state:'unknown',plan:null,campaign:'unknown',reason:'Unable to reach the page checker. Reload ChatGPT after installing or updating the extension.'});
-      return;
-    }
+    const result = await browser.runtime.sendMessage({type:CHECK_POPUP_MESSAGE,tabId,force}) as EligibilityResult | undefined;
     renderEligibility(result);
     const detected = result?.detectedCountry;
     if (typeof detected === 'string' && /^[A-Z]{2}$/.test(detected) && !['ZZ','EU','XX'].includes(detected)) {
