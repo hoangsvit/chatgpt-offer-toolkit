@@ -14,7 +14,7 @@ interface PlusCheckoutConfig extends BillingConfig {
 export type CheckoutConfig = BusinessCheckoutConfig | PlusCheckoutConfig;
 export type CheckoutInput = (Omit<BusinessCheckoutConfig, "seats"> & { seats: number | string }) | PlusCheckoutConfig;
 export type CheckoutTotal = {currency: string; minorUnits: number};
-export type CheckoutResult = { url: string; error?: never; code?: never; total?: CheckoutTotal } | { error: string; url?: never; code?: "billing_country_mismatch"; total?: never };
+export type CheckoutResult = { url: string; error?: never; code?: never; total?: CheckoutTotal } | { error: string; url?: never; code?: "billing_country_mismatch" | "unusual_activity"; total?: never };
 
 export function validateConfig(input: CheckoutInput): CheckoutConfig {
   const country = input.country.trim().toUpperCase();
@@ -97,9 +97,12 @@ export async function requestCheckout(config: CheckoutConfig): Promise<CheckoutR
       body:JSON.stringify(payload)
     });
     if (!resp.ok) {
-      // Recognize only the known billing error; do not expose arbitrary server response bodies.
+      // Recognize only known safe errors; do not expose arbitrary server response bodies.
       if (resp.status === 400) {
         const failure = await resp.json().catch(() => null);
+        if (failure?.detail === "Our systems have detected unusual activity. Please try again later.") {
+          return {code:"unusual_activity",error:"ChatGPT declined checkout due to unusual activity (HTTP 400). Coupon eligibility does not guarantee checkout approval. Use the official ChatGPT page or contact support. No retry was made."};
+        }
         if (failure?.detail === "Billing country must match request country.") {
           return {code:"billing_country_mismatch",error:"Billing country does not match the country recognized by ChatGPT (HTTP 400). Confirm your actual billing country and currency on the official page. No retry was made."};
         }
