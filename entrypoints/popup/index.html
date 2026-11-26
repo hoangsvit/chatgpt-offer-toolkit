@@ -11,7 +11,7 @@
 <main>
 <div id="offer-view">
 <div class="connection" id="connection" data-state="loading" role="status"><span class="dot"></span><span id="connection-text">Checking active tab…</span></div>
-<section class="offer" aria-label="Campaign information"><div class="offer-top"><span>CHATGPT BUSINESS</span><button id="official" type="button" class="offer-link">Official offer <span aria-hidden="true">↗</span></button></div><h2>1 month free</h2><p>Subject to account eligibility</p><p id="claim-status" role="status" aria-live="polite" hidden></p></section>
+<section class="offer" aria-label="Campaign information"><div class="offer-top"><span>CHATGPT BUSINESS</span><button id="official" type="button" class="offer-link">Official offer <span aria-hidden="true">↗</span></button></div><h2>1 month free</h2><p id="claim-status" role="status" aria-live="polite" hidden></p></section>
 <section class="account-card" aria-label="Account eligibility">
   <div class="account-top">
     <div class="account-label"><span>Account eligibility</span><small>Personal plan · <strong id="eligibility-plan">—</strong></small></div>
@@ -24,6 +24,7 @@
     <summary><span class="account-chevron" aria-hidden="true"></span>Details</summary>
     <p id="eligibility-reason" class="hint" role="status" aria-live="polite">Checking your current personal workspace.</p>
     <p class="account-note">Final price confirmed at checkout.</p>
+    <div class="privacy"><svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-11V5l-8-3-8 3v6c0 7 8 11 8 11Z"/><path d="m9 12 2 2 4-4"/></svg><span>No stored tokens</span></div>
   </details>
 </section>
 <details class="advanced eligibility-section" id="price-panel" hidden><summary>Checkout price review <span id="price-state" data-state="unknown">Price unknown</span></summary>
@@ -41,7 +42,7 @@
 
 </div>
 <div id="settings-view" hidden>
-<h2 class="section-heading">Preferences</h2>
+<h2 class="sr-only">Preferences</h2>
 <details class="advanced" id="checkout-preferences" open><summary>Checkout defaults</summary><form id="settings">
   <div class="grid workspace-grid"><div><label for="workspace">Workspace</label><input id="workspace" required maxlength="100" value="MyTeam" autocomplete="off"></div>
   <div><label for="seats">Seats</label>
@@ -52,20 +53,22 @@
   </div>
   <p id="billing-suggestion" class="hint" role="status" aria-live="polite"></p>
   <div class="toggle-row"><span>Remember billing after link succeeds</span><input id="remember-billing" type="checkbox"></div>
-  <p class="hint">Confirm actual billing details before continuing.</p>
   <button id="generate" type="submit" disabled hidden><span id="generate-label">Generate checkout link</span></button>
 </form></details>
 <details class="advanced update-settings" id="update-center"><summary>Software updates <span id="update-dot" hidden>· New</span></summary>
+<div class="update-versions">
 <div class="update-row"><span>Current version</span><strong id="update-current"></strong></div>
 <div class="update-row"><span>Latest version</span><strong id="update-latest">—</strong></div>
+</div>
 <p class="hint" id="update-state" role="status" aria-live="polite">Loading…</p>
-<button id="update-download" type="button" class="primary" hidden>View release / download ↗</button>
 <div class="toggle-row"><span>Automatically check on ChatGPT (15 min cache)</span><input id="update-auto" type="checkbox" checked disabled></div>
+<div class="update-actions">
 <button id="update-check" type="button" class="secondary">Check for updates</button>
+<button id="update-download" type="button" class="primary" hidden>View release / download ↗</button>
+</div>
 <p class="hint update-note" id="update-note"></p>
 </details>
 </div>
-<div class="privacy"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-11V5l-8-3-8 3v6c0 7 8 11 8 11Z"/><path d="m9 12 2 2 4-4"/></svg><span>No stored tokens · Privacy first</span></div>
 </main>
 <footer><button id="github" type="button" class="text-button">GitHub ↗</button><button id="telegram" type="button" class="text-button">Telegram Support ↗</button><button id="eplus" type="button" class="text-button">ePlus.DEV ↗</button></footer>
 <script type="module" src="./main.ts"></script>

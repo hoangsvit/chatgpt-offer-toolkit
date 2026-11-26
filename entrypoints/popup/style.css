@@ -47,8 +47,6 @@ svg{flex-shrink:0;vertical-align:middle}
 .offer h2{font-size:26px;line-height:1.15;letter-spacing:-.8px;margin:4px 0}
 .offer p{font-size:11px}
 .checkout-section,.advanced{border:1px solid var(--border);background:var(--surface);border-radius:11px;padding:12px;margin-bottom:9px}
-.checkout-section h2,.section-heading{font-size:14px;font-weight:700;margin:0 0 11px}
-.section-heading{margin-top:3px}
 .grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px}
 .workspace-grid{grid-template-columns:minmax(0,1.15fr) minmax(0,1fr)}
 label{display:block;font-size:11px;font-weight:650;margin:0 0 5px}
@@ -82,44 +80,50 @@ input:read-only{background:var(--soft)}
 #result{margin-top:9px;border-top:1px solid var(--border);padding-top:10px}
 #result input{font-size:11px}
 .result-actions{gap:8px}
-.privacy{display:flex;justify-content:center;align-items:center;gap:5px;color:var(--muted-foreground);font-size:10px;margin:10px 0 8px}
+.privacy{display:flex;align-items:center;gap:5px;color:var(--muted-foreground);font-size:10px;margin-top:4px}
 .privacy svg{width:13px;height:13px}
 footer{display:flex;justify-content:space-between;align-items:center;gap:6px;border-top:1px solid var(--border);padding:3px 0 0}
 .text-button{border:0;background:transparent;color:var(--muted-foreground);padding:7px 0;font-size:10px;white-space:nowrap}
 .text-button:hover{color:var(--text);text-decoration:underline}
 
 /* Compact BeUI layout; local styles complement the vendored motion components. */
-html{width:384px;min-width:384px}body{padding:17px 18px 10px}
-.header{padding:0 0 13px;border-bottom:1px solid var(--border);margin-bottom:15px}
+html{width:384px;min-width:384px}body{padding:9px 16px 6px}
+.header{padding:0 0 8px;border-bottom:1px solid var(--border);margin-bottom:10px}
 .brand h1{font-size:16px}.brand span{font-size:11px}
 .settings-trigger{position:relative}.settings-trigger .nav-dot{position:absolute;right:1px;top:1px}
-.connection{margin:0 0 18px}
-.offer{background:none;color:var(--text);padding:0;margin-bottom:18px}
+.connection{margin:0 0 8px}
+.offer{background:none;color:var(--text);padding:0;margin-bottom:10px}
 .offer-top{font-size:10px;letter-spacing:1.4px;color:var(--muted-foreground)}
-.offer h2{font-size:33px;letter-spacing:-1.2px;margin:5px 0}
+.offer h2{font-size:29px;letter-spacing:-1px;margin:2px 0 3px}
 .offer p{color:var(--muted-foreground);font-size:12px}
-.eligibility-section{background:var(--soft);border:1px solid var(--border);margin-bottom:18px}
+.eligibility-section{background:var(--soft);border:1px solid var(--border);margin-bottom:10px}
 .eligibility-section summary{display:flex;align-items:center;justify-content:space-between;gap:5px;list-style:none;min-height:28px}
 .eligibility-section summary::-webkit-details-marker{display:none}
 .eligibility-section summary>span:first-child{font-size:12px;color:var(--text);float:none;max-width:none}
 .checkout-section{border:0;background:transparent;padding:0;margin-bottom:8px}
 #beui-generate button{min-height:44px}
-#settings-view .advanced{background:var(--surface)}
-#settings-view .section-heading{font-size:20px;letter-spacing:-.5px;margin:0 0 14px}
+#settings-view .advanced{background:var(--surface);padding:7px 10px;margin-bottom:6px}
+#settings-view .advanced[open] summary{margin-bottom:7px}
+#settings-view .hint{margin:4px 0 6px}
 #settings-view .advanced summary{font-size:13px}
+#settings-view .stepper,#settings-view .beui-field{margin-bottom:4px}
+.update-versions,.update-actions{display:flex;gap:8px}
+.update-versions .update-row{flex:1;flex-wrap:wrap;gap:2px 6px;margin-bottom:2px}
+.update-actions .beui-action{flex:1}
+.update-actions button{min-height:32px;height:auto;padding:6px;line-height:1.3;white-space:normal}
 #status{line-height:1.5}
-footer{margin-top:10px}.privacy{margin-top:15px}
+footer{margin-top:4px}
 
 /* Account status: one compact summary, optional diagnostics and icon-only refresh. */
-.account-card{border:1px solid var(--border);border-radius:12px;padding:12px;margin:0 0 18px;background:var(--surface)}
+.account-card{border:1px solid var(--border);border-radius:12px;padding:9px 10px;margin:0 0 10px;background:var(--surface)}
 .account-top{display:flex;align-items:center;gap:7px;min-width:0}
 .account-label{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px;font-size:12px;font-weight:650;line-height:1.4}
 .account-label small{font-size:10px;font-weight:400;color:var(--muted-foreground)}
 .account-label strong{font-weight:600;color:var(--text)}
 #beui-eligibility{min-width:0;flex-shrink:0}
 #beui-refresh{flex:none;display:flex;align-items:center}
-.account-details{margin-top:8px;border-top:1px solid var(--border)}
-.account-details summary{display:flex;align-items:center;gap:7px;min-height:28px;color:var(--muted-foreground);font-size:11px;cursor:pointer;list-style:none}
+.account-details{margin-top:4px;border-top:1px solid var(--border)}
+.account-details summary{display:flex;align-items:center;gap:7px;min-height:24px;color:var(--muted-foreground);font-size:11px;cursor:pointer;list-style:none}
 .account-details summary::-webkit-details-marker{display:none}
 .account-details summary:hover{color:var(--text)}
 .account-details summary:focus-visible{outline:2px solid var(--ring);outline-offset:2px;border-radius:4px}
@@ -142,7 +146,7 @@ footer{margin-top:10px}.privacy{margin-top:15px}
 /* The form controller owns the hidden native actions; beUI owns the visible controls. */
 .beui-native{display:none!important}
 .beui-action{display:inline-flex;min-width:0;align-items:center}
-.result-actions .beui-action,.update-settings>.beui-action{display:flex;width:100%;margin-bottom:6px}
+.result-actions .beui-action{display:flex;width:100%;margin-bottom:6px}
 .stepper .beui-field{flex:1;min-width:0}
 .beui-field{min-width:0;width:100%;margin:0 0 9px}
 .beui-field input{height:100%;border:0;background:transparent;margin:0;padding:0 10px;outline:none}

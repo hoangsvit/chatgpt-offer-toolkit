@@ -311,7 +311,7 @@ export function SelectTrigger({ className, labelId, children }: SelectTriggerPro
       className={cn(
         "relative z-10 flex w-full items-center justify-between gap-2 border border-border bg-background px-3 py-2 text-sm text-foreground outline-none transition-colors",
         "hover:border-(--color-border-strong) focus-visible:ring-2 focus-visible:ring-foreground/20",
-        "disabled:pointer-events-none disabled:opacity-50",
+        "disabled:cursor-not-allowed disabled:opacity-50",
         className,
       )}
     >
@@ -524,7 +524,7 @@ export function SelectItem({
           selected
             ? "bg-muted text-foreground"
             : "text-muted-foreground hover:bg-muted hover:text-foreground focus-visible:bg-muted",
-          "disabled:pointer-events-none disabled:opacity-50",
+          "disabled:cursor-not-allowed disabled:opacity-50",
           className,
         )}
       >

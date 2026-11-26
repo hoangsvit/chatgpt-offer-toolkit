@@ -23,15 +23,25 @@ enhanceFormControls();
 const generate = button('generate');
 function showView(view:'offer'|'settings') {
   const isOffer=view==='offer';
+  const changed=element('offer-view').hidden===isOffer;
   element('offer-view').hidden=!isOffer;
   element('settings-view').hidden=isOffer;
   button('view-offer').setAttribute('aria-pressed',String(isOffer));
   button('view-settings').setAttribute('aria-pressed',String(!isOffer));
   button('view-offer').hidden=isOffer;
   button('view-settings').hidden=!isOffer;
+  if (changed) window.scrollTo(0,0);
 }
 button('view-offer').addEventListener('click',()=>showView('offer'));
 button('view-settings').addEventListener('click',()=>showView('settings'));
+const checkoutPreferences=element<HTMLDetailsElement>('checkout-preferences');
+const softwareUpdates=element<HTMLDetailsElement>('update-center');
+checkoutPreferences.addEventListener('toggle',()=>{
+  if (checkoutPreferences.open) softwareUpdates.open=false;
+});
+softwareUpdates.addEventListener('toggle',()=>{
+  if (softwareUpdates.open) checkoutPreferences.open=false;
+});
 mountBeui(() => {
   const form=element<HTMLFormElement>('settings');
   if(!form.checkValidity()) {
@@ -221,7 +231,6 @@ async function runPriceReview() {
     }
     const panel=element<HTMLDetailsElement>('price-panel');
     panel.hidden=false;
-    panel.open=true;
     const [response] = await browser.scripting.executeScript({target:{tabId:tab.id},func:reviewCheckoutPrice});
     const result = response?.result as PriceReview | undefined;
     state.textContent = translate(result?.state === 'zero' ? 'Zero due today' : result?.state === 'paid' ? 'Paid checkout' : 'Price unknown');
@@ -369,7 +378,6 @@ async function loadUpdates() {
     field('update-auto').disabled = false;
     const [tab] = await browser.tabs.query({active:true,currentWindow:true});
     if(updateAuto && isChatGPTUrl(tab?.url)) updateState=normalizeUpdate(await browser.runtime.sendMessage(AUTO_CHECK_MESSAGE));
-    if(isNewer(updateState.latest,currentVersion)) element<HTMLDetailsElement>('update-center').open = true;
   } catch { updateState.error = 'Unable to load update settings.'; }
   renderUpdate();
 }
