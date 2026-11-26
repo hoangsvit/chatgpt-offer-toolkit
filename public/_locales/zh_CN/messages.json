@@ -1,0 +1,263 @@
+{
+  "saved_billing_preference_confirm_it_still_matches_your_actual_billing_details": {
+    "message": "请确认已保存的账单信息仍然准确。"
+  },
+  "select_your_actual_billing_country_its_local_currency_will_be_suggested": {
+    "message": "选择实际账单国家或地区以查看建议货币。"
+  },
+  "no_verified_response_review_the_official_offer_page": {
+    "message": "尚无已验证的响应。请查看官方优惠页面。"
+  },
+  "open_chatgpt_com_and_reopen_this_popup_to_check_eligibility": {
+    "message": "打开 chatgpt.com 后重新打开此弹窗，以检查资格。"
+  },
+  "link_copied_keep_it_private": {
+    "message": "链接已复制。请勿分享。"
+  },
+  "requesting_checkout_from_your_current_chatgpt_session": {
+    "message": "正在使用当前 ChatGPT 会话请求结账链接…"
+  },
+  "download_the_new_zip_extract_into_the_existing_extension_directory_then_reload_in_the_browser": {
+    "message": "下载新的 ZIP，解压到现有扩展目录，然后在浏览器中重新加载。"
+  },
+  "firefox_can_install_updates_automatically_for_signed_self_distributed_builds_temporary_builds_must_be_reloaded_manually": {
+    "message": "Firefox 可以自动更新已签名的自行分发版本。临时版本需要手动重新加载。"
+  },
+  "open_the_official_checkout_and_open_this_popup_only_the_displayed_due_today_total_is_reviewed": {
+    "message": "打开官方结账页面后打开此弹窗。仅检查显示的今日应付金额。"
+  },
+  "a_zero_total_does_not_verify_renewal_terms_or_activation_always_review_the_official_checkout_before_subscribing": {
+    "message": "总额为零并不代表续订条款或激活已确认。订阅前请检查官方结账页面。"
+  },
+  "locale_name": {
+    "message": "zh-CN"
+  },
+  "back_to_offer": {
+    "message": "返回优惠"
+  },
+  "settings": {
+    "message": "设置"
+  },
+  "update_available": {
+    "message": "有可用更新"
+  },
+  "checking_active_tab": {
+    "message": "正在检查当前标签页…"
+  },
+  "campaign_information": {
+    "message": "活动信息"
+  },
+  "official_offer": {
+    "message": "官方优惠"
+  },
+  "1_month_free": {
+    "message": "免费 1 个月"
+  },
+  "subject_to_account_eligibility": {
+    "message": "取决于账户资格"
+  },
+  "account_eligibility": {
+    "message": "账户资格"
+  },
+  "personal_plan": {
+    "message": "个人套餐"
+  },
+  "not_checked": {
+    "message": "尚未检查"
+  },
+  "check_eligibility": {
+    "message": "检查资格"
+  },
+  "check_eligibility_again": {
+    "message": "重新检查资格"
+  },
+  "check_again": {
+    "message": "重新检查"
+  },
+  "details": {
+    "message": "详情"
+  },
+  "checking_your_current_personal_workspace": {
+    "message": "正在检查个人工作区。"
+  },
+  "final_price_confirmed_at_checkout": {
+    "message": "最终价格以结账页面为准。"
+  },
+  "checkout_price_review": {
+    "message": "查看结账价格"
+  },
+  "price_unknown": {
+    "message": "价格未知"
+  },
+  "displayed_due_today": {
+    "message": "今日应付金额（显示值）"
+  },
+  "check_checkout_price": {
+    "message": "检查结账价格"
+  },
+  "create_checkout": {
+    "message": "创建结账链接"
+  },
+  "checkout_is_available_once_chatgpt_confirms_coupon_eligibility": {
+    "message": "ChatGPT 确认优惠券资格后即可创建结账链接。"
+  },
+  "checkout_link": {
+    "message": "结账链接"
+  },
+  "copy_link": {
+    "message": "复制链接"
+  },
+  "open_checkout": {
+    "message": "打开结账页面"
+  },
+  "preferences": {
+    "message": "偏好设置"
+  },
+  "checkout_defaults": {
+    "message": "结账默认设置"
+  },
+  "workspace": {
+    "message": "工作区"
+  },
+  "seats": {
+    "message": "席位数"
+  },
+  "decrease_seats": {
+    "message": "减少席位"
+  },
+  "increase_seats": {
+    "message": "增加席位"
+  },
+  "billing_country": {
+    "message": "账单国家或地区"
+  },
+  "currency": {
+    "message": "货币"
+  },
+  "select_country": {
+    "message": "选择国家或地区"
+  },
+  "select_currency": {
+    "message": "选择货币"
+  },
+  "remember_billing_after_link_succeeds": {
+    "message": "链接创建成功后记住账单信息"
+  },
+  "confirm_actual_billing_details_before_continuing": {
+    "message": "继续前请确认实际账单信息。"
+  },
+  "generate_checkout_link": {
+    "message": "生成结账链接"
+  },
+  "generating": {
+    "message": "正在生成…"
+  },
+  "software_updates": {
+    "message": "软件更新"
+  },
+  "new": {
+    "message": "新版本"
+  },
+  "current_version": {
+    "message": "当前版本"
+  },
+  "latest_version": {
+    "message": "最新版本"
+  },
+  "loading": {
+    "message": "正在加载…"
+  },
+  "view_release_download": {
+    "message": "查看版本／下载"
+  },
+  "automatically_check_on_chatgpt_15_min_cache": {
+    "message": "在 ChatGPT 上自动检查更新（缓存 15 分钟）"
+  },
+  "automatically_check_for_updates": {
+    "message": "自动检查更新"
+  },
+  "check_for_updates": {
+    "message": "检查更新"
+  },
+  "no_stored_tokens": {
+    "message": "不存储令牌"
+  },
+  "privacy_first": {
+    "message": "隐私优先"
+  },
+  "telegram_support": {
+    "message": "Telegram 支持"
+  },
+  "connected_to_chatgpt": {
+    "message": "已连接到 ChatGPT"
+  },
+  "open_chatgpt_com_to_generate_a_checkout_link": {
+    "message": "打开 chatgpt.com 以生成结账链接"
+  },
+  "coupon_eligible": {
+    "message": "符合优惠券资格"
+  },
+  "not_eligible": {
+    "message": "不符合资格"
+  },
+  "already_redeemed": {
+    "message": "已兑换"
+  },
+  "offer_not_listed": {
+    "message": "未列出优惠"
+  },
+  "unknown": {
+    "message": "未知"
+  },
+  "checking": {
+    "message": "正在检查…"
+  },
+  "switch_to_light_mode": {
+    "message": "切换到浅色模式"
+  },
+  "switch_to_dark_mode": {
+    "message": "切换到深色模式"
+  },
+  "zero_due_today": {
+    "message": "今日无需付款"
+  },
+  "paid_checkout": {
+    "message": "需要付款"
+  },
+  "checking_github_releases": {
+    "message": "正在检查 GitHub Releases…"
+  },
+  "you_are_up_to_date": {
+    "message": "已是最新版本。"
+  },
+  "no_stable_release_yet": {
+    "message": "暂无稳定版本。"
+  },
+  "not_checked_yet": {
+    "message": "尚未检查。"
+  },
+  "select_your_billing_country_and_currency_before_continuing": {
+    "message": "继续前请选择账单国家或地区和货币。"
+  },
+  "currency_is_a_local_suggestion_verify_the_currency_supported_by_chatgpt": {
+    "message": "货币仅供参考，请确认 ChatGPT 支持的货币。"
+  },
+  "sign_in_to_chatgpt_first": {
+    "message": "请先登录 ChatGPT。"
+  },
+  "the_server_reports_that_this_account_is_not_eligible": {
+    "message": "ChatGPT 显示此账户不符合资格。"
+  },
+  "the_server_reports_that_the_promotion_was_already_redeemed": {
+    "message": "ChatGPT 显示此优惠已兑换。"
+  },
+  "this_campaign_is_not_listed_for_the_default_personal_workspace_review_the_official_offer_page_for_a_definitive_result": {
+    "message": "默认个人工作区未列出此活动。请查看官方优惠页面以确认。"
+  },
+  "coupon_eligible_and_not_redeemed_seat_coverage_total_and_activation_are_not_verified": {
+    "message": "符合优惠券资格且尚未兑换。适用席位、总价和激活状态仍需确认。"
+  },
+  "extension_description": {
+    "message": "查看 ChatGPT Business 优惠并生成结账链接。由 ePlus.DEV 开发。"
+  }
+}

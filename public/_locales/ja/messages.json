@@ -1,0 +1,263 @@
+{
+  "saved_billing_preference_confirm_it_still_matches_your_actual_billing_details": {
+    "message": "保存済みの請求情報が正しいことを確認してください。"
+  },
+  "select_your_actual_billing_country_its_local_currency_will_be_suggested": {
+    "message": "実際の請求先の国を選ぶと、通貨の候補が表示されます。"
+  },
+  "no_verified_response_review_the_official_offer_page": {
+    "message": "確認済みの応答がありません。公式特典ページをご確認ください。"
+  },
+  "open_chatgpt_com_and_reopen_this_popup_to_check_eligibility": {
+    "message": "chatgpt.comを開き、このポップアップを開き直して対象状況を確認してください。"
+  },
+  "link_copied_keep_it_private": {
+    "message": "リンクをコピーしました。第三者と共有しないでください。"
+  },
+  "requesting_checkout_from_your_current_chatgpt_session": {
+    "message": "現在のChatGPTセッションで決済リンクを作成しています…"
+  },
+  "download_the_new_zip_extract_into_the_existing_extension_directory_then_reload_in_the_browser": {
+    "message": "新しいZIPを既存の拡張機能フォルダに展開し、ブラウザーで再読み込みしてください。"
+  },
+  "firefox_can_install_updates_automatically_for_signed_self_distributed_builds_temporary_builds_must_be_reloaded_manually": {
+    "message": "署名済みの自己配布版はFirefoxが自動更新できます。一時版は手動で再読み込みしてください。"
+  },
+  "open_the_official_checkout_and_open_this_popup_only_the_displayed_due_today_total_is_reviewed": {
+    "message": "公式の決済画面でこのポップアップを開いてください。本日の支払額のみを確認します。"
+  },
+  "a_zero_total_does_not_verify_renewal_terms_or_activation_always_review_the_official_checkout_before_subscribing": {
+    "message": "合計が0でも更新条件や利用開始は確定しません。契約前に公式の決済画面を確認してください。"
+  },
+  "locale_name": {
+    "message": "ja"
+  },
+  "back_to_offer": {
+    "message": "特典に戻る"
+  },
+  "settings": {
+    "message": "設定"
+  },
+  "update_available": {
+    "message": "アップデートがあります"
+  },
+  "checking_active_tab": {
+    "message": "現在のタブを確認中…"
+  },
+  "campaign_information": {
+    "message": "キャンペーン情報"
+  },
+  "official_offer": {
+    "message": "公式特典"
+  },
+  "1_month_free": {
+    "message": "1か月無料"
+  },
+  "subject_to_account_eligibility": {
+    "message": "対象アカウントのみ"
+  },
+  "account_eligibility": {
+    "message": "アカウントの対象状況"
+  },
+  "personal_plan": {
+    "message": "個人プラン"
+  },
+  "not_checked": {
+    "message": "未確認"
+  },
+  "check_eligibility": {
+    "message": "対象か確認する"
+  },
+  "check_eligibility_again": {
+    "message": "対象状況を再確認"
+  },
+  "check_again": {
+    "message": "再確認"
+  },
+  "details": {
+    "message": "詳細"
+  },
+  "checking_your_current_personal_workspace": {
+    "message": "個人用ワークスペースを確認しています。"
+  },
+  "final_price_confirmed_at_checkout": {
+    "message": "最終価格は決済画面で確認できます。"
+  },
+  "checkout_price_review": {
+    "message": "決済価格の確認"
+  },
+  "price_unknown": {
+    "message": "価格不明"
+  },
+  "displayed_due_today": {
+    "message": "本日の支払額（表示）"
+  },
+  "check_checkout_price": {
+    "message": "決済価格を確認"
+  },
+  "create_checkout": {
+    "message": "決済リンクを作成"
+  },
+  "checkout_is_available_once_chatgpt_confirms_coupon_eligibility": {
+    "message": "ChatGPTがクーポンの対象と確認すると、決済リンクを作成できます。"
+  },
+  "checkout_link": {
+    "message": "決済リンク"
+  },
+  "copy_link": {
+    "message": "リンクをコピー"
+  },
+  "open_checkout": {
+    "message": "決済画面を開く"
+  },
+  "preferences": {
+    "message": "環境設定"
+  },
+  "checkout_defaults": {
+    "message": "決済の初期設定"
+  },
+  "workspace": {
+    "message": "ワークスペース"
+  },
+  "seats": {
+    "message": "シート数"
+  },
+  "decrease_seats": {
+    "message": "シート数を減らす"
+  },
+  "increase_seats": {
+    "message": "シート数を増やす"
+  },
+  "billing_country": {
+    "message": "請求先の国"
+  },
+  "currency": {
+    "message": "通貨"
+  },
+  "select_country": {
+    "message": "国を選択"
+  },
+  "select_currency": {
+    "message": "通貨を選択"
+  },
+  "remember_billing_after_link_succeeds": {
+    "message": "リンク作成後に請求先情報を保存"
+  },
+  "confirm_actual_billing_details_before_continuing": {
+    "message": "続行する前に実際の請求情報を確認してください。"
+  },
+  "generate_checkout_link": {
+    "message": "決済リンクを作成"
+  },
+  "generating": {
+    "message": "作成中…"
+  },
+  "software_updates": {
+    "message": "アップデート"
+  },
+  "new": {
+    "message": "新着"
+  },
+  "current_version": {
+    "message": "現在のバージョン"
+  },
+  "latest_version": {
+    "message": "最新バージョン"
+  },
+  "loading": {
+    "message": "読み込み中…"
+  },
+  "view_release_download": {
+    "message": "リリースを表示／ダウンロード"
+  },
+  "automatically_check_on_chatgpt_15_min_cache": {
+    "message": "ChatGPTで自動確認（15分キャッシュ）"
+  },
+  "automatically_check_for_updates": {
+    "message": "アップデートを自動確認"
+  },
+  "check_for_updates": {
+    "message": "アップデートを確認"
+  },
+  "no_stored_tokens": {
+    "message": "トークンを保存しません"
+  },
+  "privacy_first": {
+    "message": "プライバシーを重視"
+  },
+  "telegram_support": {
+    "message": "Telegramサポート"
+  },
+  "connected_to_chatgpt": {
+    "message": "ChatGPTに接続済み"
+  },
+  "open_chatgpt_com_to_generate_a_checkout_link": {
+    "message": "chatgpt.comを開いて決済リンクを作成してください"
+  },
+  "coupon_eligible": {
+    "message": "クーポン対象"
+  },
+  "not_eligible": {
+    "message": "対象外"
+  },
+  "already_redeemed": {
+    "message": "利用済み"
+  },
+  "offer_not_listed": {
+    "message": "特典の表示なし"
+  },
+  "unknown": {
+    "message": "不明"
+  },
+  "checking": {
+    "message": "確認中…"
+  },
+  "switch_to_light_mode": {
+    "message": "ライトモードに切り替え"
+  },
+  "switch_to_dark_mode": {
+    "message": "ダークモードに切り替え"
+  },
+  "zero_due_today": {
+    "message": "本日の支払いなし"
+  },
+  "paid_checkout": {
+    "message": "支払いが必要"
+  },
+  "checking_github_releases": {
+    "message": "GitHub Releasesを確認中…"
+  },
+  "you_are_up_to_date": {
+    "message": "最新バージョンです。"
+  },
+  "no_stable_release_yet": {
+    "message": "安定版はまだありません。"
+  },
+  "not_checked_yet": {
+    "message": "まだ確認していません。"
+  },
+  "select_your_billing_country_and_currency_before_continuing": {
+    "message": "続行する前に請求先の国と通貨を選択してください。"
+  },
+  "currency_is_a_local_suggestion_verify_the_currency_supported_by_chatgpt": {
+    "message": "通貨は候補です。ChatGPTで利用できる通貨を確認してください。"
+  },
+  "sign_in_to_chatgpt_first": {
+    "message": "先にChatGPTにログインしてください。"
+  },
+  "the_server_reports_that_this_account_is_not_eligible": {
+    "message": "このアカウントは対象外とChatGPTが報告しました。"
+  },
+  "the_server_reports_that_the_promotion_was_already_redeemed": {
+    "message": "この特典は利用済みとChatGPTが報告しました。"
+  },
+  "this_campaign_is_not_listed_for_the_default_personal_workspace_review_the_official_offer_page_for_a_definitive_result": {
+    "message": "既定の個人用ワークスペースに特典が表示されていません。公式ページで確認してください。"
+  },
+  "coupon_eligible_and_not_redeemed_seat_coverage_total_and_activation_are_not_verified": {
+    "message": "クーポン対象で未使用です。適用シート数、合計額、利用開始は未確認です。"
+  },
+  "extension_description": {
+    "message": "ChatGPT Businessの特典を確認し、決済リンクを作成します。開発元はePlus.DEVです。"
+  }
+}

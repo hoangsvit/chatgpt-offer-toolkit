@@ -2,9 +2,15 @@
 
 # ChatGPT Offer Toolkit
 
+[![Download for Chrome](https://img.shields.io/github/v/release/hoangsvit/chatgpt-offer-toolkit?label=Download%20Chrome&logo=googlechrome&logoColor=white&color=4285F4)](https://github.com/hoangsvit/chatgpt-offer-toolkit/releases/latest/download/chrome.zip)
+[![Download for Edge](https://img.shields.io/github/v/release/hoangsvit/chatgpt-offer-toolkit?label=Download%20Edge&color=0078D4)](https://github.com/hoangsvit/chatgpt-offer-toolkit/releases/latest/download/chrome.zip)
+[![Download Firefox test build](https://img.shields.io/github/v/release/hoangsvit/chatgpt-offer-toolkit?label=Download%20Firefox%20test&logo=firefoxbrowser&logoColor=white&color=E66000)](https://github.com/hoangsvit/chatgpt-offer-toolkit/releases/latest/download/firefox-unsigned.zip)
+
 A Chrome, Edge, and Firefox extension for checking ChatGPT Business offer eligibility and generating a checkout link when ChatGPT confirms the offer. Built by [ePlus.DEV](https://eplus.dev) as an independent project.
 
-[Download the latest release](https://github.com/hoangsvit/chatgpt-offer-toolkit/releases/latest) · [Report an issue](https://github.com/hoangsvit/chatgpt-offer-toolkit/issues/new/choose) · [Contribute](CONTRIBUTING.md)
+The popup follows the browser language. It supports English, Vietnamese, Spanish, Brazilian Portuguese, French, Japanese, and Simplified Chinese. Some detailed error messages use English.
+
+[Release notes and all downloads](https://github.com/hoangsvit/chatgpt-offer-toolkit/releases/latest) · [Report an issue](https://github.com/hoangsvit/chatgpt-offer-toolkit/issues/new/choose) · [Contribute](CONTRIBUTING.md)
 
 ## Install
 

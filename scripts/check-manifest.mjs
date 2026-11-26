@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { readFileSync, existsSync } from 'node:fs';
+import { readFileSync, existsSync, readdirSync } from 'node:fs';
 const browser = process.argv[2];
 assert.ok(['chrome', 'firefox'].includes(browser));
 const directory = '.output/' + browser + '-mv3/';
@@ -15,7 +15,19 @@ for (const script of manifest.content_scripts) {
   for (const file of script.js ?? []) assert.ok(existsSync(directory + file));
 }
 assert.equal(typeof manifest.description, 'string');
-assert.ok(manifest.description.includes('ePlus.DEV') && manifest.description.length <= 132);
+assert.equal(manifest.default_locale, 'en');
+assert.equal(manifest.description, '__MSG_extension_description__');
+const readMessages = locale => JSON.parse(readFileSync(directory + '_locales/' + locale + '/messages.json', 'utf8'));
+const defaultMessages = readMessages('en');
+assert.ok(defaultMessages.extension_description.message.includes('ePlus.DEV'));
+const languages = readdirSync(directory + '_locales');
+for (const language of ['en','es','fr','ja','pt_BR','vi','zh_CN']) assert.ok(languages.includes(language));
+for (const language of languages) {
+  const messages = readMessages(language);
+  assert.deepEqual(Object.keys(messages).sort(), Object.keys(defaultMessages).sort(), 'Missing translations in ' + language);
+  assert.ok(Object.values(messages).every(({message}) => typeof message === 'string' && message.trim()));
+  assert.ok(messages.extension_description.message.length <= 132);
+}
 for (const size of [16,32,48,96,128]) {
   const path = manifest.icons?.[String(size)];
   assert.ok(path, 'Missing extension icon '+size);

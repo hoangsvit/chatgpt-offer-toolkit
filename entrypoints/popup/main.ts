@@ -9,6 +9,7 @@ import { CHECK_POPUP_MESSAGE, isChatGPTUrl } from '../../utils/eligibility-badge
 import type { EligibilityResult } from '../../utils/eligibility';
 import { currencyForCountry, BILLING_PREFERENCE_KEY, parseBillingPreference } from '../../utils/billing-locale';
 import { OFFER_URL, EPLUS_URL, SUPPORT_URL } from '../../utils/links';
+import { localizePopup, translate, uiLocale } from './i18n';
 
 function element<T extends HTMLElement = HTMLElement>(id: string): T {
   const node = document.getElementById(id);
@@ -17,6 +18,7 @@ function element<T extends HTMLElement = HTMLElement>(id: string): T {
 }
 const field = (id: string) => element<HTMLInputElement>(id);
 const button = (id: string) => element<HTMLButtonElement>(id);
+localizePopup();
 enhanceFormControls();
 const generate = button('generate');
 function showView(view:'offer'|'settings') {
@@ -37,7 +39,7 @@ mountBeui(() => {
     element<HTMLDetailsElement>('checkout-preferences').open=true;
     const invalid = form.querySelector<HTMLInputElement>('input:invalid');
     if (invalid?.id === 'country' || invalid?.id === 'currency') {
-      billingHint.textContent = 'Select your billing country and currency before continuing.';
+      billingHint.textContent = translate('Select your billing country and currency before continuing.');
       invalid.nextElementSibling?.querySelector('button')?.focus();
     } else form.reportValidity();
     return;
@@ -62,9 +64,9 @@ async function loadBillingPreference() {
       currencyField.value = savedBilling.currency;
       syncBillingSelects();
       rememberBilling.checked = true;
-      billingHint.textContent = 'Saved billing preference. Confirm it still matches your actual billing details.';
+      billingHint.textContent = translate('Saved billing preference. Confirm it still matches your actual billing details.');
     } else {
-      billingHint.textContent = 'Select your actual billing country. Its local currency will be suggested.';
+      billingHint.textContent = translate('Select your actual billing country. Its local currency will be suggested.');
     }
     syncBeuiSwitches();
   } catch { /* ignore */ }
@@ -85,7 +87,7 @@ countryField.addEventListener('input', () => {
   billingEdited = true;
   currencyField.value = currencyForCountry(countryField.value) ?? '';
   syncBillingSelects();
-  billingHint.textContent = 'Currency is a local suggestion. Verify the currency supported by ChatGPT.';
+  billingHint.textContent = translate('Currency is a local suggestion. Verify the currency supported by ChatGPT.');
 });
 let currentUrl: string | null = null;
 let busy = false;
@@ -97,7 +99,7 @@ const eligibilityButton = button('eligibility-check');
 element('version').textContent = 'v' + browser.runtime.getManifest().version;
 function status(message: string) {
   const node = element('status');
-  node.textContent = message;
+  node.textContent = translate(message);
   node.hidden = !message;
 }
 function resetResult() {
@@ -136,8 +138,10 @@ function renderConnection(ready: boolean) {
     eligibleTabId = null;
   }
   element('connection').dataset.state = ready ? 'ready' : 'unavailable';
-  const connected = accountLabel ? 'Connected to ChatGPT · ' + accountLabel : 'Connected to ChatGPT';
-  element('connection-text').textContent = ready ? connected : 'Open chatgpt.com to generate a checkout link';
+  const connected = translate('Connected to ChatGPT');
+  element('connection-text').textContent = ready
+    ? connected + (accountLabel ? ' · ' + accountLabel : '')
+    : translate('Open chatgpt.com to generate a checkout link');
   generate.disabled = busy || !tabReady || eligibilityBusy || eligibleTabId === null;
   element('checkout-eligibility-hint').hidden = !tabReady || busy || eligibilityBusy || eligibleTabId !== null;
   eligibilityButton.disabled = busy || !tabReady || eligibilityBusy;
@@ -146,10 +150,10 @@ function renderEligibility(value: EligibilityResult | undefined) {
   const state = element('eligibility-state');
   const labels = {eligible:'Coupon eligible',not_eligible:'Not eligible',unknown:'Unknown',redeemed:'Already redeemed'};
   state.dataset.state = value?.state ?? 'unknown';
-  state.textContent = value?.state === 'unknown' && value.campaign === 'not_listed'
-    ? 'Offer not listed' : value ? labels[value.state] : 'Unknown';
+  state.textContent = translate(value?.state === 'unknown' && value.campaign === 'not_listed'
+    ? 'Offer not listed' : value ? labels[value.state] : 'Unknown');
   element('eligibility-plan').textContent = value?.plan ? value.plan.charAt(0).toUpperCase() + value.plan.slice(1) : '—';
-  element('eligibility-reason').textContent = value?.reason ?? 'No verified response. Review the official offer page.';
+  element('eligibility-reason').textContent = translate(value?.reason ?? 'No verified response. Review the official offer page.');
 }
 async function runEligibilityCheck(force = false) {
   if (busy || eligibilityBusy) return;
@@ -159,15 +163,15 @@ async function runEligibilityCheck(force = false) {
   accountLabel = undefined;
   eligibilityButton.disabled = true;
   generate.disabled = true;
-  eligibilityButton.textContent = 'Checking…';
+  eligibilityButton.textContent = translate('Checking…');
   renderEligibility({state:'unknown',plan:null,campaign:'unknown',reason:'Checking your current personal workspace…'});
-  element('eligibility-state').textContent = 'Checking…';
+  element('eligibility-state').textContent = translate('Checking…');
   try {
     const tabId = await getActiveChatGPTTab();
     renderConnection(tabId !== null);
     if (tabId === null) {
       renderEligibility({state:'unknown',plan:null,campaign:'unknown',reason:'Open chatgpt.com and reopen this popup to check eligibility.'});
-      element('eligibility-state').textContent = 'Not checked';
+      element('eligibility-state').textContent = translate('Not checked');
       return;
     }
     const result = await browser.runtime.sendMessage({type:CHECK_POPUP_MESSAGE,tabId,force}) as EligibilityResult | undefined;
@@ -189,7 +193,7 @@ async function runEligibilityCheck(force = false) {
   } catch { renderEligibility(undefined); }
   finally {
     eligibilityBusy = false;
-    eligibilityButton.textContent = 'Check again';
+    eligibilityButton.textContent = translate('Check again');
     renderConnection(tabReady);
   }
 }
@@ -205,14 +209,14 @@ async function runPriceReview() {
   const state = element('price-state');
   const amount = element('price-amount');
   const reason = element('price-reason');
-  state.textContent = 'Checking…'; state.dataset.state = 'unknown'; amount.textContent = '—';
+  state.textContent = translate('Checking…'); state.dataset.state = 'unknown'; amount.textContent = '—';
   try {
     const [tab] = await browser.tabs.query({active:true,currentWindow:true});
     const url = tab?.url ? new URL(tab.url) : null;
     if (tab?.id == null || !url || !(url.origin === 'https://chatgpt.com' && /^\/(checkout|payments\/checkout)(\/|$)/.test(url.pathname))) {
       element('price-panel').hidden = true;
-      state.textContent = 'Price unknown';
-      reason.textContent = 'Open a checkout on chatgpt.com. External payment pages are not read by this extension.';
+      state.textContent = translate('Price unknown');
+      reason.textContent = translate('Open a checkout on chatgpt.com. External payment pages are not read by this extension.');
       return;
     }
     const panel=element<HTMLDetailsElement>('price-panel');
@@ -220,13 +224,13 @@ async function runPriceReview() {
     panel.open=true;
     const [response] = await browser.scripting.executeScript({target:{tabId:tab.id},func:reviewCheckoutPrice});
     const result = response?.result as PriceReview | undefined;
-    state.textContent = result?.state === 'zero' ? 'Zero due today' : result?.state === 'paid' ? 'Paid checkout' : 'Price unknown';
+    state.textContent = translate(result?.state === 'zero' ? 'Zero due today' : result?.state === 'paid' ? 'Paid checkout' : 'Price unknown');
     state.dataset.state = result?.state === 'zero' ? 'eligible' : result?.state === 'paid' ? 'not_eligible' : 'unknown';
     amount.textContent = result?.amount ?? '—';
-    reason.textContent = result?.reason ?? 'No readable price. Review the official checkout manually.';
+    reason.textContent = translate(result?.reason ?? 'No readable price. Review the official checkout manually.');
   } catch {
-    state.textContent = 'Price unknown';
-    reason.textContent = 'Unable to read this checkout. Review the official total manually.';
+    state.textContent = translate('Price unknown');
+    reason.textContent = translate('Unable to read this checkout. Review the official total manually.');
   } finally {
     priceBusy = false;
     button('price-check').disabled = false;
@@ -247,7 +251,7 @@ element<HTMLFormElement>('settings').addEventListener('submit', async event => {
   busy = true;
   generate.disabled = true;
   eligibilityButton.disabled = true;
-  element('generate-label').textContent = 'Generating…';
+  element('generate-label').textContent = translate('Generating…');
   const controls = ['workspace','seats','country','currency','minus','plus','remember-billing'];
   for (const id of controls) element<HTMLInputElement | HTMLButtonElement>(id).disabled = true;
   status('Requesting checkout from your current ChatGPT session…');
@@ -268,7 +272,7 @@ element<HTMLFormElement>('settings').addEventListener('submit', async event => {
         billingEdited = true;
         showView('settings');
         element<HTMLDetailsElement>('checkout-preferences').open=true;
-        billingHint.textContent = 'Saved billing preference cleared. Correct the actual country and currency before trying again.';
+        billingHint.textContent = translate('Saved billing preference cleared. Correct the actual country and currency before trying again.');
       }
       status(result?.error || 'No checkout response received.');
       return;
@@ -307,7 +311,7 @@ element<HTMLFormElement>('settings').addEventListener('submit', async event => {
   finally {
     busy = false;
     renderConnection(tabReady);
-    element('generate-label').textContent = 'Generate checkout link';
+    element('generate-label').textContent = translate('Generate checkout link');
     for (const id of controls) element<HTMLInputElement | HTMLButtonElement>(id).disabled = false;
     syncSeats();
   }
@@ -325,7 +329,7 @@ button('official').addEventListener('click', () => {
   const message = element('claim-status');
   message.hidden = true;
   void browser.tabs.create({url: OFFER_URL}).catch(() => {
-    message.textContent = 'Unable to open the offer page. Please try again.';
+    message.textContent = translate('Unable to open the offer page. Please try again.');
     message.hidden = false;
   });
 });
@@ -341,9 +345,9 @@ let updateState: UpdateState = normalizeUpdate(undefined);
 let checkingUpdate = false;
 let updateAuto = true;
 element('update-current').textContent = 'v' + currentVersion;
-element('update-note').textContent = import.meta.env.FIREFOX
+element('update-note').textContent = translate(import.meta.env.FIREFOX
   ? 'Firefox can install updates automatically for signed self-distributed builds. Temporary builds must be reloaded manually.'
-  : 'Download the new ZIP, extract into the existing extension directory, then reload in the browser.';
+  : 'Download the new ZIP, extract into the existing extension directory, then reload in the browser.');
 function renderUpdate() {
   const newer = isNewer(updateState.latest,currentVersion);
   element('update-latest').textContent = updateState.latest ? 'v'+updateState.latest : '—';
@@ -353,9 +357,10 @@ function renderUpdate() {
   button('update-check').disabled = checkingUpdate;
   field('update-auto').checked = updateAuto;
   syncBeuiSwitches();
-  element('update-state').textContent = checkingUpdate ? 'Checking GitHub Releases…' :
-    updateState.error ?? (newer ? 'Update available.' : updateState.latest ? 'You are up to date.' : updateState.checkedAt ? 'No stable release yet.' : 'Not checked yet.') +
-    (updateState.checkedAt ? ' · '+new Date(updateState.checkedAt).toLocaleString() : '');
+  const message = checkingUpdate ? 'Checking GitHub Releases…' :
+    updateState.error ?? (newer ? 'Update available' : updateState.latest ? 'You are up to date.' : updateState.checkedAt ? 'No stable release yet.' : 'Not checked yet.');
+  element('update-state').textContent = translate(message) +
+    (!checkingUpdate && updateState.checkedAt ? ' · '+new Date(updateState.checkedAt).toLocaleString(uiLocale) : '');
 }
 async function loadUpdates() {
   try {

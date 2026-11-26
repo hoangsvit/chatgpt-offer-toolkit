@@ -7,6 +7,7 @@ import { type ComponentPropsWithoutRef, useEffect, useState } from "react";
 import { ActionSwapIcon } from "./action-swap";
 import { cn } from "./utils";
 import { Tooltip } from "./tooltip";
+import { translate } from "../i18n";
 
 export type ThemeVariant = "rectangle" | "circle" | "circle-blur" | "blinds";
 
@@ -114,7 +115,7 @@ export function ThemeToggle({
 }: ThemeToggleProps) {
   const t = { ...themeToggleMessages, ...labels };
   const { isDark, mounted, toggle } = useThemeToggle({ variant, start });
-  const label = t[mounted && isDark ? "switchToLight" : "switchToDark"];
+  const label = translate(t[mounted && isDark ? "switchToLight" : "switchToDark"]);
 
   return (
     <Tooltip content={label} side="bottom"><button

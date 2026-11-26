@@ -10,13 +10,14 @@ import { initTheme } from './extension-theme';
 import { AnimatedBadge, type AnimatedBadgeStatus } from './animated-badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './select';
 import { Tooltip } from './tooltip';
+import { translate, uiLocale } from '../i18n';
 
 const BILLING_SYNC_EVENT = 'offer-toolkit-billing-sync';
 export function syncBillingSelects() { document.dispatchEvent(new Event(BILLING_SYNC_EVENT)); }
 
 function billingOptions(id: 'country' | 'currency') {
   if (id === 'currency') return Intl.supportedValuesOf('currency').map(code => ({ code, label: code }));
-  const displayNames = new Intl.DisplayNames(['en'], { type: 'region', fallback: 'none' });
+  const displayNames = new Intl.DisplayNames([uiLocale], { type: 'region', fallback: 'none' });
   const options = [];
   for (const first of 'ABCDEFGHIJKLMNOPQRSTUVWXYZ') {
     for (const second of 'ABCDEFGHIJKLMNOPQRSTUVWXYZ') {
@@ -25,7 +26,7 @@ function billingOptions(id: 'country' | 'currency') {
       if (name && !['EU','EZ','UN','ZZ','XX'].includes(code)) options.push({ code, label: `${name} (${code})` });
     }
   }
-  return options.sort((a,b) => a.label.localeCompare(b.label,'en'));
+  return options.sort((a,b) => a.label.localeCompare(b.label,uiLocale));
 }
 
 function BillingSelect({native,id}:{native:HTMLInputElement;id:'country'|'currency'}) {
@@ -51,7 +52,7 @@ function BillingSelect({native,id}:{native:HTMLInputElement;id:'country'|'curren
     native.dispatchEvent(new Event('input',{bubbles:true}));
   }}>
     <SelectTrigger labelId={`${id}-label`} className="h-9 px-2.5 text-xs">
-      <SelectValue className="truncate" placeholder={id === 'country' ? 'Select country' : 'Select currency'}/>
+      <SelectValue className="truncate" placeholder={translate(id === 'country' ? 'Select country' : 'Select currency')}/>
     </SelectTrigger>
     <SelectContent>
       {state.value && !selected && <SelectItem value={state.value}>{state.value}</SelectItem>}
@@ -63,7 +64,7 @@ function BillingSelect({native,id}:{native:HTMLInputElement;id:'country'|'curren
 function Generate({submit}:{submit:()=>void}) {
   const native=document.getElementById('generate') as HTMLButtonElement;
   const label=document.getElementById('generate-label')!;
-  const read=()=>({disabled:native.disabled,label:label.textContent||'Generate checkout'});
+  const read=()=>({disabled:native.disabled,label:label.textContent||translate('Generate checkout link')});
   const [value,setValue]=useState(read);
   useEffect(()=>{
     const observer=new MutationObserver(()=>setValue(read()));
@@ -77,7 +78,7 @@ function Generate({submit}:{submit:()=>void}) {
 }
 function EligibilityBadge() {
   const node=document.getElementById('eligibility-state')!;
-  const read=()=>({text:node.textContent||'Unknown',state:node.dataset.state});
+  const read=()=>({text:node.textContent||translate('Unknown'),state:node.dataset.state});
   const [value,setValue]=useState(read);
   useEffect(()=>{
     const observer=new MutationObserver(()=>setValue(read()));
@@ -85,12 +86,12 @@ function EligibilityBadge() {
     setValue(read());
     return ()=>observer.disconnect();
   },[]);
-  const status:AnimatedBadgeStatus=value.text==='Checking…'?'loading':value.state==='eligible'?'success':value.state==='not_eligible'?'danger':value.state==='redeemed'?'warning':'neutral';
+  const status:AnimatedBadgeStatus=value.text===translate('Checking…')?'loading':value.state==='eligible'?'success':value.state==='not_eligible'?'danger':value.state==='redeemed'?'warning':'neutral';
   return <AnimatedBadge status={status} size="sm" pulse={false} aria-hidden="true">{value.text}</AnimatedBadge>;
 }
 function RefreshEligibility() {
   const native=document.getElementById('eligibility-check') as HTMLButtonElement;
-  const read=()=>({disabled:native.disabled,checking:native.textContent==='Checking…'});
+  const read=()=>({disabled:native.disabled,checking:native.textContent===translate('Checking…')});
   const [value,setValue]=useState(read);
   useEffect(()=>{
     const observer=new MutationObserver(()=>setValue(read()));
@@ -98,8 +99,9 @@ function RefreshEligibility() {
     setValue(read());
     return ()=>observer.disconnect();
   },[]);
-  return <Tooltip content="Check eligibility again" side="bottom"><Button variant="ghost" size="icon" disabled={value.disabled}
-    aria-label="Check eligibility again"
+  const label=translate('Check eligibility again');
+  return <Tooltip content={label} side="bottom"><Button variant="ghost" size="icon" disabled={value.disabled}
+    aria-label={label}
     onClick={()=>{if(!native.disabled)native.click()}}>
     <RefreshCw size={15} aria-hidden="true" className={value.checking?'animate-spin':undefined}/>
   </Button></Tooltip>;
@@ -145,7 +147,7 @@ function NativeAction({native,id,host}:{native:HTMLButtonElement;id:keyof typeof
     aria-label={label} aria-controls={native.getAttribute('aria-controls')||undefined} aria-pressed={state.pressed===null?undefined:state.pressed==='true'} title={onlyIcon?undefined:native.title||undefined}
     onClick={()=>{if(!native.disabled&&!native.hidden)native.click()}}>
     {!onlyIcon&&<span>{state.label}</span>}<Icon size={onlyIcon?17:13} aria-hidden="true"/>
-    {state.dot&&<span className="absolute right-0 top-0 size-2 rounded-full bg-primary" aria-label="Update available"/>}
+    {state.dot&&<span className="absolute right-0 top-0 size-2 rounded-full bg-primary" aria-label={translate('Update available')}/>}
   </Button>;
   return onlyIcon ? <Tooltip content={label} side="bottom">{action}</Tooltip> : action;
 }
@@ -186,6 +188,6 @@ export function enhanceFormControls(){
   for(const [id,label] of [['remember-billing','Remember billing after link succeeds'],['update-auto','Automatically check for updates']] as const){
     const native=document.getElementById(id) as HTMLInputElement;
     const host=document.createElement('span');native.after(host);native.classList.add('beui-native');
-    flushSync(()=>createRoot(host).render(<NativeSwitch native={native} label={label}/>));
+    flushSync(()=>createRoot(host).render(<NativeSwitch native={native} label={translate(label)}/>));
   }
 }

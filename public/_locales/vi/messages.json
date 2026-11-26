@@ -1,0 +1,263 @@
+{
+  "saved_billing_preference_confirm_it_still_matches_your_actual_billing_details": {
+    "message": "Đã lưu tùy chọn thanh toán. Hãy xác nhận thông tin vẫn chính xác."
+  },
+  "select_your_actual_billing_country_its_local_currency_will_be_suggested": {
+    "message": "Chọn quốc gia thanh toán thực tế để xem tiền tệ gợi ý."
+  },
+  "no_verified_response_review_the_official_offer_page": {
+    "message": "Chưa có phản hồi xác minh. Hãy xem trang ưu đãi chính thức."
+  },
+  "open_chatgpt_com_and_reopen_this_popup_to_check_eligibility": {
+    "message": "Mở chatgpt.com rồi mở lại popup để kiểm tra điều kiện."
+  },
+  "link_copied_keep_it_private": {
+    "message": "Đã sao chép liên kết. Hãy giữ riêng tư."
+  },
+  "requesting_checkout_from_your_current_chatgpt_session": {
+    "message": "Đang yêu cầu liên kết thanh toán từ phiên ChatGPT hiện tại…"
+  },
+  "download_the_new_zip_extract_into_the_existing_extension_directory_then_reload_in_the_browser": {
+    "message": "Tải ZIP mới, giải nén vào thư mục extension hiện tại, rồi tải lại trong trình duyệt."
+  },
+  "firefox_can_install_updates_automatically_for_signed_self_distributed_builds_temporary_builds_must_be_reloaded_manually": {
+    "message": "Firefox có thể tự cập nhật bản tự phân phối đã ký. Hãy tải lại bản tạm thời theo cách thủ công."
+  },
+  "open_the_official_checkout_and_open_this_popup_only_the_displayed_due_today_total_is_reviewed": {
+    "message": "Mở trang thanh toán chính thức rồi mở popup. Extension chỉ đọc số tiền phải trả hôm nay đang hiển thị."
+  },
+  "a_zero_total_does_not_verify_renewal_terms_or_activation_always_review_the_official_checkout_before_subscribing": {
+    "message": "Tổng tiền bằng 0 chưa xác nhận điều khoản gia hạn hoặc kích hoạt. Hãy xem trang thanh toán chính thức trước khi đăng ký."
+  },
+  "locale_name": {
+    "message": "vi"
+  },
+  "back_to_offer": {
+    "message": "Quay lại ưu đãi"
+  },
+  "settings": {
+    "message": "Cài đặt"
+  },
+  "update_available": {
+    "message": "Có bản cập nhật"
+  },
+  "checking_active_tab": {
+    "message": "Đang kiểm tra tab hiện tại…"
+  },
+  "campaign_information": {
+    "message": "Thông tin chương trình"
+  },
+  "official_offer": {
+    "message": "Ưu đãi chính thức"
+  },
+  "1_month_free": {
+    "message": "Miễn phí 1 tháng"
+  },
+  "subject_to_account_eligibility": {
+    "message": "Tùy theo điều kiện tài khoản"
+  },
+  "account_eligibility": {
+    "message": "Điều kiện tài khoản"
+  },
+  "personal_plan": {
+    "message": "Gói cá nhân"
+  },
+  "not_checked": {
+    "message": "Chưa kiểm tra"
+  },
+  "check_eligibility": {
+    "message": "Kiểm tra ưu đãi"
+  },
+  "check_eligibility_again": {
+    "message": "Kiểm tra lại ưu đãi"
+  },
+  "check_again": {
+    "message": "Kiểm tra lại"
+  },
+  "details": {
+    "message": "Chi tiết"
+  },
+  "checking_your_current_personal_workspace": {
+    "message": "Đang kiểm tra không gian làm việc cá nhân."
+  },
+  "final_price_confirmed_at_checkout": {
+    "message": "Giá cuối cùng được xác nhận khi thanh toán."
+  },
+  "checkout_price_review": {
+    "message": "Kiểm tra giá thanh toán"
+  },
+  "price_unknown": {
+    "message": "Chưa rõ giá"
+  },
+  "displayed_due_today": {
+    "message": "Số tiền hiển thị phải trả hôm nay"
+  },
+  "check_checkout_price": {
+    "message": "Kiểm tra giá thanh toán"
+  },
+  "create_checkout": {
+    "message": "Tạo liên kết thanh toán"
+  },
+  "checkout_is_available_once_chatgpt_confirms_coupon_eligibility": {
+    "message": "Có thể tạo liên kết khi ChatGPT xác nhận đủ điều kiện nhận ưu đãi."
+  },
+  "checkout_link": {
+    "message": "Liên kết thanh toán"
+  },
+  "copy_link": {
+    "message": "Sao chép liên kết"
+  },
+  "open_checkout": {
+    "message": "Mở trang thanh toán"
+  },
+  "preferences": {
+    "message": "Tùy chọn"
+  },
+  "checkout_defaults": {
+    "message": "Thiết lập thanh toán mặc định"
+  },
+  "workspace": {
+    "message": "Không gian làm việc"
+  },
+  "seats": {
+    "message": "Số ghế"
+  },
+  "decrease_seats": {
+    "message": "Giảm số ghế"
+  },
+  "increase_seats": {
+    "message": "Tăng số ghế"
+  },
+  "billing_country": {
+    "message": "Quốc gia thanh toán"
+  },
+  "currency": {
+    "message": "Tiền tệ"
+  },
+  "select_country": {
+    "message": "Chọn quốc gia"
+  },
+  "select_currency": {
+    "message": "Chọn tiền tệ"
+  },
+  "remember_billing_after_link_succeeds": {
+    "message": "Lưu thông tin thanh toán sau khi tạo liên kết"
+  },
+  "confirm_actual_billing_details_before_continuing": {
+    "message": "Xác nhận thông tin thanh toán thực tế trước khi tiếp tục."
+  },
+  "generate_checkout_link": {
+    "message": "Tạo liên kết thanh toán"
+  },
+  "generating": {
+    "message": "Đang tạo…"
+  },
+  "software_updates": {
+    "message": "Cập nhật phần mềm"
+  },
+  "new": {
+    "message": "Mới"
+  },
+  "current_version": {
+    "message": "Phiên bản hiện tại"
+  },
+  "latest_version": {
+    "message": "Phiên bản mới nhất"
+  },
+  "loading": {
+    "message": "Đang tải…"
+  },
+  "view_release_download": {
+    "message": "Xem bản phát hành / tải xuống"
+  },
+  "automatically_check_on_chatgpt_15_min_cache": {
+    "message": "Tự kiểm tra cập nhật trên ChatGPT (lưu kết quả 15 phút)"
+  },
+  "automatically_check_for_updates": {
+    "message": "Tự kiểm tra cập nhật"
+  },
+  "check_for_updates": {
+    "message": "Kiểm tra cập nhật"
+  },
+  "no_stored_tokens": {
+    "message": "Không lưu token"
+  },
+  "privacy_first": {
+    "message": "Ưu tiên quyền riêng tư"
+  },
+  "telegram_support": {
+    "message": "Hỗ trợ Telegram"
+  },
+  "connected_to_chatgpt": {
+    "message": "Đã kết nối với ChatGPT"
+  },
+  "open_chatgpt_com_to_generate_a_checkout_link": {
+    "message": "Mở chatgpt.com để tạo liên kết thanh toán"
+  },
+  "coupon_eligible": {
+    "message": "Đủ điều kiện nhận ưu đãi"
+  },
+  "not_eligible": {
+    "message": "Không đủ điều kiện"
+  },
+  "already_redeemed": {
+    "message": "Đã sử dụng"
+  },
+  "offer_not_listed": {
+    "message": "Không thấy ưu đãi"
+  },
+  "unknown": {
+    "message": "Chưa xác định"
+  },
+  "checking": {
+    "message": "Đang kiểm tra…"
+  },
+  "switch_to_light_mode": {
+    "message": "Chuyển sang giao diện sáng"
+  },
+  "switch_to_dark_mode": {
+    "message": "Chuyển sang giao diện tối"
+  },
+  "zero_due_today": {
+    "message": "Hôm nay không phải trả"
+  },
+  "paid_checkout": {
+    "message": "Có phí thanh toán"
+  },
+  "checking_github_releases": {
+    "message": "Đang kiểm tra bản phát hành GitHub…"
+  },
+  "you_are_up_to_date": {
+    "message": "Bạn đang dùng bản mới nhất."
+  },
+  "no_stable_release_yet": {
+    "message": "Chưa có bản ổn định."
+  },
+  "not_checked_yet": {
+    "message": "Chưa kiểm tra."
+  },
+  "select_your_billing_country_and_currency_before_continuing": {
+    "message": "Chọn quốc gia thanh toán và tiền tệ trước khi tiếp tục."
+  },
+  "currency_is_a_local_suggestion_verify_the_currency_supported_by_chatgpt": {
+    "message": "Đây là tiền tệ gợi ý. Hãy xác nhận loại tiền ChatGPT hỗ trợ."
+  },
+  "sign_in_to_chatgpt_first": {
+    "message": "Hãy đăng nhập ChatGPT trước."
+  },
+  "the_server_reports_that_this_account_is_not_eligible": {
+    "message": "ChatGPT xác nhận tài khoản không đủ điều kiện."
+  },
+  "the_server_reports_that_the_promotion_was_already_redeemed": {
+    "message": "ChatGPT xác nhận ưu đãi đã được sử dụng."
+  },
+  "this_campaign_is_not_listed_for_the_default_personal_workspace_review_the_official_offer_page_for_a_definitive_result": {
+    "message": "Không thấy ưu đãi trong không gian làm việc cá nhân mặc định. Xem trang ưu đãi chính thức để xác nhận."
+  },
+  "coupon_eligible_and_not_redeemed_seat_coverage_total_and_activation_are_not_verified": {
+    "message": "Đủ điều kiện và chưa dùng ưu đãi. Số ghế, tổng tiền và kích hoạt vẫn chưa được xác nhận."
+  },
+  "extension_description": {
+    "message": "Kiểm tra ưu đãi và tạo liên kết thanh toán ChatGPT Business. Phát triển bởi ePlus.DEV."
+  }
+}
