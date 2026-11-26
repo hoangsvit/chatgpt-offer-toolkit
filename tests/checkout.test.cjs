@@ -126,3 +126,20 @@ test("missing or untrustworthy server totals are not treated as zero",async()=>{
   assert.equal(result.total,undefined);assert.ok(result.url);assert.equal(calls,2);
  }
 });
+
+test("Plus respects unusual-activity checkout denial and does not retry",async()=>{
+ const responses=[
+  {ok:true,json:async()=>({accessToken:"synthetic-token"})},
+  {ok:true,json:async()=>({accounts:{default:{account:{structure:"personal",account_id:plusAccountId},eligible_promo_campaigns:{plus:{id:plusPromo}}}}})},
+  {ok:true,json:async()=>checkedPlus},
+  {ok:false,status:400,json:async()=>({detail:"Our systems have detected unusual activity. Please try again later.",private:"synthetic-private"})}
+ ];
+ let calls=0;
+ const c=load({fetch:async()=>responses[calls++]});
+ const result=await c.requestCheckout(plusConfig);
+ assert.equal(result.code,"unusual_activity");
+ assert.match(result.error,/unusual activity/);
+ assert.equal(result.url,undefined);
+ assert.equal(calls,4);
+ assert.ok(!JSON.stringify(result).includes("synthetic-private"));
+});
