@@ -176,3 +176,5 @@ footer{margin-top:4px}
 footer .beui-action{flex:none}
 footer button{font-size:11px;font-weight:550}
 body{font-size:13px;-webkit-font-smoothing:antialiased}
+
+.account-results{display:grid;gap:6px;padding:8px 0 4px}
