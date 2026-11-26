@@ -28,7 +28,7 @@ Download the package for your browser from **Assets** on GitHub Releases.
 
 1. Sign in at [ChatGPT](https://chatgpt.com), open your personal workspace, and click the extension icon.
 2. Choose **Personal** for ChatGPT Plus or **Business**, then check **Account eligibility**. Expand **Details** or click refresh to check again.
-3. When eligible, review your billing country and currency in **Settings**. **Business** also requires a workspace name and seat count. Then click **Generate checkout link**. For the official Plus flow, choose **View Plus on ChatGPT**.
+3. When eligible, review your billing country and currency in **Settings**. **Business** also requires a workspace name and seat count. Then click **Generate checkout link**. For **Plus**, the extension first verifies the offer, then hands off to the official ChatGPT pricing page — ChatGPT creates the Plus checkout itself, because a checkout created outside its own page is declined as unusual activity.
 4. Review the amount due today and the renewal terms on the official checkout before paying. **Official offer** is available directly from the popup.
 
 The toolbar badge shows the Business offer result. **OK** means eligible, **NO** means rejected or absent, and **USED** means redeemed. The popup shows a separate result for each plan.
