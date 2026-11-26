@@ -31,7 +31,20 @@ Download the package for your browser from **Assets** on GitHub Releases.
    - **Business** uses the workspace name, seats, billing country, and currency in **Settings**. When eligible, select **Generate checkout link**.
 4. Review the amount due today and renewal terms on the official checkout before paying.
 
-Hover over the toolbar icon for each plan's status. **2/2** means both offers are eligible, **P+** means Plus is eligible, and **B+** means Business is eligible. **?** means a result is unresolved, **NO** means neither check found an eligible offer, and **USED** means both were redeemed.
+### Toolbar badge
+
+| Badge | Color | Meaning |
+| --- | --- | --- |
+| `2/2` | Green | Both Plus and Business offers are eligible. |
+| `P+` | Green | Plus is the only offer confirmed eligible. |
+| `B+` | Green | Business is the only offer confirmed eligible. |
+| `…` | Gray | The extension is checking or waiting for the page checker. |
+| `?` | Gray | At least one result is unknown and neither offer is confirmed eligible. |
+| `NO` | Red or gray | Red means both offers were explicitly denied. Gray means neither is eligible and at least one offer is absent or already redeemed. |
+| `USED` | Gray | Both offers were already redeemed. |
+| `OFF` | Gray | The active tab is outside ChatGPT. |
+
+Hover over the toolbar icon for each plan's status.
 
 ## Update
 
