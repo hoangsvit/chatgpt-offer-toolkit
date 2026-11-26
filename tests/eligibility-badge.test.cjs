@@ -2,24 +2,32 @@ const test=require('node:test'),assert=require('node:assert/strict'),fs=require(
 const ctx=vm.createContext({exports:{},URL});
 vm.runInContext(ts.transpileModule(fs.readFileSync('utils/eligibility-badge.ts','utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText,ctx);
 const {badgeFor,isChatGPTUrl}=ctx.exports;
-test('green badge requires confirmed coupon and assignment',()=>{
- assert.equal(badgeFor({state:'eligible',campaign:'assigned'}).text,'OK');
- assert.equal(badgeFor({state:'eligible',campaign:'unknown'}).text,'?');
- assert.match(badgeFor({state:'eligible',campaign:'assigned'}).title,/price not verified/);
+const eligible={state:'eligible',campaign:'assigned'};
+const denied={state:'not_eligible',campaign:'assigned'};
+const redeemed={state:'redeemed',campaign:'assigned'};
+const absent={state:'unknown',campaign:'not_listed'};
+const unknown={state:'unknown',campaign:'unknown'};
+const cases=[
+ ['eligible',eligible],['denied',denied],['redeemed',redeemed],['absent',absent],['unknown',unknown]
+];
+test('combined badge covers all 25 combinations independently',()=>{
+ for(const [b,business] of cases) for(const [p,personal] of cases){
+   const badge=badgeFor({...business,plus:personal});
+   const expected=b==='eligible'&&p==='eligible'?'2/2':p==='eligible'?'P+':b==='eligible'?'B+':b==='unknown'||p==='unknown'?'?':b==='redeemed'&&p==='redeemed'?'USED':'NO';
+   assert.equal(badge.text,expected,b+' / '+p);
+   assert.equal(badge.color,expected==='2/2'||expected==='P+'||expected==='B+'?'#16845b':b==='denied'&&p==='denied'?'#b43b35':'#64736b');
+   assert.match(badge.title,/^Plus: .+ · Business: .+$/);
+   assert.ok(badge.text.length<=4);
+ }
 });
-test('explicit denial is NO, redeemed is USED and unknown is visibly distinct',()=>{
- assert.equal(badgeFor({state:'not_eligible'}).text,'NO');
- assert.equal(badgeFor({state:'redeemed'}).text,'USED');
- for(const value of [null,{}, {state:'unknown'}])assert.equal(badgeFor(value).text,'?');
+test('missing or unconfirmed plan results never count as eligible',()=>{
+ for(const value of [null,{},unknown,denied,{state:'eligible',campaign:'unknown'},{...denied,plus:{state:'eligible',campaign:'unknown'}}])assert.equal(badgeFor(value).text,'?');
+ assert.equal(badgeFor(eligible).text,'B+');
+ assert.equal(badgeFor({plus:eligible}).text,'P+');
+ assert.equal(badgeFor({...eligible,plus:unknown}).title,'Plus: Unknown · Business: Eligible');
+ assert.equal(badgeFor({...absent,plus:eligible}).title,'Plus: Eligible · Business: Offer not listed');
 });
 test('only exact HTTPS ChatGPT origin is accepted',()=>{
  assert.equal(isChatGPTUrl('https://chatgpt.com/c/test'),true);
  for(const value of ['https://chatgpt.com.evil.test','http://chatgpt.com','https://chatgpt.com:444',null,'invalid'])assert.equal(isChatGPTUrl(value),false);
-});
-
-test('successful account check without assigned campaign is distinct from an unknown check',()=>{
- const badge=badgeFor({state:'unknown',campaign:'not_listed'});
- assert.equal(badge.text,'NO');assert.equal(badge.color,'#64736b');assert.match(badge.title,/final eligibility not verified/);
- assert.equal(badgeFor({state:'unknown',campaign:'unknown'}).text,'?');
- assert.equal(badgeFor({state:'not_eligible',campaign:'not_listed'}).text,'NO');
 });

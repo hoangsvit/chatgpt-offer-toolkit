@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import { flushSync } from 'react-dom';
-import { ArrowRight, ArrowLeft, ArrowUpRight, Settings2, Link2, RefreshCw, Minus, Plus, Copy, ExternalLink, Download } from 'lucide-react';
+import { ArrowRight, ArrowLeft, ArrowUpRight, Settings2, Link2, RefreshCw, Minus, Plus, Copy, ExternalLink, Download, UserRound, UsersRound, X } from 'lucide-react';
 import { Input } from './input';
 import { Switch } from './switch';
 import { Button } from './button';
@@ -80,8 +80,8 @@ function Generate({submit}:{submit:()=>void}) {
     <Link2 size={17} aria-hidden="true"/><span className="flex-1">{value.label}</span><ArrowRight size={17} aria-hidden="true"/>
   </Button></Tooltip>;
 }
-function EligibilityBadge() {
-  const node=document.getElementById('eligibility-state')!;
+function EligibilityBadge({id}:{id:string}) {
+  const node=document.getElementById(id)!;
   const read=()=>({text:node.textContent||translate('Unknown'),state:node.dataset.state});
   const [value,setValue]=useState(read);
   useEffect(()=>{
@@ -89,12 +89,12 @@ function EligibilityBadge() {
     observer.observe(node,{attributes:true,attributeFilter:['data-state'],childList:true,subtree:true,characterData:true});
     setValue(read());
     return ()=>observer.disconnect();
-  },[]);
+  },[node]);
   const status:AnimatedBadgeStatus=value.text===translate('Checking…')?'loading':value.state==='eligible'?'success':value.state==='not_eligible'?'danger':value.state==='redeemed'?'warning':'neutral';
   return <AnimatedBadge status={status} size="sm" pulse={false} aria-hidden="true">{value.text}</AnimatedBadge>;
 }
-function RefreshEligibility() {
-  const native=document.getElementById('eligibility-check') as HTMLButtonElement;
+function RefreshEligibility({id}:{id:string}) {
+  const native=document.getElementById(id) as HTMLButtonElement;
   const read=()=>({disabled:native.disabled,checking:native.textContent===translate('Checking…')});
   const [value,setValue]=useState(read);
   useEffect(()=>{
@@ -102,7 +102,7 @@ function RefreshEligibility() {
     observer.observe(native,{attributes:true,attributeFilter:['disabled'],childList:true,subtree:true,characterData:true});
     setValue(read());
     return ()=>observer.disconnect();
-  },[]);
+  },[native]);
   const label=translate('Check eligibility again');
   return <Tooltip content={label} side="bottom"><Button variant="ghost" size="icon" disabled={value.disabled}
     aria-label={label}
@@ -116,10 +116,19 @@ export function mountBeui(submit:()=>void) {
   const cta=document.getElementById('beui-generate')!;
   const eligibility=document.getElementById('beui-eligibility')!;
   const refresh=document.getElementById('beui-refresh')!;
-  flushSync(()=>{createRoot(theme).render(<ThemeToggle variant="circle" start="top-right" className="rounded-xl border border-border bg-background p-2" iconClassName="size-4"/>);createRoot(cta).render(<Generate submit={submit}/>);createRoot(eligibility).render(<EligibilityBadge/>);createRoot(refresh).render(<RefreshEligibility/>);});
+  flushSync(()=>{
+    createRoot(theme).render(<ThemeToggle variant="circle" start="top-right" className="rounded-xl border border-border bg-background p-2" iconClassName="size-4"/>);
+    createRoot(cta).render(<Generate submit={submit}/>);
+    createRoot(eligibility).render(<EligibilityBadge id="eligibility-state"/>);
+    createRoot(refresh).render(<RefreshEligibility id="eligibility-check"/>);
+    createRoot(document.getElementById('beui-plus-eligibility')!).render(<EligibilityBadge id="plus-eligibility-state"/>);
+  });
 }
 
 const buttonSpecs = {
+  'plan-business': {icon:UsersRound, variant:'ghost', size:'sm'},
+  'plan-personal': {icon:UserRound, variant:'ghost', size:'sm'},
+  'plus-pricing': {icon:ExternalLink, variant:'ghost', size:'sm', tooltip:'Open the official ChatGPT pricing page.'},
   'view-offer': {icon:ArrowLeft, variant:'ghost', size:'icon'},
   'view-settings': {icon:Settings2, variant:'outline', size:'icon'},
   'official': {icon:ArrowUpRight, variant:'ghost', size:'sm', tooltip:'Open the official ChatGPT offer page.'},
@@ -130,6 +139,8 @@ const buttonSpecs = {
   'price-check': {icon:RefreshCw, variant:'outline', size:'md', tooltip:'Read the amount due today on the current checkout page.'},
   'update-check': {icon:RefreshCw, variant:'outline', size:'md', tooltip:'Check GitHub for a newer version.'},
   'update-download': {icon:Download, variant:'primary', size:'md', tooltip:'Open the GitHub release and its downloads.'},
+  'update-banner-download': {icon:Download, variant:'ghost', size:'icon', tooltip:'Open the GitHub release and its downloads.'},
+  'update-banner-skip': {icon:X, variant:'ghost', size:'icon'},
   'github': {icon:ArrowUpRight, variant:'ghost', size:'sm', tooltip:'Open the project on GitHub.'},
   'telegram': {icon:ArrowUpRight, variant:'ghost', size:'sm', tooltip:'Open support on Telegram.'},
   'eplus': {icon:ArrowUpRight, variant:'ghost', size:'sm', tooltip:'Visit ePlus.DEV.'},
@@ -147,14 +158,15 @@ function NativeAction({native,id,host}:{native:HTMLButtonElement;id:keyof typeof
   },[]);
   const onlyIcon=spec.size==='icon';
   const label=native.getAttribute('aria-label')||state.label;
-  const action=<Button variant={spec.variant} size={spec.size} className={onlyIcon?'relative size-8 rounded-lg':id==='official'?'h-7 gap-1 px-1 text-primary':id==='github'||id==='telegram'||id==='eplus'?'h-7 gap-1 px-1 text-[10px]':'w-full rounded-lg'} disabled={state.disabled}
+  const offerLink=id==='official'||id==='plus-pricing';
+  const action=<Button variant={spec.variant} size={spec.size} className={onlyIcon?'relative size-8 rounded-lg':offerLink?'h-7 gap-1 px-1 text-primary':id==='github'||id==='telegram'||id==='eplus'?'h-7 gap-1 px-1 text-[10px]':'w-full rounded-lg'} disabled={state.disabled}
     aria-label={label} aria-controls={native.getAttribute('aria-controls')||undefined} aria-pressed={state.pressed===null?undefined:state.pressed==='true'}
     onClick={()=>{if(!native.disabled&&!native.hidden)native.click()}}>
     {!onlyIcon&&<span>{state.label}</span>}<Icon size={onlyIcon?17:13} aria-hidden="true"/>
     {state.dot&&<span className="absolute right-0 top-0 size-2 rounded-full bg-primary" aria-label={translate('Update available')}/>}
   </Button>;
-  const content='tooltip' in spec ? translate(spec.tooltip) : label;
-  return <Tooltip content={content} side={onlyIcon || id==='official' ? 'bottom' : 'top'}>{action}</Tooltip>;
+  const content=native.dataset.tooltip||('tooltip' in spec ? translate(spec.tooltip) : label);
+  return <Tooltip content={content} side={onlyIcon || offerLink ? 'bottom' : 'top'}>{action}</Tooltip>;
 }
 const SWITCH_EVENT='offer-toolkit-switch-sync';
 export function syncBeuiSwitches(){document.dispatchEvent(new Event(SWITCH_EVENT));}

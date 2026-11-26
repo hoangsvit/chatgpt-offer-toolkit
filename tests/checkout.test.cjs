@@ -3,15 +3,56 @@ const assert = require("node:assert/strict");
 const vm = require("node:vm");
 const fs = require("node:fs");
 const ts = require("typescript");
+const { webcrypto } = require("node:crypto");
 const source = ts.transpileModule(fs.readFileSync("utils/checkout.ts","utf8"), {
   compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 }
 }).outputText;
 function load({origin="https://chatgpt.com",fetch=async()=>{throw Error("unexpected request")}}={}){
-  const ctx=vm.createContext({URL,location:{origin},fetch,exports:{}});
+  const ctx=vm.createContext({URL,crypto:webcrypto,location:{origin},fetch,exports:{}});
   vm.runInContext(source,ctx);
   return ctx.exports;
 }
 const config={workspace:"MyTeam",seats:5,country:"VN",currency:"USD"};
+const plusConfig={plan:"plus",country:"VN",currency:"VND",appearance:"light"};
+const plusPromo="plus-synthetic";
+const plusAccountId="00000000-0000-4000-8000-000000000001";
+const checkedPlus={coupon:plusPromo,state:"eligible",redemption:{redeemed:false,redeemed_by_user:false,redeemed_by_workspace:false}};
+function mockPlus(coupon=checkedPlus,changes={}) {
+ const calls=[];
+ const data=[
+  {accessToken:"sample-token"},
+  {accounts:{default:{account:{structure:"personal",account_id:plusAccountId},eligible_promo_campaigns:{plus:{id:plusPromo}}}}},
+  coupon
+ ];
+ const api=load({fetch:async (path,options)=>{
+  const body=data[calls.length];calls.push({path,options});return {ok:true,json:async()=>body};
+ }});
+ return {api,calls};
+}
+test("Plus verifies the campaign and returns the official pricing flow without creating a checkout",async()=>{
+ const {api,calls}=mockPlus();
+ assert.equal(api.validateConfig(plusConfig).currency,"VND");
+ const result=await api.requestCheckout(plusConfig);
+ const url=new URL(result.url);
+ assert.equal(url.origin,"https://chatgpt.com");
+ assert.equal(url.pathname,"/");
+ assert.equal(url.searchParams.get("cta_tab"),"personal");
+ assert.equal(url.searchParams.get("highlight_plan"),"plus");
+ assert.equal(url.searchParams.get("promo_campaign"),plusPromo);
+ assert.equal(url.hash,"#pricing");
+ assert.match(result.notice,/official ChatGPT pricing page/);
+ // Session, account check and coupon check only — never a checkout POST,
+ // which ChatGPT's risk system declines as unusual activity from here.
+ assert.equal(calls.length,3);
+ assert.ok(calls.every(call=>call.path!=="/backend-api/payments/checkout"));
+ assert.equal(calls[2].options.headers["ChatGPT-Account-Id"],plusAccountId);
+});
+test("Plus refuses the official flow when the coupon is unconfirmed",async()=>{
+ const denied=mockPlus({...checkedPlus,state:"not_eligible"});
+ assert.match((await denied.api.requestCheckout(plusConfig)).error,/verify the Plus offer/);
+ assert.equal(denied.calls.length,3);
+ assert.ok(denied.calls.every(call=>call.path!=="/backend-api/payments/checkout"));
+});
 test("config validation",()=>{
  const c=load(); assert.equal(c.validateConfig(config).seats,5);
  for(const seats of [1,101,2.5]) assert.throws(()=>c.validateConfig({...config,seats}));
@@ -80,4 +121,19 @@ test("missing or untrustworthy server totals are not treated as zero",async()=>{
   const result=await c.requestCheckout({...config,currency:"VND"});
   assert.equal(result.total,undefined);assert.ok(result.url);assert.equal(calls,2);
  }
+});
+
+test("Business respects unusual-activity checkout denial and does not retry",async()=>{
+ const responses=[
+  {ok:true,json:async()=>({accessToken:"synthetic-token"})},
+  {ok:false,status:400,json:async()=>({detail:"Our systems have detected unusual activity. Please try again later.",private:"synthetic-private"})}
+ ];
+ let calls=0;
+ const c=load({fetch:async()=>responses[calls++]});
+ const result=await c.requestCheckout(config);
+ assert.equal(result.code,"unusual_activity");
+ assert.match(result.error,/unusual activity/);
+ assert.equal(result.url,undefined);
+ assert.equal(calls,2);
+ assert.ok(!JSON.stringify(result).includes("synthetic-private"));
 });

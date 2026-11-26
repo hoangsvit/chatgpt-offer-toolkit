@@ -1,4 +1,43 @@
 {
+  "check_now": {
+    "message": "今すぐ確認"
+  },
+  "view_release": {
+    "message": "リリースを見る"
+  },
+  "last_checked": {
+    "message": "最終確認"
+  },
+  "skip_this_version": {
+    "message": "このバージョンをスキップ"
+  },
+  "unable_to_save_the_skipped_version": {
+    "message": "スキップしたバージョンを保存できませんでした。"
+  },
+  "personal": {
+    "message": "個人"
+  },
+  "coupon_eligibility_required": {
+    "message": "クーポンの対象である必要があります。"
+  },
+  "choose_a_plan": {
+    "message": "プランを選択"
+  },
+  "for_individuals": {
+    "message": "個人向け"
+  },
+  "view_plus_on_chatgpt": {
+    "message": "ChatGPTでPlusを見る"
+  },
+  "open_the_official_chatgpt_pricing_page": {
+    "message": "ChatGPTの公式料金ページを開きます。"
+  },
+  "plus_offer_eligible_confirm_pricing_on_chatgpt": {
+    "message": "Plus特典の対象です。ChatGPTで料金を確認してください。"
+  },
+  "campaign_information_is_unavailable": {
+    "message": "キャンペーン情報を取得できません。"
+  },
   "create_a_checkout_link_with_your_current_settings": {
     "message": "現在の設定で決済リンクを作成します。"
   },

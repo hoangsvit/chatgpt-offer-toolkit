@@ -79,13 +79,13 @@ export default defineBackground(() => {
     const next = (queues.get(tabId) ?? Promise.resolve()).catch(()=>{}).then(async()=>{
       await browser.action.setBadgeBackgroundColor({tabId,color});
       await browser.action.setBadgeText({tabId,text});
-      await browser.action.setTitle({tabId,title:'ChatGPT Offer Toolkit — '+title});
+      await browser.action.setTitle({tabId,title});
     });
     queues.set(tabId,next);
     void next.finally(()=>{if(queues.get(tabId)===next)queues.delete(tabId);}).catch(()=>{});
   }
-  const offBadge = {text:'OFF',color:'#64736b',title:'Inactive — only works on chatgpt.com'};
-  const checkingBadge = {text:'…',color:'#64736b',title:'Checking offer eligibility'};
+  const offBadge = {text:'OFF',color:'#64736b',title:'Open chatgpt.com to check offers'};
+  const checkingBadge = {text:'…',color:'#64736b',title:'Checking Plus and Business offers'};
   function paintEligibility(tabId: number, result: unknown, checking = false) {
     const {text,color,title} = checking ? checkingBadge : badgeFor(result);
     paint(tabId,text,color,title);
@@ -93,7 +93,7 @@ export default defineBackground(() => {
   async function defaultBadge() {
     await browser.action.setBadgeBackgroundColor({color:offBadge.color});
     await browser.action.setBadgeText({text:offBadge.text});
-    await browser.action.setTitle({title:'ChatGPT Offer Toolkit — '+offBadge.title});
+    await browser.action.setTitle({title:offBadge.title});
   }
   function clear(tabId: number, url: unknown) {
     revision.set(tabId,Symbol());

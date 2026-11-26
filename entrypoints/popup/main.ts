@@ -6,9 +6,9 @@ import { mountBeui, enhanceFormControls, syncBeuiSwitches, syncBillingSelects } 
 import { reviewCheckoutPrice } from '../../utils/checkout-price';
 import type { PriceReview } from '../../utils/checkout-price';
 import { CHECK_POPUP_MESSAGE, isChatGPTUrl } from '../../utils/eligibility-badge';
-import type { EligibilityResult } from '../../utils/eligibility';
+import type { CampaignEligibility, EligibilityResult } from '../../utils/eligibility';
 import { currencyForCountry, BILLING_PREFERENCE_KEY, parseBillingPreference } from '../../utils/billing-locale';
-import { OFFER_URL, EPLUS_URL, SUPPORT_URL } from '../../utils/links';
+import { OFFER_URL, PLUS_PRICING_URL, EPLUS_URL, SUPPORT_URL } from '../../utils/links';
 import { localizePopup, translate, uiLocale } from './i18n';
 import { mountSettingsCards, openCheckoutPreferences } from './beui/settings-cards';
 
@@ -23,6 +23,8 @@ localizePopup();
 mountSettingsCards();
 enhanceFormControls();
 const generate = button('generate');
+type OfferPlan = 'business' | 'personal';
+let selectedPlan: OfferPlan = 'business';
 function showView(view:'offer'|'settings') {
   const isOffer=view==='offer';
   const changed=element('offer-view').hidden===isOffer;
@@ -36,6 +38,24 @@ function showView(view:'offer'|'settings') {
 }
 button('view-offer').addEventListener('click',()=>showView('offer'));
 button('view-settings').addEventListener('click',()=>showView('settings'));
+function showPlan(plan:OfferPlan) {
+  if (busy || selectedPlan === plan) return;
+  selectedPlan=plan;
+  const business=plan==='business';
+  element('business-panel').hidden=!business;
+  element('plus-panel').hidden=business;
+  button('plan-business').setAttribute('aria-pressed',String(business));
+  button('plan-personal').setAttribute('aria-pressed',String(!business));
+  button('open').dataset.tooltip=business?'':translate('Open checkout');
+  element('business-fields').hidden=!business;
+  field('workspace').disabled=!business;
+  field('seats').disabled=!business;
+  resetResult();
+  status('');
+  renderConnection(tabReady);
+}
+button('plan-business').addEventListener('click',()=>showPlan('business'));
+button('plan-personal').addEventListener('click',()=>showPlan('personal'));
 mountBeui(() => {
   const form=element<HTMLFormElement>('settings');
   if(!form.checkValidity()) {
@@ -97,7 +117,7 @@ let currentUrl: string | null = null;
 let busy = false;
 let tabReady = false;
 let eligibilityBusy = false;
-let eligibleTabId: number | null = null;
+const eligibleTabIds: Record<OfferPlan,number|null> = {business:null,personal:null};
 const eligibilityButton = button('eligibility-check');
 
 element('version').textContent = 'v' + browser.runtime.getManifest().version;
@@ -139,52 +159,58 @@ function renderConnection(ready: boolean) {
   tabReady = ready;
   if (!ready) {
     accountLabel = undefined;
-    eligibleTabId = null;
+    eligibleTabIds.business = eligibleTabIds.personal = null;
   }
   element('connection').dataset.state = ready ? 'ready' : 'unavailable';
   const connected = translate('Connected to ChatGPT');
   element('connection-text').textContent = ready
     ? connected + (accountLabel ? ' · ' + accountLabel : '')
     : translate('Open chatgpt.com to generate a checkout link');
-  generate.disabled = busy || !tabReady || eligibilityBusy || eligibleTabId === null;
+  const eligible = eligibleTabIds[selectedPlan] !== null;
+  generate.disabled = busy || !tabReady || eligibilityBusy || !eligible;
   const hint = element('checkout-eligibility-hint');
-  hint.hidden = !tabReady || busy || eligibilityBusy || eligibleTabId !== null;
+  hint.hidden = !tabReady || busy || eligibilityBusy || eligible;
   generate.dataset.tooltip = busy ? translate('Generating…') : !tabReady
     ? translate('Open chatgpt.com to generate a checkout link') : eligibilityBusy
-      ? translate('Checking…') : hint.hidden ? translate('Create a checkout link with your current settings.') : hint.textContent ?? '';
+      ? translate('Checking…') : hint.hidden ? translate('Create a checkout link with your current settings.')
+        : translate('Checkout is available once ChatGPT confirms coupon eligibility.');
   eligibilityButton.disabled = busy || !tabReady || eligibilityBusy;
 }
-function renderEligibility(value: EligibilityResult | undefined) {
-  const state = element('eligibility-state');
+function renderCampaign(state:HTMLElement, reason:HTMLElement, value:CampaignEligibility | undefined, message?:string) {
   const labels = {eligible:'Coupon eligible',not_eligible:'Not eligible',unknown:'Unknown',redeemed:'Already redeemed'};
   state.dataset.state = value?.state ?? 'unknown';
-  state.textContent = translate(value?.state === 'unknown' && value.campaign === 'not_listed'
-    ? 'Offer not listed' : value ? labels[value.state] : 'Unknown');
-  element('eligibility-plan').textContent = value?.plan ? value.plan.charAt(0).toUpperCase() + value.plan.slice(1) : '—';
-  element('eligibility-reason').textContent = translate(value?.reason ?? 'No verified response. Review the official offer page.');
+  state.textContent = translate(message ?? (value?.state === 'unknown' && value.campaign === 'not_listed'
+    ? 'Offer not listed' : value ? labels[value.state] : 'Unknown'));
+  reason.textContent = translate(value?.reason ?? 'No verified response. Review the official offer page.');
+}
+function renderEligibility(value: EligibilityResult | undefined, message?:string) {
+  const plan = value?.plan ? value.plan.charAt(0).toUpperCase() + value.plan.slice(1) : '—';
+  element('eligibility-plan').textContent = plan;
+  renderCampaign(element('eligibility-state'),element('eligibility-reason'),value,message);
+  const sharedReason = value?.campaign === 'unknown' ? value : undefined;
+  renderCampaign(element('plus-eligibility-state'),element('plus-eligibility-reason'),value?.plus ?? sharedReason,message);
 }
 async function runEligibilityCheck(force = false) {
   if (busy || eligibilityBusy) return;
   eligibilityBusy = true;
-  eligibleTabId = null;
+  eligibleTabIds.business = eligibleTabIds.personal = null;
   resetResult();
   accountLabel = undefined;
   eligibilityButton.disabled = true;
   generate.disabled = true;
   generate.dataset.tooltip = translate('Checking…');
   eligibilityButton.textContent = translate('Checking…');
-  renderEligibility({state:'unknown',plan:null,campaign:'unknown',reason:'Checking your current personal workspace…'});
-  element('eligibility-state').textContent = translate('Checking…');
+  renderEligibility({state:'unknown',plan:null,campaign:'unknown',reason:'Checking your current personal workspace.'},'Checking…');
   try {
     const tabId = await getActiveChatGPTTab();
     renderConnection(tabId !== null);
     if (tabId === null) {
-      renderEligibility({state:'unknown',plan:null,campaign:'unknown',reason:'Open chatgpt.com and reopen this popup to check eligibility.'});
-      element('eligibility-state').textContent = translate('Not checked');
+      renderEligibility({state:'unknown',plan:null,campaign:'unknown',reason:'Open chatgpt.com and reopen this popup to check eligibility.'},'Not checked');
       return;
     }
     const result = await browser.runtime.sendMessage({type:CHECK_POPUP_MESSAGE,tabId,force}) as EligibilityResult | undefined;
-    if (result?.state === 'eligible' && result.campaign === 'assigned') eligibleTabId = tabId;
+    if (result?.state === 'eligible' && result.campaign === 'assigned') eligibleTabIds.business = tabId;
+    if (result?.plus?.state === 'eligible' && result.plus.campaign === 'assigned') eligibleTabIds.personal = tabId;
     accountLabel = result?.accountLabel;
     renderEligibility(result);
     const detected = result?.detectedCountry;
@@ -249,27 +275,31 @@ void runPriceReview();
 
 element<HTMLFormElement>('settings').addEventListener('submit', async event => {
   event.preventDefault();
-  if (busy || eligibilityBusy || eligibleTabId === null) return;
+  const plan = selectedPlan;
+  if (busy || eligibilityBusy || eligibleTabIds[plan] === null) return;
   showView('offer');
   resetResult();
   let config: CheckoutConfig;
   try {
-    config = validateConfig({workspace:field('workspace').value,seats:seats.value,country:field('country').value,currency:field('currency').value});
+    const billing = {country:countryField.value,currency:currencyField.value};
+    config = validateConfig(plan === 'personal'
+      ? {...billing,plan:'plus',appearance:document.documentElement.classList.contains('dark')?'dark':'light'}
+      : {...billing,workspace:field('workspace').value,seats:seats.value});
   } catch (error) { status(error instanceof Error ? error.message : 'Invalid settings.'); return; }
   busy = true;
   generate.disabled = true;
   generate.dataset.tooltip = translate('Generating…');
   eligibilityButton.disabled = true;
   element('generate-label').textContent = translate('Generating…');
-  const controls = ['workspace','seats','country','currency','minus','plus','remember-billing'];
+  const controls = ['workspace','seats','country','currency','minus','plus','remember-billing','plan-business','plan-personal'];
   for (const id of controls) element<HTMLInputElement | HTMLButtonElement>(id).disabled = true;
   status('Requesting checkout from your current ChatGPT session…');
   try {
     const tabId = await getActiveChatGPTTab();
     renderConnection(tabId !== null);
     if (tabId === null) { status('Open chatgpt.com, sign in, and reopen the extension.'); return; }
-    if (tabId !== eligibleTabId) {
-      eligibleTabId = null;
+    if (tabId !== eligibleTabIds[plan]) {
+      eligibleTabIds.business = eligibleTabIds.personal = null;
       status('Check offer eligibility in the current ChatGPT tab before generating checkout.');
       return;
     }
@@ -297,7 +327,9 @@ element<HTMLFormElement>('settings').addEventListener('submit', async event => {
     }
     field('link').value = currentUrl;
     element('result').hidden = false;
-    if (result.total) {
+    if (result.notice) {
+      status(result.notice);
+    } else if (result.total) {
       const {currency, minorUnits} = result.total;
       const zeroDecimal = new Set([
         'BIF','CLP','DJF','GNF','JPY','KMF','KRW','MGA','PYG','RWF',
@@ -322,6 +354,7 @@ element<HTMLFormElement>('settings').addEventListener('submit', async event => {
     renderConnection(tabReady);
     element('generate-label').textContent = translate('Generate checkout link');
     for (const id of controls) element<HTMLInputElement | HTMLButtonElement>(id).disabled = false;
+    field('workspace').disabled = field('seats').disabled = plan === 'personal';
     syncSeats();
   }
 });
@@ -333,7 +366,25 @@ button('copy').addEventListener('click', async () => {
 function openUrl(url: string) {
   void browser.tabs.create({url}).catch(() => status('Unable to open the page.'));
 }
-button('open').addEventListener('click', () => { if (currentUrl) openUrl(currentUrl); });
+button('plus-pricing').addEventListener('click',()=>openUrl(PLUS_PRICING_URL));
+button('open').addEventListener('click', async () => {
+  const url = currentUrl;
+  if (!url) return;
+  if (selectedPlan === 'business') {
+    openUrl(url);
+    return;
+  }
+  try {
+    // Keep the Plus checkout in the cookie store that created the session.
+    const tabId = await getActiveChatGPTTab();
+    if (url !== currentUrl) return;
+    if (tabId === null || tabId !== eligibleTabIds.personal) {
+      status('Open chatgpt.com, sign in, and reopen the extension.');
+      return;
+    }
+    await browser.tabs.update(tabId,{url});
+  } catch { status('Unable to open the page.'); }
+});
 button('official').addEventListener('click', () => {
   const message = element('claim-status');
   message.hidden = true;
@@ -346,36 +397,54 @@ button('github').addEventListener('click', () => openUrl('https://github.com/hoa
 
 button('eplus').addEventListener('click', () => openUrl(EPLUS_URL));
 button('telegram').addEventListener('click', () => openUrl(SUPPORT_URL));
-import { UPDATE_KEY, AUTO_KEY, CHECK_MESSAGE, AUTO_CHECK_MESSAGE, normalizeUpdate, isNewer, releasePage } from '../../utils/updates';
+import { UPDATE_KEY, AUTO_KEY, SKIPPED_UPDATE_KEY, CHECK_MESSAGE, AUTO_CHECK_MESSAGE, normalizeUpdate, isNewer, releasePage } from '../../utils/updates';
 import type { UpdateState } from '../../utils/updates';
 
 const currentVersion = browser.runtime.getManifest().version;
 let updateState: UpdateState = normalizeUpdate(undefined);
 let checkingUpdate = false;
 let updateAuto = true;
+let skippedVersion: string | null = null;
+let skippingVersion = false;
 element('update-current').textContent = 'v' + currentVersion;
 element('update-note').textContent = translate(import.meta.env.FIREFOX
   ? 'Firefox can install updates automatically for signed self-distributed builds. Temporary builds must be reloaded manually.'
   : 'Download the new ZIP, extract into the existing extension directory, then reload in the browser.');
 function renderUpdate() {
   const newer = isNewer(updateState.latest,currentVersion);
+  const notify = newer && updateState.latest !== skippedVersion;
   element('update-latest').textContent = updateState.latest ? 'v'+updateState.latest : '—';
-  element('update-dot').hidden = !newer;
-  element('nav-update-dot').hidden = !newer;
+  element('update-latest-card').dataset.newer = String(newer);
+  element('update-banner').hidden = !notify;
+  element('update-banner-version').textContent = notify ? 'v'+updateState.latest : '';
+  element('update-dot').hidden = !notify;
+  element('nav-update-dot').hidden = !notify;
   button('update-download').hidden = !newer;
+  element('update-note').hidden = !newer;
   button('update-check').disabled = checkingUpdate;
   field('update-auto').checked = updateAuto;
   syncBeuiSwitches();
   const message = checkingUpdate ? 'Checking GitHub Releases…' :
     updateState.error ?? (newer ? 'Update available' : updateState.latest ? 'You are up to date.' : updateState.checkedAt ? 'No stable release yet.' : 'Not checked yet.');
-  element('update-state').textContent = translate(message) +
-    (!checkingUpdate && updateState.checkedAt ? ' · '+new Date(updateState.checkedAt).toLocaleString(uiLocale) : '');
+  const state = element('update-state');
+  state.textContent = translate(message);
+  state.dataset.state = checkingUpdate ? 'checking' : updateState.error ? 'error' : newer ? 'available' : 'idle';
+  const timestamp = element<HTMLTimeElement>('update-checked-at');
+  const checkedAt = new Date(updateState.checkedAt);
+  timestamp.hidden = checkingUpdate || !updateState.checkedAt || !Number.isFinite(checkedAt.getTime());
+  if (!timestamp.hidden) {
+    timestamp.dateTime = checkedAt.toISOString();
+    timestamp.textContent = checkedAt.toLocaleString(uiLocale,{dateStyle:'short',timeStyle:'short'});
+    timestamp.title = translate('Last checked');
+  }
 }
 async function loadUpdates() {
   try {
-    const s = await browser.storage.local.get([UPDATE_KEY,AUTO_KEY]);
+    const s = await browser.storage.local.get([UPDATE_KEY,AUTO_KEY,SKIPPED_UPDATE_KEY]);
     updateState = normalizeUpdate(s[UPDATE_KEY]); updateAuto = s[AUTO_KEY] !== false;
+    skippedVersion = normalizeUpdate({latest:s[SKIPPED_UPDATE_KEY]}).latest;
     field('update-auto').disabled = false;
+    renderUpdate();
     const [tab] = await browser.tabs.query({active:true,currentWindow:true});
     if(updateAuto && isChatGPTUrl(tab?.url)) updateState=normalizeUpdate(await browser.runtime.sendMessage(AUTO_CHECK_MESSAGE));
   } catch { updateState.error = 'Unable to load update settings.'; }
@@ -395,10 +464,30 @@ field('update-auto').addEventListener('change',async()=>{
   finally {control.disabled=false;renderUpdate();}
 });
 button('update-download').addEventListener('click',()=>openUrl(releasePage(updateState.latest)));
+button('update-banner-download').addEventListener('click',()=>openUrl(releasePage(updateState.latest)));
+button('update-banner-skip').addEventListener('click',async()=>{
+  const version = updateState.latest;
+  if (skippingVersion || !version || !isNewer(version,currentVersion)) return;
+  const control = button('update-banner-skip');
+  const error = element('update-banner-error');
+  skippingVersion = control.disabled = true;
+  error.hidden = true;
+  try {
+    await browser.storage.local.set({[SKIPPED_UPDATE_KEY]:version});
+    skippedVersion = version;
+  } catch {
+    error.textContent = translate('Unable to save the skipped version.');
+    error.hidden = false;
+  } finally {
+    skippingVersion = control.disabled = false;
+    renderUpdate();
+  }
+});
 browser.storage.onChanged.addListener((changes,area)=>{
   if(area!=='local')return;
   if(changes[UPDATE_KEY])updateState=normalizeUpdate(changes[UPDATE_KEY].newValue);
   if(changes[AUTO_KEY])updateAuto=changes[AUTO_KEY].newValue!==false;
-  if(changes[UPDATE_KEY]||changes[AUTO_KEY])renderUpdate();
+  if(changes[SKIPPED_UPDATE_KEY])skippedVersion=normalizeUpdate({latest:changes[SKIPPED_UPDATE_KEY].newValue}).latest;
+  if(changes[UPDATE_KEY]||changes[AUTO_KEY]||changes[SKIPPED_UPDATE_KEY])renderUpdate();
 });
 void loadUpdates();

@@ -82,6 +82,13 @@ input:read-only{background:var(--soft)}
 .update-row span{color:var(--muted-foreground)}
 .update-row strong{text-align:right;max-width:55%;overflow-wrap:anywhere}
 #update-dot{color:var(--offer-text)}
+.update-banner{margin-bottom:8px;padding:2px 5px 2px 8px;border:1px solid var(--border);border-radius:8px;background:var(--soft)}
+.update-banner-row{display:flex;align-items:center;gap:3px}
+.update-banner-version{flex:1;min-width:0;font-size:11px;color:var(--text)}
+.update-banner-version strong{margin-inline-start:3px;color:var(--offer-text)}
+.update-banner .beui-action{flex:none}
+.update-banner .beui-action button{width:26px;height:26px}
+#update-banner-error{margin:2px 0;color:var(--status-danger)}
 #status,#claim-status{font-size:11px;overflow-wrap:anywhere}
 #status{margin:9px 0 0;padding:9px;background:var(--soft);border-radius:8px}
 #claim-status{margin:6px 0;color:var(--status-danger)}
@@ -117,10 +124,20 @@ html{width:384px;min-width:384px}body{padding:9px 16px 6px}
 .settings-card-panel[data-state=open]{overflow:visible}
 .settings-card[data-state=open]{z-index:1}
 #settings-view .stepper,#settings-view .beui-field{margin-bottom:4px}
-.update-versions,.update-actions{display:flex;gap:8px}
-.update-versions .update-row{flex:1;flex-wrap:wrap;gap:2px 6px;margin-bottom:2px}
+.update-versions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;margin:0}
+.update-version{padding:6px 8px;border:1px solid var(--border);border-radius:8px;background:var(--field)}
+.update-version dt{color:var(--muted-foreground);font-size:10px}
+.update-version dd{margin:1px 0 0;font-size:13px;font-weight:700;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.update-version[data-newer=true]{border-color:color-mix(in oklch,var(--success) 35%,var(--border));background:var(--offer);color:var(--offer-text)}
+.update-status-row{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:2px 8px;margin:6px 0;font-size:10px;color:var(--muted-foreground)}
+#update-state{font-size:11px;font-weight:600}
+#update-state[data-state=available]{color:var(--offer-text)}
+#update-state[data-state=error]{color:var(--status-danger)}
+#update-checked-at{font-variant-numeric:tabular-nums}
+.update-actions{display:flex;gap:6px}
 .update-actions .beui-action{flex:1}
 .update-actions button{min-height:32px;height:auto;padding:6px;line-height:1.3;white-space:normal}
+.update-auto-row{margin:7px 0 0;padding-top:7px;border-top:1px solid var(--border)}
 #status{line-height:1.5}
 footer{margin-top:4px}
 
@@ -130,9 +147,14 @@ footer{margin-top:4px}
 .account-label{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px;font-size:12px;font-weight:700;line-height:1.4}
 .account-label small{font-size:10px;font-weight:500;color:var(--muted-foreground)}
 .account-label strong{font-weight:650;color:var(--text)}
-#beui-eligibility{min-width:0;flex-shrink:0}
-#beui-eligibility>span{font-weight:600}
-#beui-refresh{flex:none;display:flex;align-items:center}
+#beui-eligibility,#beui-plus-eligibility{min-width:0;flex-shrink:0}
+#beui-eligibility>span,#beui-plus-eligibility>span{font-weight:600}
+#beui-refresh,#beui-plus-refresh{flex:none;display:flex;align-items:center}
+.plan-picker{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:3px;padding:3px;margin-bottom:9px;border:1px solid var(--border);border-radius:10px;background:var(--soft)}
+.plan-picker .beui-action{display:flex}
+.plan-picker button{width:100%;height:28px;min-height:28px;border-radius:7px;color:var(--muted-foreground);font-size:12px;font-weight:600}
+.plan-picker button[aria-pressed=true]{background:var(--surface);color:var(--text);box-shadow:0 1px 3px rgb(0 0 0/.11)}
+#checkout-eligibility-hint{margin:4px 0 0}
 .account-details{margin-top:4px;border-top:1px solid var(--border)}
 .account-details summary{display:flex;align-items:center;gap:7px;min-height:24px;color:var(--muted-foreground);font-size:11px;cursor:pointer;list-style:none}
 .account-details summary::-webkit-details-marker{display:none}
@@ -171,3 +193,5 @@ footer{margin-top:4px}
 footer .beui-action{flex:none}
 footer button{font-size:11px;font-weight:550}
 body{font-size:13px;-webkit-font-smoothing:antialiased}
+
+.account-results{display:grid;gap:6px;padding:8px 0 4px}

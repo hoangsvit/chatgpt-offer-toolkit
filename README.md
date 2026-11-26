@@ -1,4 +1,3 @@
-
 <img width="1672" height="941" alt="Offer Toolkit Dark Mode Hero" src="https://github.com/user-attachments/assets/92f7359c-4706-4b7f-b7ec-6a92e51e31f4" />
 
 # ChatGPT Offer Toolkit
@@ -7,8 +6,7 @@
 [![Download for Edge](https://img.shields.io/github/v/release/hoangsvit/chatgpt-offer-toolkit?label=Download%20Edge&color=0078D4)](https://github.com/hoangsvit/chatgpt-offer-toolkit/releases/latest/download/chrome.zip)
 [![Download Firefox test build](https://img.shields.io/github/v/release/hoangsvit/chatgpt-offer-toolkit?label=Download%20Firefox%20test&logo=firefoxbrowser&logoColor=white&color=E66000)](https://github.com/hoangsvit/chatgpt-offer-toolkit/releases/latest/download/firefox-unsigned.zip)
 
-
-A Chrome, Edge, and Firefox extension for checking ChatGPT Business offer eligibility and generating a checkout link when ChatGPT confirms the offer. Built by [ePlus.DEV](https://eplus.dev) as an independent project.
+A Chrome, Edge, and Firefox extension that checks ChatGPT **Personal (Plus)** and **Business** offers together. It helps eligible users generate a Business checkout link or continue to the official Plus offer on ChatGPT. Built by [ePlus.DEV](https://eplus.dev) as an independent project.
 
 The popup follows the browser language. It supports English, Vietnamese, Hindi, Indonesian, Malay, Spanish, Brazilian Portuguese, French, Japanese, and Simplified Chinese. Some detailed error messages use English.
 
@@ -27,20 +25,37 @@ Download the package for your browser from **Assets** on GitHub Releases.
 ## Use
 
 1. Sign in at [ChatGPT](https://chatgpt.com), open your personal workspace, and click the extension icon.
-2. Check **Account eligibility**. Expand **Details** to see the reason, or click refresh to check again.
-3. If eligible, review your workspace, seats, billing country, and currency in **Settings**, then click **Generate checkout link**.
-4. Review the amount due today and the renewal terms on the official checkout before paying. **Official offer** is available directly from the popup.
+2. Review both results in **Account eligibility**. Expand **Details** for the reason or use the refresh button to check both again.
+3. Choose a plan below the results.
+   - **Personal (Plus)** verifies the assigned offer and gives you a link to continue in ChatGPT.
+   - **Business** uses the workspace name, seats, billing country, and currency in **Settings**. When eligible, select **Generate checkout link**.
+4. Review the amount due today and renewal terms on the official checkout before paying.
 
-The toolbar badge shows **OK** when ChatGPT confirms eligibility, **NO** when it rejects the offer or the offer is absent, and **USED** when it was redeemed. Open **Details** in the popup to see the exact result.
+### Toolbar badge
+
+| Badge | Color | Meaning |
+| --- | --- | --- |
+| `2/2` | Green | Both Plus and Business offers are eligible. |
+| `P+` | Green | Plus is the only offer confirmed eligible. |
+| `B+` | Green | Business is the only offer confirmed eligible. |
+| `…` | Gray | The extension is checking or waiting for the page checker. |
+| `?` | Gray | At least one result is unknown and neither offer is confirmed eligible. |
+| `NO` | Red or gray | Red means both offers were explicitly denied. Gray means neither is eligible and at least one offer is absent or already redeemed. |
+| `USED` | Gray | Both offers were already redeemed. |
+| `OFF` | Gray | The active tab is outside ChatGPT. |
+
+Hover over the toolbar icon for each plan's status.
 
 ## Update
 
-Open **Settings → Software updates** to check for a new version. On Chrome or Edge, replace the files in the existing unpacked folder and click **Reload** on the extensions page. Signed Firefox builds can update through Firefox.
+The popup shows the new version with options to open its GitHub release or **Skip this version**. Skipping hides that notice until a different version is available. You can still open the release from **Settings → Software updates**, which shows the installed version, latest release, and last check time. Use **Check now** to refresh.
+
+On Chrome or Edge, replace the files in the existing unpacked folder and click **Reload** on the extensions page. Signed Firefox builds can update through Firefox.
 
 ## Project links
 
 - [Development, contribution and release guide](CONTRIBUTING.md)
 - [Installation and update notes included with each release](.github/release-notes.md)
-- [BeUI credits and license](public/beui-LICENSE.txt)
+- [BeUI and Allo credits](entrypoints/popup/beui/UPSTREAM.md)
 
 Session credentials stay in memory and are sent only to ChatGPT. The extension does not store checkout links, send telemetry, or submit payments.

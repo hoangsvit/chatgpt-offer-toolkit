@@ -36,6 +36,24 @@ test('assigned coupon explicitly eligible, no price or token returned',async()=>
 test('unassigned campaign is unknown and does not query coupon',async()=>{
  const {result,calls}=await run([session,{body:profile(false)}]);assert.equal(result.state,'unknown');assert.equal(result.campaign,'not_listed');assert.equal(calls.length,2);
 });
+test('Plus eligibility is independent of the Business result',async()=>{
+ const p=profile(false);
+ p.accounts.default.eligible_promo_campaigns.plus={id:'plus-synthetic-offer'};
+ const {result,calls}=await run([session,{body:p},{body:{...coupon(),coupon:'plus-synthetic-offer'}}]);
+ assert.equal(result.campaign,'not_listed');
+ assert.equal(result.plus.state,'eligible');
+ assert.equal(calls.length,3);
+ assert.equal(new URL(calls[2]).searchParams.get('coupon'),'plus-synthetic-offer');
+ assert.ok(!JSON.stringify(result).includes('plus-synthetic-offer'));
+});
+test('a failed Plus coupon check leaves a valid Business result available',async()=>{
+ const p=profile();
+ p.accounts.default.eligible_promo_campaigns.plus={id:'plus-synthetic-offer'};
+ const {result,calls}=await run([session,{body:p},{body:coupon()},{status:403}]);
+ assert.equal(result.state,'eligible');
+ assert.equal(result.plus.state,'unknown');
+ assert.equal(calls.length,4);
+});
 test('explicit negative or redemption wins',async()=>{
  for(const [body,state] of [[coupon('not_eligible'),'not_eligible'],[coupon('eligible',{redeemed_by_user:true}),'redeemed']]){
   assert.equal((await run([session,{body:profile()},{body}])).result.state,state);

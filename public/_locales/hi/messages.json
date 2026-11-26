@@ -1,4 +1,43 @@
 {
+  "check_now": {
+    "message": "अभी जाँचें"
+  },
+  "view_release": {
+    "message": "रिलीज़ देखें"
+  },
+  "last_checked": {
+    "message": "पिछली जाँच"
+  },
+  "skip_this_version": {
+    "message": "यह संस्करण छोड़ें"
+  },
+  "unable_to_save_the_skipped_version": {
+    "message": "छोड़ा गया संस्करण सहेजा नहीं जा सका।"
+  },
+  "personal": {
+    "message": "व्यक्तिगत"
+  },
+  "coupon_eligibility_required": {
+    "message": "कूपन की पात्रता ज़रूरी है।"
+  },
+  "choose_a_plan": {
+    "message": "प्लान चुनें"
+  },
+  "for_individuals": {
+    "message": "व्यक्तिगत उपयोग के लिए"
+  },
+  "view_plus_on_chatgpt": {
+    "message": "ChatGPT पर Plus देखें"
+  },
+  "open_the_official_chatgpt_pricing_page": {
+    "message": "ChatGPT का आधिकारिक मूल्य पेज खोलें।"
+  },
+  "plus_offer_eligible_confirm_pricing_on_chatgpt": {
+    "message": "Plus ऑफ़र के लिए पात्र हैं। कीमत ChatGPT पर जाँचें।"
+  },
+  "campaign_information_is_unavailable": {
+    "message": "प्रचार की जानकारी उपलब्ध नहीं है।"
+  },
   "create_a_checkout_link_with_your_current_settings": {
     "message": "अपनी मौजूदा सेटिंग से चेकआउट लिंक बनाएँ।"
   },

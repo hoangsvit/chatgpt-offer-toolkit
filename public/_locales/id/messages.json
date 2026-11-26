@@ -1,4 +1,43 @@
 {
+  "check_now": {
+    "message": "Periksa sekarang"
+  },
+  "view_release": {
+    "message": "Lihat rilis"
+  },
+  "last_checked": {
+    "message": "Pemeriksaan terakhir"
+  },
+  "skip_this_version": {
+    "message": "Lewati versi ini"
+  },
+  "unable_to_save_the_skipped_version": {
+    "message": "Versi yang dilewati tidak dapat disimpan."
+  },
+  "personal": {
+    "message": "Pribadi"
+  },
+  "coupon_eligibility_required": {
+    "message": "Kelayakan kupon diperlukan."
+  },
+  "choose_a_plan": {
+    "message": "Pilih paket"
+  },
+  "for_individuals": {
+    "message": "Untuk pengguna pribadi"
+  },
+  "view_plus_on_chatgpt": {
+    "message": "Lihat Plus di ChatGPT"
+  },
+  "open_the_official_chatgpt_pricing_page": {
+    "message": "Buka halaman harga resmi ChatGPT."
+  },
+  "plus_offer_eligible_confirm_pricing_on_chatgpt": {
+    "message": "Memenuhi syarat penawaran Plus. Konfirmasi harga di ChatGPT."
+  },
+  "campaign_information_is_unavailable": {
+    "message": "Informasi promosi tidak tersedia."
+  },
   "create_a_checkout_link_with_your_current_settings": {
     "message": "Buat tautan pembayaran dengan pengaturan saat ini."
   },
