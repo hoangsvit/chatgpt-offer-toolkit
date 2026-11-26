@@ -335,7 +335,9 @@ element<HTMLFormElement>('settings').addEventListener('submit', async event => {
     }
     field('link').value = currentUrl;
     element('result').hidden = false;
-    if (result.total) {
+    if (result.notice) {
+      status(result.notice);
+    } else if (result.total) {
       const {currency, minorUnits} = result.total;
       const zeroDecimal = new Set([
         'BIF','CLP','DJF','GNF','JPY','KMF','KRW','MGA','PYG','RWF',
