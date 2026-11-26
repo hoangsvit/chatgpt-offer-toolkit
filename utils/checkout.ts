@@ -14,7 +14,7 @@ interface PlusCheckoutConfig extends BillingConfig {
 export type CheckoutConfig = BusinessCheckoutConfig | PlusCheckoutConfig;
 export type CheckoutInput = (Omit<BusinessCheckoutConfig, "seats"> & { seats: number | string }) | PlusCheckoutConfig;
 export type CheckoutTotal = {currency: string; minorUnits: number};
-export type CheckoutResult = { url: string; error?: never; code?: never; total?: CheckoutTotal } | { error: string; url?: never; code?: "billing_country_mismatch" | "unusual_activity"; total?: never };
+export type CheckoutResult = { url: string; notice?: string; error?: never; code?: never; total?: CheckoutTotal } | { error: string; url?: never; code?: "billing_country_mismatch" | "unusual_activity"; total?: never };
 
 export function validateConfig(input: CheckoutInput): CheckoutConfig {
   const country = input.country.trim().toUpperCase();
@@ -72,25 +72,29 @@ export async function requestCheckout(config: CheckoutConfig): Promise<CheckoutR
       }
       plusCampaign = campaign;
     }
-    const payload = config.plan === 'plus'
-      ? {
-        ...billing,
-        plan_name:"chatgptplusplan",
-        entry_point:"all_plans_pricing_modal",
-        checkout_source:"chatgpt_web_merged",
-        supports_saved_payment_link:true,
-        checkout_ui_mode:"custom",
-        checkout_appearance:config.appearance,
-        purchase_attempt_id:crypto.randomUUID(),
-        promo_campaign:{promo_campaign_id:plusCampaign,is_coupon_from_query_param:false},
-      } : {
-        ...billing,
-        entry_point:"team_workspace_purchase_modal",
-        plan_name:"chatgptteamplan",
-        team_plan_data:{workspace_name:config.workspace,price_interval:"month",seat_quantity:config.seats},
-        checkout_ui_mode:"hosted",
-        promo_campaign:{promo_campaign_id:"team-1-month-free",is_coupon_from_query_param:false}
-      };
+    if (config.plan === 'plus') {
+      // Never create the Plus checkout from this injected context. A bare
+      // fetch lacks the web app's own request protections (its Sentinel
+      // proof and device headers), so ChatGPT's risk system declines it
+      // with "unusual activity" (HTTP 400) even for eligible accounts.
+      // Hand the verified campaign to the official pricing flow instead:
+      // ChatGPT's own page creates the checkout when the user continues
+      // there. This URL is the same one the pricing page itself uses.
+      const url = new URL("https://chatgpt.com/");
+      url.searchParams.set("cta_tab","personal");
+      url.searchParams.set("highlight_plan","plus");
+      url.searchParams.set("promo_campaign",plusCampaign as string);
+      url.hash = "pricing";
+      return {url:url.href,notice:"Plus offer verified. Open the official ChatGPT pricing page and continue there — ChatGPT creates the Plus checkout itself. Review the amount due today and renewal terms before paying."};
+    }
+    const payload = {
+      ...billing,
+      entry_point:"team_workspace_purchase_modal",
+      plan_name:"chatgptteamplan",
+      team_plan_data:{workspace_name:config.workspace,price_interval:"month",seat_quantity:config.seats},
+      checkout_ui_mode:"hosted",
+      promo_campaign:{promo_campaign_id:"team-1-month-free",is_coupon_from_query_param:false}
+    };
     const resp = await fetch("/backend-api/payments/checkout", {
       method:"POST", credentials:"same-origin", redirect:"error", cache:"no-store",
       headers:{...headers,"Content-Type":"application/json"},
@@ -110,20 +114,6 @@ export async function requestCheckout(config: CheckoutConfig): Promise<CheckoutR
       return {error:"Checkout request declined (HTTP "+resp.status+"). Review your billing details on the official offer page."};
     }
     const data = await resp.json();
-    if (config.plan === 'plus') {
-      const sessionId = data?.checkout_session_id;
-      const processor = data?.processor_entity;
-      if (data?.checkout_ui_mode !== "custom" || data?.plan_name !== "chatgptplusplan" ||
-        data?.promo_campaign?.promo_campaign_id !== plusCampaign ||
-        typeof processor !== "string" || !/^openai_[a-z][a-z_]{0,31}$/.test(processor) ||
-        typeof sessionId !== "string" || !/^oaics_[0-9a-f]{32}$/i.test(sessionId) || !plusCampaign) {
-        return {error:"Plus checkout did not return a usable session. Open ChatGPT to review the offer."};
-      }
-      const url = new URL("https://chatgpt.com/checkout/"+processor+"/"+sessionId);
-      url.searchParams.set("source","chatgpt_web_merged");
-      url.searchParams.set("promo_campaign",plusCampaign);
-      return {url:url.href};
-    }
     const url = [data?.url, data?.stripe_hosted_url, data?.checkout_url].find(
       (value): value is string => typeof value === "string" && value.trim().length > 0
     );
