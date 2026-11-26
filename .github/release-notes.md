@@ -10,4 +10,10 @@ Download a browser package under **Assets**.
 
 To update Chrome or Edge, replace the files in the same unpacked folder, then click **Reload** on the extension's card. Signed Firefox installations receive updates through the extension's update feed when Firefox allows add-on updates.
 
-`SHA256SUMS.txt` contains the checksums for both ZIP files. To get started, sign in at ChatGPT, open the extension on that tab, and review **Account eligibility** and **Settings**. Confirm the total and renewal terms on the official checkout page before paying.
+`SHA256SUMS.txt` contains the checksums for both ZIP files.
+
+## Use the extension
+
+Sign in at ChatGPT and open the popup to check **Personal (Plus)** and **Business** together. Choose **Personal** to continue to the official Plus offer on ChatGPT, or choose **Business** to generate a checkout link when eligible. Confirm the amount due today and the renewal terms before paying.
+
+The popup can show a new release or let you skip that version. Details and manual checks are available in **Settings → Software updates**.
