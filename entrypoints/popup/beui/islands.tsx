@@ -122,7 +122,6 @@ export function mountBeui(submit:()=>void) {
     createRoot(eligibility).render(<EligibilityBadge id="eligibility-state"/>);
     createRoot(refresh).render(<RefreshEligibility id="eligibility-check"/>);
     createRoot(document.getElementById('beui-plus-eligibility')!).render(<EligibilityBadge id="plus-eligibility-state"/>);
-    createRoot(document.getElementById('beui-plus-refresh')!).render(<RefreshEligibility id="plus-eligibility-check"/>);
   });
 }
 
