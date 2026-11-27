@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { readFileSync, existsSync, readdirSync } from 'node:fs';
 const browser = process.argv[2];
-assert.ok(['chrome', 'firefox'].includes(browser));
+assert.ok(['chrome', 'edge', 'opera', 'firefox'].includes(browser));
 const directory = '.output/' + browser + '-mv3/';
 const manifest = JSON.parse(readFileSync(directory + 'manifest.json', 'utf8'));
 assert.equal(manifest.manifest_version, 3);
