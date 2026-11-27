@@ -27,7 +27,7 @@ jobs:
         run: |
           node --input-type=module <<'NODE'
           import { execFileSync } from 'node:child_process';
-          const {GITHUB_REPOSITORY:repo,GITHUB_RUN_ID:run,GITHUB_RUN_ATTEMPT:attempt,PR_NUMBER:pr,PR_HEAD:head,PREVIEW_PHASE:phase,TEST_RESULT:test,BUILD_RESULT:build,JOB_RESULT:job,CHROME_ARTIFACT:chrome,FIREFOX_ARTIFACT:firefox,SCREENSHOT_ARTIFACT:screenshot}=process.env;
+          const {GITHUB_REPOSITORY:repo,GITHUB_RUN_ID:run,GITHUB_RUN_ATTEMPT:attempt,PR_NUMBER:pr,PR_HEAD:head,PREVIEW_PHASE:phase,TEST_RESULT:test,BUILD_RESULT:build,JOB_RESULT:job,CHROME_ARTIFACT:chrome,EDGE_ARTIFACT:edge,OPERA_ARTIFACT:opera,FIREFOX_ARTIFACT:firefox,SCREENSHOT_ARTIFACT:screenshot}=process.env;
           if (!/^\d+$/.test(pr)||!/^\d+$/.test(run)||!/^\d+$/.test(attempt)||!/^\w+\/[\w.-]+$/.test(repo)||! /^[a-f0-9]{40}$/.test(head)) throw Error('Invalid PR metadata');
           const api=(...args)=>JSON.parse(execFileSync('gh',['api',...args],{encoding:'utf8'}));
           const endpoint='repos/'+repo;
@@ -43,10 +43,10 @@ jobs:
           if(phase==='start'){
            lines.push('','⏳ **Building and testing…**','','Downloads will appear here only after all checks pass.');
           }else if(job==='success'&&test==='success'&&build==='success'){
-           const selected=[chrome,firefox];
+           const selected=[chrome,edge,opera,firefox];
            if(selected.every(id=>typeof id==='string'&&/^\d+$/.test(id))){
             lines.push('','✅ **Build and tests passed**','','| Package | Download |','| --- | --- |');
-            for(const [i,label] of ['Chrome / Edge','Firefox (unsigned)'].entries())lines.push('| '+label+' | [Download ZIP]('+runUrl+'/artifacts/'+selected[i]+') |');
+            for(const [i,label] of ['Chrome / Brave / Vivaldi','Microsoft Edge','Opera / Opera GX','Firefox (unsigned)'].entries())lines.push('| '+label+' | [Download ZIP]('+runUrl+'/artifacts/'+selected[i]+') |');
             if(typeof screenshot==='string'&&/^\d+$/.test(screenshot))lines.push('| Popup screenshots | [Download ZIP]('+runUrl+'/artifacts/'+screenshot+') |');
             lines.push('','GitHub login may be required. Extract the downloaded ZIP once, then load the directory containing manifest.json. Artifacts expire according to repository retention settings.');
            }else lines.push('','⚠️ **Build finished, but required artifacts are missing.**','','Downloads withheld.');
@@ -73,14 +73,14 @@ jobs:
       - name: Typecheck and unit tests
         id: tests
         run: npm run typecheck && npm test
-      - name: Build and validate both browsers
+      - name: Build and validate all browser targets
         id: build
         run: |
           set -euo pipefail
-          npx --no-install wxt build -b chrome --mv3
-          node scripts/check-manifest.mjs chrome
-          npx --no-install wxt build -b firefox --mv3
-          node scripts/check-manifest.mjs firefox
+          for browser in chrome edge opera firefox; do
+            npx --no-install wxt build -b "$browser" --mv3
+            node scripts/check-manifest.mjs "$browser"
+          done
       - name: Install Chromium (optional)
         if: vars.RUN_POPUP_PLAYWRIGHT == 'true'
         run: npx playwright install --with-deps chromium
@@ -97,12 +97,32 @@ jobs:
           if-no-files-found: ignore
           retention-days: 7
           overwrite: true
-      - name: Upload Chrome and Edge package
+      - name: Upload Chrome package
         id: chrome
         uses: actions/upload-artifact@v7.0.2
         with:
-          name: extension-chrome
+          name: chatgpt-offer-toolkit-chrome
           path: .output/chrome-mv3/
+          include-hidden-files: true
+          if-no-files-found: error
+          retention-days: 7
+          overwrite: true
+      - name: Upload Microsoft Edge package
+        id: edge
+        uses: actions/upload-artifact@v7.0.2
+        with:
+          name: chatgpt-offer-toolkit-edge
+          path: .output/edge-mv3/
+          include-hidden-files: true
+          if-no-files-found: error
+          retention-days: 7
+          overwrite: true
+      - name: Upload Opera package
+        id: opera
+        uses: actions/upload-artifact@v7.0.2
+        with:
+          name: chatgpt-offer-toolkit-opera
+          path: .output/opera-mv3/
           include-hidden-files: true
           if-no-files-found: error
           retention-days: 7
@@ -111,7 +131,7 @@ jobs:
         id: firefox
         uses: actions/upload-artifact@v7.0.2
         with:
-          name: extension-firefox
+          name: chatgpt-offer-toolkit-firefox
           path: .output/firefox-mv3/
           include-hidden-files: true
           if-no-files-found: error
@@ -128,12 +148,14 @@ jobs:
           BUILD_RESULT: ${{ steps.build.outcome }}
           JOB_RESULT: ${{ job.status }}
           CHROME_ARTIFACT: ${{ steps.chrome.outputs.artifact-id }}
+          EDGE_ARTIFACT: ${{ steps.edge.outputs.artifact-id }}
+          OPERA_ARTIFACT: ${{ steps.opera.outputs.artifact-id }}
           FIREFOX_ARTIFACT: ${{ steps.firefox.outputs.artifact-id }}
           SCREENSHOT_ARTIFACT: ${{ steps.screenshots.outputs.artifact-id }}
         run: |
           node --input-type=module <<'NODE'
           import { execFileSync } from 'node:child_process';
-          const {GITHUB_REPOSITORY:repo,GITHUB_RUN_ID:run,GITHUB_RUN_ATTEMPT:attempt,PR_NUMBER:pr,PR_HEAD:head,PREVIEW_PHASE:phase,TEST_RESULT:test,BUILD_RESULT:build,JOB_RESULT:job,CHROME_ARTIFACT:chrome,FIREFOX_ARTIFACT:firefox,SCREENSHOT_ARTIFACT:screenshot}=process.env;
+          const {GITHUB_REPOSITORY:repo,GITHUB_RUN_ID:run,GITHUB_RUN_ATTEMPT:attempt,PR_NUMBER:pr,PR_HEAD:head,PREVIEW_PHASE:phase,TEST_RESULT:test,BUILD_RESULT:build,JOB_RESULT:job,CHROME_ARTIFACT:chrome,EDGE_ARTIFACT:edge,OPERA_ARTIFACT:opera,FIREFOX_ARTIFACT:firefox,SCREENSHOT_ARTIFACT:screenshot}=process.env;
           if (!/^\d+$/.test(pr)||!/^\d+$/.test(run)||!/^\d+$/.test(attempt)||!/^\w+\/[\w.-]+$/.test(repo)||! /^[a-f0-9]{40}$/.test(head)) throw Error('Invalid PR metadata');
           const api=(...args)=>JSON.parse(execFileSync('gh',['api',...args],{encoding:'utf8'}));
           const endpoint='repos/'+repo;
@@ -149,10 +171,10 @@ jobs:
           if(phase==='start'){
            lines.push('','⏳ **Building and testing…**','','Downloads will appear here only after all checks pass.');
           }else if(job==='success'&&test==='success'&&build==='success'){
-           const selected=[chrome,firefox];
+           const selected=[chrome,edge,opera,firefox];
            if(selected.every(id=>typeof id==='string'&&/^\d+$/.test(id))){
             lines.push('','✅ **Build and tests passed**','','| Package | Download |','| --- | --- |');
-            for(const [i,label] of ['Chrome / Edge','Firefox (unsigned)'].entries())lines.push('| '+label+' | [Download ZIP]('+runUrl+'/artifacts/'+selected[i]+') |');
+            for(const [i,label] of ['Chrome / Brave / Vivaldi','Microsoft Edge','Opera / Opera GX','Firefox (unsigned)'].entries())lines.push('| '+label+' | [Download ZIP]('+runUrl+'/artifacts/'+selected[i]+') |');
             if(typeof screenshot==='string'&&/^\d+$/.test(screenshot))lines.push('| Popup screenshots | [Download ZIP]('+runUrl+'/artifacts/'+screenshot+') |');
             lines.push('','GitHub login may be required. Extract the downloaded ZIP once, then load the directory containing manifest.json. Artifacts expire according to repository retention settings.');
            }else lines.push('','⚠️ **Build finished, but required artifacts are missing.**','','Downloads withheld.');
