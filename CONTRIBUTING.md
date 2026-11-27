@@ -14,7 +14,7 @@ npm run dev:edge
 npm run dev:opera
 ```
 
-Open a branch for your change and target `main` with your pull request. Describe the user-visible change, how you verified it, and any cross-browser differences. Include light and dark screenshots for substantial popup changes when practical.
+Create a feature, fix, docs, or chore branch from the latest `dev` and target `dev` with your pull request. Only release pull requests from `dev` may target `main`. See [AGENTS.md](AGENTS.md) for the required workflow. Describe the user-visible change, how you verified it, and any cross-browser differences. Include light and dark screenshots for substantial popup changes when practical.
 
 ## Validate changes
 
@@ -34,8 +34,8 @@ GitHub Actions runs validation for pull requests and pushes to `main`. Browser Z
 
 ## Publish a GitHub release
 
-1. Set `package.json` to a stable version greater than the latest stable GitHub release. Include the version bump in the PR intended for release.
-2. Merge to `main`. The release workflow validates and packages Chrome, Edge, Opera and Firefox, creates `v<version>` at the validated commit when the tag is absent, and publishes that tag's GitHub Release.
+1. Set `package.json` to a stable version greater than the latest stable GitHub release. Include the version bump on the development path before opening the release PR.
+2. Open a release PR from `dev` to `main` and merge only after validation and approval. The release workflow validates and packages Chrome, Edge, Opera and Firefox, creates `v<version>` at the validated commit when the tag is absent, and publishes that tag's GitHub Release.
 3. Check the generated release notes, asset list, and tag. The notes begin with [installation and update instructions](.github/release-notes.md) and include GitHub-generated changes.
 
 The workflow also supports a manual run on `main` or an existing `v<version>` tag that matches `package.json`. If a tag already exists, it must refer to the commit being released. Versions at or below the latest stable release are skipped.
