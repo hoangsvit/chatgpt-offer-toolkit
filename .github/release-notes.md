@@ -2,15 +2,20 @@
 
 Download a browser package under **Assets**.
 
-| Browser | Package | How to install |
+| Browser | Package | Steps |
 | --- | --- | --- |
-| Chrome or Edge | `chrome.zip` | Extract to a permanent folder. Open `chrome://extensions` or `edge://extensions`, enable **Developer mode**, then choose **Load unpacked** and select the folder containing `manifest.json`. |
-| Firefox | `firefox.xpi`, when available | Open `about:addons`, select the gear menu, choose **Install Add-on From File** and select the signed XPI. |
-| Firefox temporary testing | `firefox-unsigned.zip` | Extract the archive. Open `about:debugging#/runtime/this-firefox`, choose **Load Temporary Add-on** and select `manifest.json`. Restarting Firefox removes the temporary installation. |
+| Google Chrome | `chatgpt-offer-toolkit-{version}-chrome.zip` | Extract to a permanent folder. Open `chrome://extensions`, enable **Developer mode**, then **Load unpacked** and select the folder containing `manifest.json`. |
+| Microsoft Edge | `chatgpt-offer-toolkit-{version}-edge.zip` | Follow the same steps at `edge://extensions`. |
+| Opera / Opera GX | `chatgpt-offer-toolkit-{version}-opera.zip` | Follow the same steps at `opera://extensions`. |
+| Brave / Vivaldi | Chrome ZIP | Follow the same steps at `brave://extensions` or `vivaldi://extensions`. |
+| Firefox | `chatgpt-offer-toolkit-{version}-firefox.xpi`, when signed and available | Open `about:addons`, choose **Install Add-on From File**, and select the XPI. |
+| Firefox temporary testing | `chatgpt-offer-toolkit-{version}-firefox.zip` (unsigned) | Extract the ZIP. In `about:debugging#/runtime/this-firefox`, select **Load Temporary Add-on** and choose `manifest.json`. Restarting Firefox removes the temporary install. |
 
-To update Chrome or Edge, replace the files in the same unpacked folder, then click **Reload** on the extension's card. Signed Firefox installations receive updates through the extension's update feed when Firefox allows add-on updates.
+Replace `{version}` with the actual release version. Older releases may use `chrome.zip`, `firefox-unsigned.zip`, and `firefox.xpi`.
 
-`SHA256SUMS.txt` contains the checksums for both ZIP files.
+To update a Chromium-based browser, replace the files in the same unpacked folder, then click **Reload** on the extension's card. Signed Firefox installations receive updates through the extension's update feed when Firefox allows add-on updates.
+
+`SHA256SUMS.txt` contains the checksums for all four browser ZIP files.
 
 ## Use the extension
 
